@@ -1,0 +1,3205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SECURO VIP - الإدارة والمستخدم</title>
+    <!-- مكتبة الأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-light-card: #334155;
+            --text-white: #ffffff;
+            --text-muted: #94a3b8;
+            --primary-blue: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --vip-gold: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --vip-disabled: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --telegram-blue: #229ED9;
+            --border-color: #334155;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+            --bottom-nav-height: 68px;
+            --bottom-nav-gap: 24px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background:
+                radial-gradient(circle at 12% 8%, rgba(37, 99, 235, 0.18), transparent 28rem),
+                radial-gradient(circle at 88% 92%, rgba(14, 165, 233, 0.12), transparent 26rem),
+                #020617;
+            display: flex; justify-content: center; min-height: 100vh; min-height: 100dvh;
+        }
+
+        .app-container {
+            width: 100%; max-width: 1180px; min-height: 100vh; min-height: 100dvh;
+            height: auto;
+            background-color: var(--bg-body);
+            display: flex; flex-direction: column; position: relative;
+            overflow-x: clip; overflow-y: visible; color: var(--text-white);
+            box-shadow: 0 0 80px rgba(15, 23, 42, 0.55);
+        }
+
+        /* رأس الصفحة */
+        header {
+            background: var(--bg-card);
+            padding: 12px 16px; text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+        header h1 {
+            background: linear-gradient(90deg, #60a5fa, #2563eb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 1.5rem; font-weight: 900; letter-spacing: 2px;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .content {
+            flex: 0 0 auto; min-height: 0; overflow-y: visible; overflow-x: clip;
+            -webkit-overflow-scrolling: touch; touch-action: pan-y;
+            padding: 24px;
+            padding-bottom: calc(var(--bottom-nav-height) + var(--bottom-nav-gap) + env(safe-area-inset-bottom));
+            overscroll-behavior-y: auto;
+        }
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        .auth-layout {
+            min-height: calc(100vh - 80px); display: grid; grid-template-columns: 1.15fr .85fr;
+            align-items: center; gap: 34px; max-width: 1080px; margin: 0 auto; padding: 24px 0;
+        }
+        .auth-brand { padding: 34px 18px; }
+        .brand-mark {
+            width: 66px; height: 66px; border-radius: 20px; display: grid; place-items: center;
+            background: linear-gradient(135deg, #60a5fa, #2563eb); color: white;
+            font-size: 1.8rem; box-shadow: 0 18px 40px rgba(37, 99, 235, .3); margin-bottom: 20px;
+        }
+        .auth-brand h2 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.1; margin-bottom: 16px; }
+        .auth-brand h2 span { color: #60a5fa; }
+        .auth-brand p { color: #a7b4c9; max-width: 510px; line-height: 1.9; font-size: 1rem; }
+        .trust-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+        .trust-pill {
+            display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px;
+            border: 1px solid rgba(96, 165, 250, .22); border-radius: 999px;
+            color: #cbd5e1; background: rgba(30, 41, 59, .52); font-size: .78rem;
+        }
+        .auth-card {
+            width: 100%; max-width: 430px; justify-self: end; padding: 26px;
+            background: linear-gradient(145deg, rgba(30, 41, 59, .98), rgba(15, 23, 42, .98));
+            border-color: rgba(96, 165, 250, .24); box-shadow: 0 24px 70px rgba(0,0,0,.34);
+        }
+        .auth-card .form-group { margin-top: 22px; }
+        .field-label { display: block; color: #cbd5e1; font-size: .78rem; font-weight: 700; margin: 0 0 -5px; }
+        .auth-note {
+            display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: .76rem;
+            line-height: 1.6; margin-top: 15px; padding-top: 14px; border-top: 1px solid rgba(148,163,184,.14);
+        }
+        .admin-shell { max-width: 1280px; }
+        .admin-screen { max-width: 1120px; margin: 0 auto; }
+        .admin-hero {
+            display: flex; justify-content: space-between; align-items: center; gap: 20px;
+            background: linear-gradient(135deg, #172554 0%, #1e3a8a 52%, #0f766e 140%);
+            border: 1px solid rgba(125, 211, 252, .28); border-radius: 24px; padding: 28px;
+            margin-bottom: 18px; box-shadow: 0 22px 55px rgba(30, 64, 175, .22);
+        }
+        .admin-hero-copy { display: flex; align-items: center; gap: 16px; }
+        .admin-hero-icon {
+            width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center;
+            background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); font-size: 1.8rem;
+        }
+        .admin-hero h2 { color: #eff6ff; font-size: 1.45rem; margin-bottom: 5px; }
+        .admin-hero p { color: #bfdbfe; font-size: .82rem; }
+        .admin-refresh {
+            width: auto; padding: 11px 15px; background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.22); color: white; font-size: .8rem;
+        }
+        .admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; background: transparent; border: 0; padding: 0; }
+        .admin-stats .stat-box {
+            text-align: right; padding: 18px 20px; border-radius: 18px; background: #162236;
+            border: 1px solid rgba(148,163,184,.16); position: relative; overflow: hidden;
+        }
+        .admin-stats .stat-box::after {
+            content: ""; position: absolute; width: 85px; height: 85px; border-radius: 50%;
+            background: rgba(59,130,246,.1); left: -25px; bottom: -40px;
+        }
+        .admin-stats .stat-num { font-size: 1.55rem; color: #e0f2fe; }
+        .admin-stats .stat-lbl { font-size: .76rem; color: #94a3b8; margin-top: 5px; }
+        .admin-panel { background: rgba(30, 41, 59, .86); border-color: rgba(148,163,184,.16); padding: 20px; }
+        .admin-panel h3 { font-size: 1rem; padding-bottom: 12px; border-bottom: 1px solid rgba(148,163,184,.12); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ترويسة الشاشات الفرعية */
+        .subpage-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);
+        }
+        .back-btn-arrow {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-white);
+            width: 38px; height: 38px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;
+            transition: 0.2s;
+        }
+        .back-btn-arrow:active { background: var(--bg-light-card); }
+
+        /* نموذج الإدخال */
+        .form-group { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        input, select, textarea {
+            width: 100%; padding: 14px; border: 1.5px solid var(--border-color);
+            border-radius: 12px; font-size: 0.95rem; background-color: var(--bg-card);
+            color: var(--text-white); transition: border 0.2s; outline: none; resize: none;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); }
+        input::placeholder, textarea::placeholder { color: #64748b; }
+
+        input[readonly] {
+            background-color: #0f172a !important;
+            color: #38bdf8 !important;
+            font-weight: bold;
+            cursor: not-allowed;
+            border-color: #1e3a8a !important;
+        }
+
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+        }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .btn:disabled { opacity: .65; transform: none; }
+        .btn-primary { background: var(--primary-gradient); color: white; box-shadow: var(--shadow-lg); }
+        .btn-green { background-color: var(--accent-green); color: white; }
+        .btn-red { background-color: var(--accent-red); color: white; }
+        .btn-gold { background: var(--vip-gold); color: white; }
+        .btn-disabled { background: var(--vip-disabled); color: #94a3b8; cursor: not-allowed; }
+        .btn-telegram { background-color: var(--telegram-blue); color: white; box-shadow: 0 4px 12px rgba(34, 158, 217, 0.3); }
+
+        /* سلايدر الصور */
+        .slider-container {
+            width: 100%; height: 180px; border-radius: 18px; overflow: hidden;
+            position: relative; margin-bottom: 15px; box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+        .slider-slide {
+            width: 100%; height: 100%; position: absolute; opacity: 0;
+            transition: opacity 0.8s ease-in-out; background-size: cover; background-position: center;
+            display: flex; align-items: flex-end;
+        }
+        .slider-slide.active { opacity: 1; }
+        .slide-caption {
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95), transparent);
+            color: white; width: 100%; padding: 12px; font-size: 0.85rem; text-align: center; font-weight: bold;
+        }
+
+        /* شبكة الإختصارات السريعة */
+        .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .action-item {
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px;
+            padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+            cursor: pointer; transition: transform 0.2s; text-align: center;
+        }
+        .action-item:active { transform: scale(0.95); }
+        .action-icon {
+            width: 42px; height: 42px; border-radius: 12px; background: rgba(59, 130, 246, 0.15);
+            display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #60a5fa;
+        }
+        .action-title { font-size: 0.75rem; font-weight: bold; color: var(--text-muted); }
+
+        /* بطاقة عجلة الحظ */
+        .wheel-card {
+            background: linear-gradient(135deg, #1e1b4b 0%, #311b92 100%);
+            border: 1.5px solid #6366f1; border-radius: 20px; padding: 18px;
+            text-align: center; margin-bottom: 18px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
+            position: relative; overflow: hidden;
+        }
+        .wheel-container-wrapper { position: relative; width: 230px; height: 230px; margin: 15px auto; }
+        .wheel-pointer {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 14px solid transparent; border-right: 14px solid transparent;
+            border-top: 24px solid #ef4444; z-index: 10;
+            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.5));
+        }
+        .wheel-canvas {
+            width: 100%; height: 100%; border-radius: 50%;
+            border: 5px solid #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+            transition: transform 4s cubic-bezier(0.15, 0.99, 0.24, 0.99);
+        }
+        .spin-center-btn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 54px; height: 54px; background: var(--vip-gold); border: 3px solid #ffffff;
+            border-radius: 50%; color: white; font-weight: 900; font-size: 0.85rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 5;
+        }
+
+        /* شريط الإحصائيات */
+        .stats-bar {
+            background: linear-gradient(90deg, #1e1b4b, #1e293b); border-radius: 14px;
+            padding: 12px 16px; margin-bottom: 15px; border: 1px solid #312e81;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .stat-box { text-align: center; }
+        .stat-num { font-size: 1.1rem; font-weight: 800; color: #60a5fa; }
+        .stat-lbl { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* بطاقات العرض */
+        .card {
+            background: var(--bg-card); border-radius: 16px; padding: 16px;
+            margin-bottom: 15px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);
+        }
+        .card h3 { color: var(--text-white); margin-bottom: 8px; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+
+        /* صفحة فريقي */
+        .referral-earnings-card {
+            background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            border: 1px solid #34d399; border-radius: 16px; padding: 18px;
+            text-align: center; margin-bottom: 15px; box-shadow: var(--shadow-lg);
+        }
+        .referral-box {
+            background: linear-gradient(135deg, #1e1b4b, #0f172a);
+            border: 1px solid #3b82f6; border-radius: 16px; padding: 16px; margin-bottom: 15px;
+        }
+        .copy-input-container { display: flex; gap: 8px; margin-top: 8px; }
+        .copy-btn {
+            background: var(--primary-gradient); color: white; border: none;
+            padding: 0 16px; border-radius: 10px; font-weight: bold; cursor: pointer;
+            font-size: 0.85rem; white-space: nowrap;
+        }
+        .levels-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .level-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 14px; padding: 12px 8px; text-align: center;
+        }
+        .level-badge { font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 6px; }
+        .lvl-1 { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .lvl-2 { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+        .lvl-3 { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+
+        /* صفحة ملكي */
+        .balance-card {
+            background: var(--primary-gradient); color: white; border-radius: 18px;
+            padding: 20px; text-align: center; margin-bottom: 15px; box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+        .balance-amount { font-size: 2.2rem; font-weight: 800; margin: 10px 0; }
+
+        .daily-reward-card {
+            background: #2e1065; border: 1.5px dashed #a855f7; border-radius: 14px;
+            padding: 14px; text-align: center; margin-bottom: 15px;
+        }
+
+        .support-banner-profile {
+            background: linear-gradient(135deg, #0e7490 0%, #0369a1 100%);
+            border: 1px solid #38bdf8; border-radius: 16px; padding: 16px;
+            margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--shadow-sm); cursor: pointer; transition: transform 0.2s;
+        }
+        .support-banner-profile:active { transform: scale(0.98); }
+        .support-avatar-box {
+            width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; border: 1px solid rgba(255, 255, 255, 0.3); flex-shrink: 0;
+        }
+
+        .menu-list { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
+        .menu-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; color: var(--text-white);
+        }
+        .menu-item select {
+            background: var(--bg-body); color: var(--text-white);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 4px 10px; font-size: 0.85rem; outline: none; cursor: pointer; width: auto;
+        }
+
+        /* شاشة المهام */
+        .task-progress-box {
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            border: 1px solid #4338ca; border-radius: 16px; padding: 16px;
+            margin-bottom: 15px; text-align: center; box-shadow: var(--shadow-sm);
+        }
+        .hotel-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 16px; overflow: hidden; margin-bottom: 15px; box-shadow: var(--shadow-sm);
+        }
+        .hotel-img {
+            width: 100%; height: 160px; background-size: cover; background-position: center;
+            position: relative; display: flex; align-items: flex-end;
+        }
+        .hotel-badge {
+            position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px); color: #fbbf24; padding: 4px 10px;
+            border-radius: 20px; font-size: 0.8rem; font-weight: bold;
+        }
+        .hotel-info { padding: 14px; }
+
+        .task-complete-card {
+            background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+            border: 2px solid #10b981; border-radius: 20px; padding: 25px 18px;
+            text-align: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .task-complete-icon-box {
+            width: 80px; height: 80px; background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #34d399; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 15px auto; color: #34d399; font-size: 2.8rem;
+            animation: scaleUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .commission-badge-box {
+            background: rgba(15, 23, 42, 0.6); border: 1px dashed #34d399;
+            border-radius: 14px; padding: 12px; margin: 15px 0; display: inline-block; width: 100%;
+        }
+
+        .history-card {
+            background: var(--bg-card); border-radius: 14px; padding: 14px;
+            margin-bottom: 10px; border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .admin-panel .history-card { background: rgba(15, 23, 42, .6); border-color: rgba(148,163,184,.13); }
+        .history-info { display: flex; flex-direction: column; gap: 4px; }
+        .history-title { font-weight: bold; font-size: 0.95rem; color: var(--text-white); }
+        .history-date { font-size: 0.78rem; color: var(--text-muted); }
+        .history-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+        .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge-orange { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+        .vip-card {
+            background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 16px;
+            padding: 16px; margin-bottom: 15px; position: relative; overflow: hidden;
+        }
+        .vip-card.trial {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #064e3b 0%, #1e293b 100%);
+        }
+        .vip-card.disabled { border-color: #475569; opacity: 0.75; }
+        .vip-badge {
+            position: absolute; top: 12px; left: 12px; background: var(--vip-gold);
+            color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;
+        }
+        .vip-badge.trial-badge { background: #10b981; }
+        .vip-badge.locked-badge { background: #64748b; }
+
+        .trial-success-box {
+            display: none; text-align: center; padding: 14px 12px;
+            background: rgba(16, 185, 129, 0.2); border: 1.5px solid #34d399;
+            border-radius: 14px; margin-top: 10px; animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        .trial-success-icon { font-size: 2.5rem; color: #34d399; margin-bottom: 6px; animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .trial-success-text { color: #34d399; font-weight: 800; font-size: 1rem; margin-bottom: 4px; }
+
+        @keyframes scaleUp { 0% { transform: scale(0); } 80% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+        .withdraw-info-box {
+            background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 12px;
+            padding: 12px; margin-top: 15px; text-align: right; font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;
+        }
+
+        .deposit-notice-box {
+            background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; border-radius: 12px;
+            padding: 10px 14px; margin-top: 12px; text-align: center; font-size: 0.85rem; color: #fbbf24; font-weight: bold;
+        }
+
+        .modal {
+            display: none; position: absolute; top:0; left:0; right:0; bottom:0;
+            background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(6px);
+            z-index: 100; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            width: min(100%, 430px); border-radius: 20px; padding: 22px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; color: var(--text-white);
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .warning-icon-box {
+            background: rgba(245, 158, 11, 0.15); width: 65px; height: 65px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px auto; border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .error-icon-box {
+            background: rgba(239, 68, 68, 0.15); width: 70px; height: 70px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px auto; border: 2px solid var(--accent-red); font-size: 2.2rem;
+        }
+        .success-icon-box {
+            background: rgba(16, 185, 129, 0.15); width: 70px; height: 70px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px auto; border: 2px solid var(--accent-green); font-size: 2.5rem;
+        }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: min(100%, 1180px); height: var(--bottom-nav-height);
+            background-color: var(--bg-card); border-top: 1px solid var(--border-color);
+            display: none; justify-content: space-around; align-items: center; z-index: 10; padding: 0 4px;
+        }
+        .nav-link {
+            display: flex; flex-direction: column; align-items: center; color: var(--text-muted);
+            cursor: pointer; font-size: 0.7rem; font-weight: 700; gap: 3px; flex: 1;
+        }
+        .nav-link.active { color: var(--primary-blue); }
+        .nav-link span { font-size: 1.25rem; }
+
+        @media (max-width: 760px) {
+            .app-container { max-width: 520px; }
+            .content {
+                padding: 15px;
+                padding-bottom: calc(var(--bottom-nav-height) + var(--bottom-nav-gap) + env(safe-area-inset-bottom));
+            }
+            .auth-layout { display: block; min-height: auto; padding: 22px 0; }
+            .auth-brand { padding: 16px 8px 24px; text-align: center; }
+            .brand-mark { margin: 0 auto 16px; }
+            .auth-brand h2 { font-size: 2rem; }
+            .auth-brand p { font-size: .88rem; margin: auto; }
+            .trust-row { justify-content: center; }
+            .auth-card { max-width: none; justify-self: auto; }
+            .admin-hero { align-items: flex-start; padding: 20px; }
+            .admin-hero-copy { align-items: flex-start; }
+            .admin-refresh { width: auto; }
+            .admin-stats { grid-template-columns: 1fr; gap: 10px; }
+            .admin-stats .stat-box { text-align: center; }
+        }
+
+
+        /* ==========================================================
+         * PLATFORM MENU, SITE HEADER & HOME OVERVIEW
+         * ========================================================== */
+        :root {
+            --surface-0: #06101f;
+            --surface-1: #0d1b2e;
+            --line-soft: rgba(148, 163, 184, .16);
+            --line-strong: rgba(96, 165, 250, .32);
+            --text-soft: #b7c7db;
+            --menu-width: min(390px, 92vw);
+        }
+        .site-header {
+            min-height: 70px;
+            padding: 10px clamp(12px, 3vw, 28px);
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 12px;
+            background: rgba(8, 20, 38, .94);
+            border-bottom: 1px solid var(--line-soft);
+            box-shadow: 0 8px 28px rgba(0,0,0,.18);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        .header-start, .header-end { display: flex; align-items: center; min-width: 0; }
+        .header-start { justify-content: flex-start; }
+        .header-end   { justify-content: flex-end; }
+        .brand-lockup {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; min-width: 0; text-align: center;
+        }
+        .brand-symbol {
+            width: 38px; height: 38px; display: grid; place-items: center;
+            border-radius: 12px; color: white; flex: 0 0 auto;
+            background: linear-gradient(145deg, #38bdf8, #2563eb 72%);
+            box-shadow: 0 8px 20px rgba(37,99,235,.28);
+        }
+        .brand-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; min-width: 0; }
+        .brand-copy h1 {
+            background: linear-gradient(90deg, #e0f2fe, #60a5fa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 1.2rem; letter-spacing: .12em; line-height: 1.05; white-space: nowrap;
+        }
+        .brand-copy small { color: #8ea8c4; font-size: .62rem; letter-spacing: .04em; white-space: nowrap; }
+        .header-menu-button, .header-account-button {
+            border: 1px solid var(--line-soft); background: rgba(30,64,175,.17); color: #dbeafe;
+            border-radius: 12px; min-height: 42px; padding: 8px 12px;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; cursor: pointer;
+            transition: transform .2s, border-color .2s, background .2s;
+            font: inherit; font-size: .78rem; font-weight: 800;
+        }
+        .header-menu-button:hover, .header-account-button:hover {
+            transform: translateY(-1px); background: rgba(37,99,235,.3); border-color: var(--line-strong);
+        }
+        .header-menu-button i { font-size: 1rem; }
+        .header-account-button { display: none; border-radius: 999px; padding-inline: 13px; }
+        .header-account-button i { color: #7dd3fc; }
+
+        .platform-menu {
+            position: fixed; inset: 0; z-index: 100; visibility: hidden; pointer-events: none;
+        }
+        .platform-menu.is-open { visibility: visible; pointer-events: auto; }
+        .platform-menu-backdrop {
+            position: absolute; inset: 0; background: rgba(2,6,23,.7);
+            opacity: 0; transition: opacity .22s ease; backdrop-filter: blur(4px);
+        }
+        .platform-menu-panel {
+            position: absolute; top: 0; right: 0; width: var(--menu-width); height: 100%;
+            padding: 20px 16px max(20px, env(safe-area-inset-bottom));
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            background: linear-gradient(180deg, #102643 0%, #081426 55%, #06101f 100%);
+            border-left: 1px solid rgba(125,211,252,.18);
+            box-shadow: -20px 0 60px rgba(0,0,0,.36);
+            transform: translateX(105%);
+            transition: transform .25s cubic-bezier(.2,.8,.2,1);
+        }
+        .platform-menu.is-open .platform-menu-backdrop { opacity: 1; }
+        .platform-menu.is-open .platform-menu-panel { transform: translateX(0); }
+        .platform-menu-head {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+            padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--line-soft);
+        }
+        .platform-menu-head h2 { color: #f8fafc; font-size: 1.1rem; margin-bottom: 4px; }
+        .platform-menu-head p  { color: #8ea8c4; font-size: .72rem; line-height: 1.5; }
+        .platform-menu-close {
+            width: 36px; height: 36px; border-radius: 11px; border: 1px solid var(--line-soft);
+            background: rgba(15,23,42,.45); color: #dbeafe; cursor: pointer; font-size: 1rem;
+            display: grid; place-items: center;
+        }
+        .platform-menu-group { margin-bottom: 18px; }
+        .platform-menu-label {
+            display: flex; align-items: center; gap: 7px; color: #7dd3fc; font-size: .66rem;
+            font-weight: 900; letter-spacing: .08em; margin: 0 4px 8px;
+        }
+        .platform-menu-item {
+            width: 100%; display: flex; align-items: center; gap: 12px; min-height: 46px;
+            padding: 9px 12px; margin-bottom: 5px;
+            border: 1px solid transparent; border-radius: 13px;
+            background: rgba(15,23,42,.36); color: #dbeafe; cursor: pointer; text-align: right;
+            font: inherit; font-size: .83rem;
+            transition: background .2s, border-color .2s, transform .2s;
+        }
+        .platform-menu-item:hover, .platform-menu-item.is-active {
+            background: rgba(37,99,235,.22); border-color: rgba(96,165,250,.25); transform: translateX(-2px);
+        }
+        .platform-menu-item i, .platform-menu-item .menu-item-icon {
+            width: 26px; color: #7dd3fc; text-align: center; font-size: 1rem; flex: 0 0 26px;
+        }
+        .platform-menu-item .menu-item-arrow { margin-inline-start: auto; color: #6f89a5; font-size: .72rem; }
+        .platform-menu-language {
+            width: auto; min-width: 110px; min-height: 34px; margin-inline-start: auto;
+            padding: 4px 8px; border: 1px solid var(--line-soft); border-radius: 10px;
+            background: rgba(15,23,42,.55); color: #e2e8f0; font: inherit; font-size: .72rem;
+        }
+        .platform-menu-logout { color: #fda4af; background: rgba(127,29,29,.2); border-color: rgba(248,113,113,.18); }
+        .platform-menu-logout i { color: #fb7185; }
+        .menu-admin-only { display: none; }
+        .menu-user-only  { display: block; }
+        .platform-menu.admin-mode .menu-admin-only { display: block; }
+        .platform-menu.admin-mode .menu-user-only  { display: none; }
+
+        .home-overview {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(200px, .55fr);
+            align-items: stretch; gap: 14px; margin-bottom: 14px;
+        }
+        .home-welcome, .home-status {
+            border: 1px solid var(--line-soft); border-radius: 18px;
+            background: linear-gradient(145deg, rgba(22,53,91,.9), rgba(13,27,46,.92));
+            box-shadow: 0 12px 30px rgba(0,0,0,.16);
+        }
+        .home-welcome { position: relative; overflow: hidden; padding: 20px; }
+        .home-welcome::after {
+            content: ""; position: absolute; width: 160px; height: 160px;
+            left: -60px; bottom: -80px; border-radius: 50%;
+            background: rgba(56,189,248,.12);
+        }
+        .home-kicker { color: #7dd3fc; font-size: .7rem; font-weight: 900; letter-spacing: .08em; margin-bottom: 7px; }
+        .home-welcome h2 { color: #f8fafc; font-size: clamp(1.15rem, 3vw, 1.75rem); margin-bottom: 7px; }
+        .home-welcome p  { color: var(--text-soft); font-size: .8rem; line-height: 1.65; max-width: 580px; }
+        .home-status { padding: 16px; display: flex; flex-direction: column; justify-content: center; }
+        .home-status-label { color: #91a8c3; font-size: .72rem; margin-bottom: 4px; }
+        .home-status-value { color: #f8fafc; font-size: 1.55rem; font-weight: 900; }
+        .home-status-note  { color: #86efac; font-size: .68rem; margin-top: 4px; }
+        .about-screen .slider-container,
+        .about-screen .stats-bar,
+        .about-screen .card { margin-bottom: 14px; }
+
+        .screen.active { animation: screenReveal .22s ease both; }
+        @keyframes screenReveal { from { opacity: .5; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card, .vip-card, .hotel-card, .wheel-card, .history-card, .admin-panel,
+        .balance-card, .referral-box, .daily-reward-card, .task-progress-box {
+            border-radius: 18px;
+            border-color: var(--line-soft);
+        }
+        .btn { border-radius: 12px; min-height: 46px; }
+        .admin-panel { background: linear-gradient(145deg, rgba(19,39,66,.94), rgba(12,27,46,.94)); }
+        .admin-section-anchor { scroll-margin-top: 80px; }
+
+        /* ==========================================================
+         * DEFINITIVE LAYOUT CONTRACT
+         * Single source of truth — document scroll model
+         * No bottom-nav (platform menu replaces it)
+         * ========================================================== */
+
+        :root {
+            --page-gutter:        clamp(12px, 3vw, 40px);
+            --content-pad-top:    14px;
+            --content-pad-bottom: 32px;
+        }
+
+        /* Document owns the scroll */
+        html {
+            width: 100%;
+            min-width: 0;
+            min-height: 100%;
+            overflow-x: clip;
+            overflow-y: auto;
+            -webkit-text-size-adjust: 100%;
+            background: #020617;
+        }
+        body {
+            width: 100%;
+            min-width: 0;
+            min-height: 100dvh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: clip;
+            overflow-y: visible;
+        }
+
+        /* App shell — natural height, no overflow clip */
+        .app-container {
+            width: min(100%, 1180px);
+            min-width: 0;
+            height: auto;
+            min-height: 100dvh;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: visible;
+            overflow-x: clip;
+            position: relative;
+        }
+
+        /* Content — block-level, grows with content */
+        .app-container > .content {
+            flex: 0 0 auto;
+            width: 100%;
+            min-width: 0;
+            height: auto;
+            min-height: 0;
+            margin: 0;
+            padding: var(--content-pad-top) var(--page-gutter) var(--content-pad-bottom);
+            overflow: visible;
+            overflow-x: clip;
+        }
+
+        /* Auth screen: full-height centred column */
+        .app-container:has(#auth-screen.active) > .site-header {
+            display: none;
+        }
+        .app-container:has(#auth-screen.active) > .content {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100dvh;
+            padding: 24px var(--page-gutter);
+        }
+
+        /* Admin screen — generous bottom room */
+        .app-container:has(#admin-screen.active) > .content {
+            padding-bottom: 52px;
+        }
+
+        /* Home screen — tighter top */
+        .app-container:has(#home-screen.active) > .content {
+            padding-top: 8px;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 1120px;
+            min-width: 0;
+            height: auto;
+            min-height: 0;
+            margin: 0 auto;
+            padding: 0;
+            overflow: visible;
+        }
+        .screen.active { display: block; }
+        .admin-screen  { max-width: 100%; }
+
+        /* Auth card layout */
+        .auth-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 18px;
+            width: 100%;
+            max-width: 460px;
+            min-height: 0;
+            height: auto;
+            margin: 0 auto;
+            padding: 24px 0 28px;
+        }
+        .auth-brand {
+            width: 100%;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+            line-height: 1;
+        }
+        .auth-brand::before {
+            content: "SECURO";
+            display: block;
+            color: #3f8cff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: clamp(1.5rem, 4vw, 1.9rem);
+            font-weight: 900;
+            letter-spacing: .15em;
+            text-shadow: 0 0 24px rgba(59,130,246,.25);
+            margin-bottom: 2px;
+        }
+        /* Hide legacy brand children inside auth screen */
+        .auth-brand .brand-mark,
+        .auth-brand h2,
+        .auth-brand p,
+        .auth-brand .trust-row { display: none; }
+        /* Hide field labels and auth note for cleaner auth card */
+        .auth-card .field-label { display: none; }
+        .auth-card .auth-note { display: none; }
+        /* Hide the icon button (top-right of auth card) */
+        .auth-card > div:first-child > div:last-child { display: none; }
+        .auth-card {
+            width: 100%;
+            max-width: 430px;
+            margin: 0;
+        }
+
+        /* Bottom nav — hidden (platform menu replaces it) */
+        .bottom-nav { display: none; }
+
+        /* Modals — absolute inside app-container so page scrolls beneath */
+        .modal {
+            position: absolute;
+            inset: 0;
+            display: none;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            padding: max(14px, env(safe-area-inset-top)) 14px
+                     max(14px, env(safe-area-inset-bottom));
+        }
+        .modal-content {
+            min-width: 0;
+            width: min(100%, 520px);
+            max-width: 100%;
+            max-height: calc(100dvh - 28px);
+            overflow-x: hidden;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            margin-block: auto;
+        }
+        #deposit-modal,
+        #withdraw-modal {
+            align-items: flex-end;
+            padding: 0 0 env(safe-area-inset-bottom);
+        }
+        #deposit-modal .modal-content,
+        #withdraw-modal  .modal-content {
+            width: 100%;
+            max-height: min(92dvh, 760px);
+            border-radius: 22px 22px 0 0;
+            margin: 0;
+        }
+
+        /* Global box-model resets */
+        * { box-sizing: border-box; }
+        img, canvas, svg, video, iframe { max-width: 100%; }
+        p, h1, h2, h3, h4, span, label, a { overflow-wrap: anywhere; word-break: break-word; }
+        input, select, textarea { min-width: 0; font-size: max(16px, .95rem); }
+        textarea { min-height: 84px; line-height: 1.55; }
+        .screen > *, .card, .vip-card, .hotel-card, .admin-panel,
+        .history-card, .auth-card, .referral-box, .balance-card,
+        .task-progress-box, .task-complete-card, .wheel-card { min-width: 0; max-width: 100%; }
+
+        /* Cards must not clip JS-injected content */
+        .card, .vip-card, .hotel-card, .wheel-card, .task-complete-card,
+        .admin-panel, .balance-card, .referral-box, .task-progress-box,
+        .daily-reward-card, .referral-earnings-card { overflow: visible; }
+        .history-card { overflow: hidden; }
+
+        /* Admin panel lists */
+        .admin-panel > [id$="-list"],
+        .admin-panel > [id$="-requests"] {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .admin-panel .history-card {
+            display: block;
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .admin-panel h3 { overflow-wrap: anywhere; }
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        /* Copy input row */
+        .copy-input-container { min-width: 0; align-items: stretch; }
+        .copy-input-container input { flex: 1 1 auto; min-width: 0; }
+        .copy-btn { min-height: 48px; }
+
+        /* Levels grid */
+        .levels-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .level-card { min-width: 0; }
+        .level-card > * { max-width: 100%; overflow-wrap: anywhere; }
+
+        /* Wheel */
+        .wheel-container-wrapper {
+            width: min(230px, 68vw);
+            height: min(230px, 68vw);
+            max-width: 100%;
+        }
+        .wheel-canvas { display: block; width: 100%; height: 100%; aspect-ratio: 1; }
+
+        /* Subpage header */
+        .subpage-header { gap: 12px; }
+        .subpage-header h2, .subpage-header h3 { min-width: 0; line-height: 1.35; }
+        .back-btn-arrow { flex: 0 0 42px; width: 42px; height: 42px; }
+
+        /* Touch targets */
+        button, .btn, .action-item, .copy-btn { min-height: 48px; }
+        .menu-item { min-height: 52px; }
+
+        /* Slider/hotel image heights */
+        .slider-container { height: clamp(150px, 28vw, 230px); }
+        .hotel-img { height: clamp(140px, 26vw, 200px); }
+
+        /* Quick actions — 4-col grid */
+        .quick-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+
+        /* Support banner */
+        .support-banner-profile { min-width: 0; }
+        .support-banner-profile > div:first-child { min-width: 0; flex: 1 1 auto; }
+        .support-banner-profile .btn { flex: 0 1 auto; min-width: 0; }
+
+        /* History card */
+        .history-card { min-width: 0; gap: 10px; }
+        .history-card > * { min-width: 0; max-width: 100%; }
+        .history-info { min-width: 0; overflow-wrap: anywhere; }
+        .history-badge { white-space: nowrap; }
+
+        /* Admin hero */
+        .admin-hero { min-width: 0; }
+        .admin-hero-copy { min-width: 0; }
+        .admin-hero-copy > div:last-child { min-width: 0; }
+        .admin-hero h2, .admin-hero p { overflow-wrap: anywhere; }
+
+        /* ==========================================================
+         * RESPONSIVE BREAKPOINTS
+         * ========================================================== */
+
+        /* Desktop (≥ 1021px) */
+        @media (min-width: 1021px) {
+            .app-container > .content {
+                padding-inline: clamp(24px, 4vw, 46px);
+                padding-top: 18px;
+            }
+            .screen:not(.admin-screen) { max-width: 960px; }
+        }
+
+        /* Tablet (761 – 1020px) */
+        @media (min-width: 761px) and (max-width: 1020px) {
+            .app-container > .content { padding-inline: clamp(18px, 4vw, 32px); }
+            .home-overview { grid-template-columns: minmax(0, 1.3fr) minmax(200px, 0.7fr); }
+        }
+
+        /* Mobile (≤ 760px) */
+        @media (max-width: 760px) {
+            :root {
+                --page-gutter:        11px;
+                --content-pad-top:    6px;
+                --content-pad-bottom: 22px;
+            }
+
+            body { display: block; }
+
+            .app-container { width: 100%; max-width: none; box-shadow: none; }
+
+            /* Header compact */
+            .site-header {
+                min-height: 56px;
+                padding: 8px 11px;
+                grid-template-columns: auto 1fr auto;
+                gap: 7px;
+            }
+            .brand-symbol { width: 32px; height: 32px; border-radius: 10px; }
+            .brand-copy h1 { font-size: 1rem; }
+            .brand-copy small { font-size: .56rem; }
+            .header-menu-button { width: 42px; min-height: 42px; padding: 0; gap: 0; }
+            .header-menu-button span, .header-account-button span { display: none; }
+            .header-account-button { width: 42px; padding: 0; }
+            .platform-menu-panel { padding-inline: 13px; }
+
+            /* Auth */
+            .app-container:has(#auth-screen.active) > .content {
+                padding: 0 var(--page-gutter) 24px;
+                min-height: 100dvh;
+            }
+            .auth-layout { gap: 14px; padding: 16px 0 24px; }
+            .auth-card { padding: 20px 14px; }
+
+            /* Home */
+            .home-overview { grid-template-columns: 1fr; gap: 10px; }
+            .home-welcome { padding: 16px; }
+            .home-status  { padding: 13px 16px; }
+
+            /* Slider & hotel */
+            .slider-container { height: clamp(140px, 40vw, 190px); border-radius: 14px; }
+            .hotel-img { height: clamp(135px, 36vw, 185px); }
+            .hotel-card .hotel-img { border-radius: 14px 14px 0 0; }
+
+            /* Quick actions */
+            .quick-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+            .action-item  { min-height: 72px; padding: 8px 4px; gap: 4px; border-radius: 12px; }
+            .action-icon  { width: 34px; height: 34px; font-size: 1.05rem; border-radius: 10px; }
+            .action-title { font-size: clamp(.6rem, 2.2vw, .7rem); line-height: 1.2; }
+
+            /* Wheel */
+            .wheel-card { padding: 13px 9px; margin-bottom: 10px; }
+            .wheel-card h3 { font-size: 1rem; }
+            .wheel-container-wrapper { width: min(200px, 58vw); height: min(200px, 58vw); margin: 10px auto; }
+            .spin-center-btn { width: 48px; height: 48px; font-size: .78rem; }
+
+            /* Stats bar */
+            .stats-bar { flex-wrap: wrap; gap: 8px; padding: 9px 7px; }
+            .stats-bar > .stat-box { flex: 1 1 28%; min-width: 0; }
+            .stats-bar > div[style*="height: 25px"] { display: none; }
+            .stat-num { font-size: clamp(.88rem, 4vw, 1.1rem); }
+
+            /* Profile screen */
+            .balance-amount { font-size: clamp(1.75rem, 9vw, 2.2rem); }
+            .balance-card { padding: 18px 14px; }
+
+            /* Team/referral */
+            .copy-input-container { flex-direction: column; gap: 8px; }
+            .copy-btn { width: 100%; }
+            .levels-grid { gap: 7px; }
+            .level-card { padding: 10px 5px; }
+
+            /* Support banner */
+            .support-banner-profile { align-items: flex-start; flex-wrap: wrap; }
+            .support-banner-profile .btn { flex: 1 1 100%; width: 100%; }
+
+            /* Menu list */
+            .menu-item { padding: 13px 14px; min-height: 52px; }
+            .menu-item select { max-width: 48%; }
+
+            /* History cards */
+            .history-card { padding: 12px; align-items: flex-start; flex-wrap: wrap; }
+            .history-info { flex: 1 1 65%; }
+            .history-card > div:last-child { max-width: 100%; }
+
+            /* Admin */
+            .admin-hero {
+                flex-direction: column; align-items: stretch;
+                gap: 12px; padding: 16px; border-radius: 16px;
+            }
+            .admin-hero-copy { width: 100%; }
+            .admin-hero-copy > div:last-child { flex: 1 1 auto; }
+            .admin-hero-icon { flex: 0 0 46px; width: 46px; height: 46px; }
+            .admin-refresh { width: 100%; }
+            .admin-panel { padding: 13px; }
+            .admin-stats { grid-template-columns: 1fr; gap: 8px; }
+            .admin-stats .stat-box { text-align: center; }
+
+            /* Modals */
+            .modal { padding-inline: 11px; }
+            .modal-content { width: 100%; border-radius: 16px; }
+            #deposit-modal, #withdraw-modal {
+                align-items: flex-end;
+                padding: 0 0 env(safe-area-inset-bottom);
+            }
+            #deposit-modal .modal-content,
+            #withdraw-modal .modal-content {
+                max-height: min(92dvh, 760px);
+                border-radius: 22px 22px 0 0;
+                margin: 0;
+            }
+
+            /* Subpage header */
+            .subpage-header h2 { font-size: clamp(.95rem, 5vw, 1.2rem); }
+        }
+
+        /* Very small phones (≤ 380px) */
+        @media (max-width: 380px) {
+            :root { --page-gutter: 8px; }
+            .quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+            .action-item { min-height: 78px; }
+            .levels-grid { grid-template-columns: 1fr; }
+            .stats-bar > .stat-box { flex-basis: 100%; }
+            .auth-card { padding-inline: 12px; }
+            .nav-link { font-size: .58rem; }
+        }
+        /* ==========================================================
+         * SECURO VIP — production layout refinement
+         * A calm, premium fintech surface: disciplined grid, compact
+         * rhythm, high-contrast actions and one predictable scroll model.
+         * ========================================================== */
+        :root {
+            --bg-body: #07111f;
+            --bg-card: #0f1d31;
+            --bg-light-card: #172a43;
+            --text-white: #f4f8ff;
+            --text-muted: #91a5bf;
+            --primary-blue: #4c9dff;
+            --primary-gradient: linear-gradient(135deg, #2877e8 0%, #1551b8 100%);
+            --vip-gold: linear-gradient(135deg, #e9b949 0%, #b87518 100%);
+            --vip-disabled: linear-gradient(135deg, #3a506b, #26384f);
+            --accent-green: #2ecf91;
+            --accent-red: #ed6570;
+            --border-color: rgba(145, 165, 191, .18);
+            --bottom-nav-height: 66px;
+            --bottom-nav-gap: 18px;
+            --page-gutter: clamp(14px, 3vw, 40px);
+        }
+        html { background: #040a13; overflow-x: hidden; scroll-behavior: smooth; }
+        body {
+            background:
+                radial-gradient(900px 460px at 50% -10%, rgba(35, 103, 196, .20), transparent 70%),
+                radial-gradient(700px 480px at 100% 100%, rgba(22, 126, 145, .11), transparent 70%),
+                #040a13;
+            color: var(--text-white);
+            overflow-x: hidden;
+        }
+        *, *::before, *::after { min-width: 0; }
+        button, input, select, textarea { font: inherit; }
+        button { -webkit-tap-highlight-color: transparent; }
+        .app-container {
+            width: min(100%, 1240px);
+            min-height: 100dvh;
+            background: linear-gradient(180deg, rgba(8, 20, 37, .98), #07111f 28rem);
+            box-shadow: 0 0 100px rgba(0, 0, 0, .25);
+        }
+        .site-header {
+            min-height: 68px;
+            padding: 10px var(--page-gutter);
+            background: rgba(7, 17, 31, .86);
+            border-color: rgba(145, 165, 191, .14);
+        }
+        .brand-copy h1 { font-size: 1.08rem; letter-spacing: .14em; }
+        .header-menu-button, .header-account-button { min-height: 40px; background: rgba(35, 91, 164, .20); }
+        .content {
+            width: 100%;
+            padding: 20px var(--page-gutter) calc(var(--bottom-nav-height) + var(--bottom-nav-gap) + env(safe-area-inset-bottom));
+            overflow: visible;
+        }
+        .screen { max-width: 1120px; }
+        .screen > h2 { margin: 0 0 14px !important; font-size: clamp(1.1rem, 2.5vw, 1.45rem); line-height: 1.45; }
+        .screen.active { animation: screenReveal .2s ease both; }
+        .card, .vip-card, .hotel-card, .wheel-card, .history-card, .admin-panel,
+        .balance-card, .referral-box, .daily-reward-card, .task-progress-box {
+            margin-bottom: 14px;
+            box-shadow: 0 10px 28px rgba(0,0,0,.14);
+        }
+        .card, .vip-card, .admin-panel { padding: 18px; background: rgba(15, 29, 49, .94); }
+        .card h3 { margin-bottom: 10px; }
+        .btn {
+            min-height: 44px;
+            padding: 11px 14px;
+            border-radius: 11px;
+            font-size: .88rem;
+            box-shadow: none;
+        }
+        .btn-primary { box-shadow: 0 8px 18px rgba(21, 81, 184, .24); }
+        .btn:hover { filter: brightness(1.08); }
+        input, select, textarea {
+            min-height: 44px;
+            padding: 11px 13px;
+            background: #0b192b;
+            border-color: rgba(145, 165, 191, .2);
+            border-radius: 10px;
+        }
+        .form-group { gap: 9px; margin-top: 13px; }
+        .home-overview { grid-template-columns: minmax(0, 1.4fr) minmax(210px, .6fr); gap: 12px; margin-bottom: 12px; }
+        .home-welcome, .home-status { border-radius: 16px; }
+        .home-welcome { padding: 18px; }
+        .home-status { padding: 15px; }
+        .home-status-value { font-size: 1.42rem; }
+        .slider-container { height: clamp(155px, 24vw, 230px); margin-bottom: 12px; border-radius: 16px; }
+        .quick-actions { gap: 9px; margin-bottom: 12px; }
+        .action-item { min-height: 84px; padding: 12px 7px; background: rgba(15, 29, 49, .9); }
+        .action-item:hover { border-color: rgba(76,157,255,.55); transform: translateY(-2px); }
+        .action-icon { width: 38px; height: 38px; }
+        .stats-bar { gap: 4px; padding: 12px; margin-bottom: 14px; background: #0c1b30; border-color: rgba(76,157,255,.24); }
+        .stats-bar > .stat-box { flex: 1; }
+        .wheel-card { background: linear-gradient(145deg, #132c53, #101c35 66%, #162b42); border-color: rgba(76,157,255,.4); padding: 18px; }
+        .wheel-container-wrapper { width: min(235px, 62vw); height: min(235px, 62vw); }
+        .balance-card { padding: 22px; background: linear-gradient(145deg, #185dc2, #123d87); }
+        .balance-amount { font-size: clamp(2rem, 5vw, 2.65rem); }
+        .menu-list { gap: 8px; margin: 13px 0; }
+        .menu-item { min-height: 52px; padding: 13px 15px; background: rgba(15,29,49,.9); }
+        .hotel-card { overflow: hidden; }
+        .hotel-img { height: clamp(145px, 24vw, 220px); }
+        .hotel-info { padding: 16px; }
+        .levels-grid { gap: 10px; }
+        .level-card { padding: 13px 8px; background: rgba(15,29,49,.9); }
+        .history-card { padding: 14px 15px; background: rgba(15,29,49,.9); }
+        .history-card + .history-card { margin-top: 9px; }
+        .history-title { line-height: 1.45; }
+        .copy-input-container { align-items: stretch; }
+        .copy-input-container input { flex: 1 1 auto; }
+        .copy-btn { min-height: 44px; }
+        .referral-earnings-card { background: linear-gradient(145deg, #075b58, #093e49); }
+        .task-progress-box { background: linear-gradient(145deg, #182a62, #12243c); }
+        .admin-screen { max-width: 1160px; }
+        .admin-hero { margin-bottom: 14px; padding: 22px; }
+        .admin-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+        .admin-panel { padding: 17px; }
+        .admin-panel h3 { margin-bottom: 12px; }
+        .admin-panel .history-card { margin-bottom: 9px; }
+        .platform-menu-panel { background: #09182b; border-left: 1px solid rgba(76,157,255,.2); }
+        .platform-menu-item { min-height: 45px; }
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            padding: max(14px, env(safe-area-inset-top)) var(--page-gutter) max(14px, env(safe-area-inset-bottom));
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+        .modal-content {
+            width: min(100%, 520px);
+            max-height: calc(100dvh - 28px);
+            padding: 20px;
+            border-radius: 18px;
+            background: #102038;
+            border-color: rgba(145,165,191,.22);
+            overflow-y: auto;
+        }
+        #deposit-modal, #withdraw-modal { align-items: flex-end; padding-inline: 0; }
+        #deposit-modal .modal-content, #withdraw-modal .modal-content {
+            width: min(100%, 560px);
+            border-radius: 20px 20px 0 0;
+            max-height: min(92dvh, 760px);
+        }
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            width: min(100%, 1240px);
+            height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+            padding: 5px 8px env(safe-area-inset-bottom);
+            transform: translateX(-50%);
+            background: rgba(8, 20, 37, .96);
+            border-top: 1px solid rgba(145,165,191,.18);
+            box-shadow: 0 -14px 35px rgba(0,0,0,.22);
+            backdrop-filter: blur(18px);
+            z-index: 50;
+        }
+        .nav-link { min-width: 0; gap: 2px; padding: 5px 4px; border-radius: 10px; font-size: .65rem; }
+        .nav-link span { font-size: 1.15rem; line-height: 1.1; }
+        .nav-link.active { color: #73b6ff; background: rgba(76,157,255,.1); }
+        .app-container.nav-visible .content { padding-bottom: calc(var(--bottom-nav-height) + var(--bottom-nav-gap) + env(safe-area-inset-bottom)); }
+        @media (min-width: 761px) {
+            .app-container.nav-visible .bottom-nav { display: none !important; }
+            .app-container.nav-visible .content { padding-bottom: 40px; }
+            .header-account-button { display: inline-flex; }
+            .screen:not(.admin-screen) { max-width: 960px; }
+        }
+        @media (max-width: 760px) {
+            .content { padding-top: 14px; }
+            .home-overview { grid-template-columns: 1fr; }
+            .home-status { flex-direction: row; align-items: center; justify-content: space-between; }
+            .admin-hero { flex-direction: column; align-items: stretch; gap: 12px; }
+            .admin-refresh { width: 100%; }
+            .admin-stats { grid-template-columns: 1fr; }
+            .admin-stats .stat-box { text-align: center; }
+            .header-account-button { display: none; }
+            .auth-card { padding: 20px 16px; }
+        }
+        @media (max-width: 430px) {
+            :root { --page-gutter: 11px; }
+            .site-header { padding-inline: 11px; }
+            .brand-copy small { display: none; }
+            .brand-copy h1 { font-size: .96rem; }
+            .header-menu-button { padding-inline: 10px; }
+            .quick-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+            .action-item { min-height: 72px; padding: 8px 3px; }
+            .action-icon { width: 32px; height: 32px; font-size: 1rem; }
+            .action-title { font-size: .61rem; line-height: 1.2; }
+            .levels-grid { gap: 6px; }
+            .level-card { padding-inline: 4px; }
+            .copy-input-container { flex-direction: column; }
+            .history-card { align-items: flex-start; gap: 10px; }
+            .history-card > div:last-child { text-align: left; }
+            .modal-content { padding: 17px 14px; }
+        }
+        @media (max-width: 350px) {
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
+            .nav-link { font-size: .58rem; }
+        }
+
+        /* Top-anchor invariant: every app screen is document-flow content.
+           This intentionally overrides the earlier auth-era flex rules so a
+           short phone viewport can never create a giant blank lead-in. */
+        .app-container > .content {
+            display: block !important;
+            flex: 0 0 auto !important;
+            align-items: initial !important;
+            justify-content: flex-start !important;
+            min-height: 0 !important;
+            height: auto !important;
+            padding-top: 12px !important;
+        }
+        .screen,
+        .screen.active {
+            min-height: 0 !important;
+            height: auto !important;
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+            justify-content: flex-start !important;
+        }
+        .auth-layout {
+            min-height: 0 !important;
+            padding-top: 12px !important;
+            padding-bottom: 18px !important;
+        }
+        .home-secondary-content { margin: 0; padding: 0; }
+        .home-overview { margin-top: 0; }
+        .screen > :first-child { margin-top: 0 !important; }
+        .content, .screen { scroll-margin-top: 0; }
+        @media (max-width: 760px) {
+            .app-container > .content { padding-top: 10px !important; }
+            .screen > h2 { margin-top: 0 !important; }
+            .app-container.nav-visible .content {
+                padding-bottom: calc(var(--bottom-nav-height) + var(--bottom-nav-gap) + env(safe-area-inset-bottom)) !important;
+            }
+        }
+
+        /*
+         * Final no-gap layout rule for authenticated screens.
+         * The home and admin pages must start immediately below the header;
+         * neither page should reserve viewport height before its content.
+         */
+        .app-container:has(#home-screen.active) > .content,
+        .app-container:has(#admin-screen.active) > .content {
+            display: block !important;
+            flex: 0 0 auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 32px !important;
+            align-items: initial !important;
+            justify-content: flex-start !important;
+        }
+        #home-screen.active,
+        #admin-screen.active {
+            display: block !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding-top: 0 !important;
+            transform: none !important;
+        }
+        /* Mobile-First Fixes */
+        @media (max-width: 760px) {
+            .auth-layout { grid-template-columns: 1fr !important; gap: 15px !important; }
+            .auth-brand { display: none !important; }
+            .quick-actions { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+            .admin-stats { grid-template-columns: 1fr !important; gap: 8px !important; }
+            .levels-grid { grid-template-columns: 1fr !important; gap: 8px !important; }
+            .app-container > .content { padding: 12px 10px !important; }
+            .modal-content { padding: 15px !important; }
+            #admin-users-list .history-card > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+            #admin-users-list .history-card > div:last-child { flex-direction: column !important; align-items: stretch !important; }
+            #admin-users-list .history-card .btn { min-width: 100% !important; margin-bottom: 4px !important; }
+            .admin-hero { flex-direction: column !important; }
+            .card { padding: 12px !important; margin-bottom: 10px !important; }
+            .slider-container { height: 140px !important; }
+            .history-card { padding: 12px !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header class="site-header">
+        <div class="header-start">
+            <button id="platform-menu-toggle" class="header-menu-button" type="button" aria-label="فتح قائمة منصة" aria-expanded="false" onclick="togglePlatformMenu()">
+                <i class="fa-solid fa-bars"></i><span>منصة</span>
+            </button>
+        </div>
+        <div class="brand-lockup" aria-label="SECURO">
+            <div class="brand-symbol"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="brand-copy">
+                <h1 id="header-title">SECURO</h1>
+                <small id="header-subtitle">مساحتك المالية الذكية</small>
+            </div>
+        </div>
+        <div class="header-end">
+            <button id="header-account-action" class="header-account-button" type="button" aria-label="فتح حسابي" onclick="switchTab('profile')">
+                <i class="fa-solid fa-user"></i><span>حسابي</span>
+            </button>
+        </div>
+    </header>
+
+    <div id="platform-menu" class="platform-menu" aria-hidden="true">
+        <div class="platform-menu-backdrop" onclick="closePlatformMenu()"></div>
+        <aside class="platform-menu-panel" aria-label="قائمة منصة">
+            <div class="platform-menu-head">
+                <div>
+                    <h2><i class="fa-solid fa-layer-group" style="color:#7dd3fc;"></i> منصة SECURO</h2>
+                    <p id="platform-menu-description">كل أقسام المنصة في مكان واحد</p>
+                </div>
+                <button class="platform-menu-close" type="button" aria-label="إغلاق القائمة" onclick="closePlatformMenu()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="menu-user-only">
+                <div class="platform-menu-group">
+                    <div class="platform-menu-label"><i class="fa-solid fa-compass"></i> الوصول السريع</div>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('home')">
+                        <span class="menu-item-icon">⌂</span><span>الرئيسية</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('about')">
+                        <span class="menu-item-icon">◈</span><span>عن SECURO والمعلومات</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                </div>
+                <div class="platform-menu-group">
+                    <div class="platform-menu-label"><i class="fa-solid fa-bolt"></i> نشاط المنصة</div>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('vip')">
+                        <span class="menu-item-icon">♛</span><span>مستويات ومنتجات VIP</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('tasks')">
+                        <span class="menu-item-icon">★</span><span>مهامي اليومية</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('team')">
+                        <span class="menu-item-icon">♧</span><span>فريقي والإحالات</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                </div>
+                <div class="platform-menu-group">
+                    <div class="platform-menu-label"><i class="fa-solid fa-user-circle"></i> الحساب والسجلات</div>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('profile')">
+                        <span class="menu-item-icon">◎</span><span>حسابي والرصيد</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('deposit-history-screen')">
+                        <span class="menu-item-icon">▣</span><span>سجل الإيداع</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('withdraw-history-screen')">
+                        <span class="menu-item-icon">⇩</span><span>سجل السحوبات</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('reward-history-screen')">
+                        <span class="menu-item-icon">✦</span><span>سجل المكافآت</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('tx-history-screen')">
+                        <span class="menu-item-icon">↔</span><span>المعاملات المالية</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="closePlatformMenu(); openSupportModal()">
+                        <span class="menu-item-icon">?</span><span>خدمة العملاء والدعم</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <label class="platform-menu-item" for="platform-language-select">
+                        <span class="menu-item-icon">文</span><span>لغة التطبيق</span>
+                        <select id="platform-language-select" class="platform-menu-language" onchange="changeLanguage(this.value); closePlatformMenu()">
+                            <option value="ar">العربية (AR)</option>
+                            <option value="fr">Français (FR)</option>
+                            <option value="en">English (EN)</option>
+                            <option value="es">Español (ES)</option>
+                            <option value="zh">中文 (ZH)</option>
+                        </select>
+                    </label>
+                </div>
+                <button class="platform-menu-item platform-menu-logout" type="button" onclick="closePlatformMenu(); logout()">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i><span>تسجيل الخروج</span>
+                </button>
+            </div>
+
+            <div class="menu-admin-only">
+                <div class="platform-menu-group">
+                    <div class="platform-menu-label"><i class="fa-solid fa-chart-line"></i> إدارة المنصة</div>
+                    <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('admin-dashboard')">
+                        <span class="menu-item-icon">⌂</span><span>نظرة عامة</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="focusAdminSection('admin-users-panel')">
+                        <span class="menu-item-icon">♧</span><span>الحسابات المسجلة</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="focusAdminSection('admin-deposits-panel')">
+                        <span class="menu-item-icon">▣</span><span>طلبات الإيداع</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="focusAdminSection('admin-withdrawals-panel')">
+                        <span class="menu-item-icon">⇩</span><span>طلبات السحب</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                    <button class="platform-menu-item" type="button" onclick="closePlatformMenu(); renderAdminDashboard()">
+                        <span class="menu-item-icon">↻</span><span>تحديث البيانات</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                    </button>
+                </div>
+                <button class="platform-menu-item platform-menu-logout" type="button" onclick="closePlatformMenu(); logout()">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i><span>تسجيل الخروج</span>
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <main class="content">
+        <!-- 1. شاشة تسجيل الدخول وإنشاء حساب -->
+        <div id="auth-screen" class="screen active">
+            <div class="auth-layout">
+              <div class="auth-brand" aria-label="SECURO"></div>
+              <div class="card auth-card">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
+                  <div>
+                    <div style="font-size:.74rem;color:#60a5fa;font-weight:800;letter-spacing:.08em;">WELCOME BACK</div>
+                    <h2 id="auth-title" style="color: var(--text-white); margin-top: 6px;">تسجيل الدخول</h2>
+                  </div>
+                  <div style="width:42px;height:42px;border-radius:14px;background:rgba(59,130,246,.14);display:grid;place-items:center;color:#60a5fa;"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
+                </div>
+                <form class="form-group" id="auth-form" onsubmit="event.preventDefault(); window.handleAuth();">
+                    <label class="field-label" id="reg-name-label" for="reg-name" style="display:none;">الاسم الكامل</label>
+                    <input type="text" id="reg-name" placeholder="اكتب اسمك الكامل" style="display: none;">
+                    <label class="field-label" for="auth-email">البريد الإلكتروني</label>
+                    <input type="email" id="auth-email" placeholder="name@example.com" autocomplete="email">
+                    <label class="field-label" for="auth-pass">كلمة المرور</label>
+                    <input type="password" id="auth-pass" placeholder="6 أحرف أو أرقام على الأقل" autocomplete="current-password">
+                    
+                    <div id="invite-group" style="display: none;">
+                        <label class="field-label" for="invite-code-input">رمز الدعوة <span style="color:#64748b;font-weight:400;">(اختياري)</span></label>
+                        <input type="text" id="invite-code-input" value="" placeholder="أدخل رمز الدعوة">
+                        <span style="font-size: 0.75rem; color: var(--accent-green); margin-top: 4px; display: block;">✓ سيتم ربط حسابك بمرسل الدعوة كفريق</span>
+                    </div>
+
+                    <button class="btn btn-primary" id="auth-btn" type="submit">🚀 دخول</button>
+                </form>
+                <div class="auth-note"><i class="fa-solid fa-circle-info" style="color:#60a5fa;"></i><span>لن نشارك بياناتك. يتم حفظ حسابك في قاعدة بيانات آمنة.</span></div>
+                <div style="text-align: center; margin-top: 18px;">
+                    <span id="toggle-text" style="color: #60a5fa; cursor: pointer; font-size: 0.88rem; font-weight: bold;" onclick="toggleAuth()">ليس لديك حساب؟ إنشاء حساب جديد</span>
+                </div>
+              </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1.5 لوحة تحكم الأدمن (Admin Dashboard) -->
+        <div id="admin-screen" class="screen admin-screen">
+            <div class="admin-hero">
+              <div class="admin-hero-copy">
+                <div class="admin-hero-icon"><i class="fa-solid fa-crown"></i></div>
+                <div>
+                  <h2>لوحة تحكم المشرف</h2>
+                  <p>نظرة موحّدة على الحسابات والطلبات والمعاملات</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn admin-refresh" onclick="renderAdminDashboard()"><i class="fa-solid fa-rotate"></i> تحديث البيانات</button>
+                <button class="btn admin-refresh" style="border-color:rgba(167,139,250,.45);" onclick="openChangePasswordModal()">🔑 تغيير كلمة مروري</button>
+              </div>
+            </div>
+
+            <div class="stats-bar admin-stats">
+                <div class="stat-box">
+                    <div style="color:#60a5fa;margin-bottom:8px;"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-num" id="admin-total-users">0</div>
+                    <div class="stat-lbl">إجمالي الحسابات</div>
+                </div>
+                <div class="stat-box">
+                    <div style="color:#34d399;margin-bottom:8px;"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    <div class="stat-num" id="admin-total-deposits">$0.00</div>
+                    <div class="stat-lbl">إجمالي الإيداع المقبول</div>
+                    <div id="admin-total-deposit-count" style="font-size:.68rem;color:#86efac;margin-top:3px;">0 عملية مقبولة</div>
+                </div>
+                <div class="stat-box">
+                    <div style="color:#fbbf24;margin-bottom:8px;"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                    <div class="stat-num" id="admin-total-withdraws">$0.00</div>
+                    <div class="stat-lbl">إجمالي السحب المقبول</div>
+                    <div id="admin-total-withdrawal-count" style="font-size:.68rem;color:#fde68a;margin-top:3px;">0 عملية مقبولة</div>
+                </div>
+            </div>
+
+            <div id="admin-users-panel" class="card admin-panel admin-section-anchor">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid rgba(148,163,184,.12);">
+                    <h3 style="border:none;padding:0;margin:0;"><i class="fa-solid fa-users" style="color:#60a5fa;"></i> الحسابات المسجلة في المنصة</h3>
+                    <div style="display:flex;align-items:center;gap:8px;background:rgba(15,23,42,.55);border:1px solid rgba(148,163,184,.18);border-radius:12px;padding:7px 12px;flex:1;min-width:180px;max-width:320px;">
+                        <i class="fa-solid fa-magnifying-glass" style="color:#60a5fa;font-size:1rem;flex-shrink:0;"></i>
+                        <input
+                            id="admin-search-input"
+                            type="text"
+                            placeholder="ابحث باسم أو بريد أو رمز الإحالة…"
+                            oninput="adminSearchUsers()"
+                            style="background:transparent;border:none;outline:none;width:100%;color:#f8fafc;font-size:.82rem;padding:0;min-height:0;height:auto;"
+                        >
+                        <button
+                            type="button"
+                            id="admin-search-clear"
+                            onclick="document.getElementById('admin-search-input').value='';adminSearchUsers();"
+                            style="background:none;border:none;color:#64748b;cursor:pointer;padding:0;font-size:.85rem;line-height:1;display:none;min-height:0;width:auto;"
+                            title="مسح البحث"
+                        >✕</button>
+                    </div>
+                </div>
+                <div id="admin-users-list" style="margin-top: 10px;"></div>
+            </div>
+
+             <div id="admin-deposits-panel" class="card admin-panel admin-section-anchor" style="margin-top: 15px;">
+                 <h3><i class="fa-solid fa-wallet" style="color:#34d399;"></i> طلبات الإيداع</h3>
+                 <div id="admin-deposit-requests" style="margin-top: 10px;"></div>
+             </div>
+
+             <div id="admin-withdrawals-panel" class="card admin-panel admin-section-anchor" style="margin-top: 15px;">
+                 <h3><i class="fa-solid fa-money-bill-transfer" style="color:#fbbf24;"></i> طلبات السحب</h3>
+                 <div id="admin-withdrawal-requests" style="margin-top: 10px;"></div>
+             </div>
+
+            <button class="btn" style="background:rgba(127,29,29,.28);border:1px solid rgba(248,113,113,.25);color:#fca5a5;margin-top:15px;" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> تسجيل الخروج</button>
+        </div>
+
+        <!-- 2. الصفحة الرئيسية للمستخدم -->
+        <div id="home-screen" class="screen">
+            <div class="home-overview">
+                <div class="home-welcome">
+                    <div class="home-kicker">مساحتك في SECURO</div>
+                    <h2>أهلاً بك في منصتك</h2>
+                    <p>تابع رصيدك، نفّذ خطواتك اليومية، واستكشف جميع الأقسام من قائمة <strong>منصة</strong> المنظمة.</p>
+                </div>
+                <div class="home-status">
+                    <div class="home-status-label">الرصيد المتاح</div>
+                    <div class="home-status-value">$<span id="home-balance">0.00</span></div>
+                    <div class="home-status-note">بياناتك محدثة من الخادم</div>
+                </div>
+            </div>
+            <div class="quick-actions">
+                <div class="action-item" onclick="openDepositModal()">
+                    <div class="action-icon">💳</div>
+                    <div class="action-title">إيداع</div>
+                </div>
+                <div class="action-item" onclick="openWithdrawModal()">
+                    <div class="action-icon">💸</div>
+                    <div class="action-title">سحب</div>
+                </div>
+                <div class="action-item" onclick="switchTab('tasks')">
+                    <div class="action-icon">⭐</div>
+                    <div class="action-title">مهامي</div>
+                </div>
+                <div class="action-item" onclick="openSupportModal()">
+                    <div class="action-icon">🎧</div>
+                    <div class="action-title">الدعم</div>
+                </div>
+            </div>
+
+            <div id="home-secondary-content" class="home-secondary-content">
+            <div class="slider-container">
+                <div class="slider-slide active" style="background-image: linear-gradient(to top, #0f172a, transparent), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80');">
+                    <div class="slide-caption">🏢 المقر الرئيسي للشركة - نيويورك، الولايات المتحدة الأمريكية</div>
+                </div>
+                <div class="slider-slide" style="background-image: linear-gradient(to top, #0f172a, transparent), url('https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=600&q=80');">
+                    <div class="slide-caption">🏛️ مكاتب العمل الإدارية والتقنية (تأسست عام 2014)</div>
+                </div>
+                <div class="slider-slide" style="background-image: linear-gradient(to top, #0f172a, transparent), url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80');">
+                    <div class="slide-caption">⚡ SECURO - ريادة عالمية موثوقة في الاستثمار الذكي</div>
+                </div>
+            </div>
+            <!-- عجلة الحظ -->
+            <div class="wheel-card">
+                <h3 style="justify-content: center; color: #fbbf24; font-size: 1.2rem; margin-bottom: 2px;">🎡 عجلة الحظ المباشرة</h3>
+                <p style="font-size: 0.78rem; color: #c7d2fe;">تُمنح محاولات عجلة الحظ تلقائياً عند إجراء الترقية أو إيداع صديق عن طريق رابط دعواتك!</p>
+                
+                <div class="wheel-container-wrapper">
+                    <div class="wheel-pointer"></div>
+                    <canvas id="wheel-canvas" class="wheel-canvas" width="230" height="230"></canvas>
+                    <button class="spin-center-btn" id="spin-wheel-button" type="button" onclick="spinWheel()" disabled>دوران</button>
+                </div>
+
+                <div style="background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 8px 12px; display: inline-block; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <span style="font-size: 0.85rem; color: #a5f3fc; font-weight: bold;">المحاولات المتاحة لديك: </span>
+                    <span id="wheel-spins-count" style="font-size: 1.1rem; font-weight: 900; color: #fbbf24;">0</span>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-box">
+                    <div class="stat-num">$1.2M+</div>
+                    <div class="stat-lbl">إجمالي السحوبات</div>
+                </div>
+                <div style="height: 25px; width: 1px; background: var(--border-color);"></div>
+                <div class="stat-box">
+                    <div class="stat-num">45.8K</div>
+                    <div class="stat-lbl">مستثمر نشط</div>
+                </div>
+                <div style="height: 25px; width: 1px; background: var(--border-color);"></div>
+                <div class="stat-box">
+                    <div class="stat-num">2014</div>
+                    <div class="stat-lbl">سنة التأسيس</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🇺🇸 عن شركة SECURO (نيويورك)</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6;">
+                    تأسست شركة **SECURO** رسميًا في عام **2014** وتتخذ من مدينة **نيويورك في الولايات المتحدة الأمريكية** مقراً رئيسياً لها. تُعد المنصة رائدة عالمياً في مجالات التداول والحلول الاستثمارية الرقمية المتقدمة.
+                </p>
+            </div>
+            </div>
+        </div>
+
+        <div id="about-screen" class="screen about-screen">
+            <div class="subpage-header">
+                <div>
+                    <div class="home-kicker">معلومات المنصة</div>
+                    <h2 style="color: var(--text-white); font-size: 1.2rem;">عن SECURO</h2>
+                </div>
+                <button class="back-btn-arrow" type="button" onclick="switchTab('home')" aria-label="العودة للرئيسية">➔</button>
+            </div>
+            <div id="about-screen-content"></div>
+        </div>
+
+        <!-- 3. صفحة VIP -->
+        <div id="vip-screen" class="screen">
+            <h2 style="margin-bottom: 15px; color: var(--text-white);">👑 مستويات ومنتجات VIP</h2>
+
+            <div class="vip-card trial">
+                <span class="vip-badge trial-badge">تجربة مجانية</span>
+                <h3 style="color: #34d399;">🎁 الفترة التجريبية (Trial Period)</h3>
+                <p style="font-size: 0.85rem; color: #a7f3d0; margin: 5px 0 10px 0;">
+                    تنتهي بعد إكمال 4 مهام | الأرباح: $1.00 لكل مهمة | مجاني بالكامل
+                </p>
+                <button class="btn btn-green" id="btn-trial-activate" onclick="activateTrial()">تفعيل الفترة التجريبية (مجاناً)</button>
+                <div id="trial-success-section" class="trial-success-box">
+                    <i class="fa-solid fa-circle-check trial-success-icon"></i>
+                    <div class="trial-success-text">الفترة التجريبية نشطة — أكمل 4 مهام لتنتهي تلقائياً 🚀</div>
+                    <div style="font-size: 0.82rem; color: #a7f3d0; margin-bottom: 10px;">انتقل لصفحة "مهامي" وأكمل 4 مهام تقييم لتحصيل أرباحك.</div>
+                    <button class="btn btn-red" style="padding: 8px; font-size: 0.82rem;" id="btn-trial-cancel" onclick="cancelTrialSelf()">⛔ إيقاف الفترة التجريبية</button>
+                </div>
+            </div>
+
+            <div class="vip-card" id="vip-card-vip1" style="border-color: #f59e0b;">
+                <span class="vip-badge">VIP 1</span>
+                <h3 style="color: #fbbf24;">المستوى الأول</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 3 مهام يومياً | دخل المهام: $1.20 | سعر العضوية: $14.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip1" onclick="buyVipProduct('VIP 1', 14, 3, 1.20)">شراء العضوية ($14)</button>
+            </div>
+
+            <div class="vip-card" id="vip-card-vip2" style="border-color: #f59e0b;">
+                <span class="vip-badge">VIP 2</span>
+                <h3 style="color: #fbbf24;">المستوى الثاني</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 6 مهام يومياً | دخل المهام: $2.50 | سعر العضوية: $24.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip2" onclick="buyVipProduct('VIP 2', 24, 6, 2.50)">شراء العضوية ($24)</button>
+            </div>
+
+            <div class="vip-card" id="vip-card-vip3" style="border-color: #f59e0b;">
+                <span class="vip-badge">VIP 3</span>
+                <h3 style="color: #fbbf24;">المستوى الثالث</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 8 مهام يومياً | دخل المهام: $7.00 | سعر العضوية: $54.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip3" onclick="buyVipProduct('VIP 3', 54, 8, 7.00)">شراء العضوية ($54)</button>
+            </div>
+
+            <div class="vip-card" id="vip-card-vip4" style="border-color: #f59e0b;">
+                <span class="vip-badge">VIP 4</span>
+                <h3 style="color: #fbbf24;">المستوى الرابع</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 10 مهام يومياً | دخل المهام: $18.00 | سعر العضوية: $120.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip4" onclick="buyVipProduct('VIP 4', 120, 10, 18.00)">شراء العضوية ($120)</button>
+            </div>
+
+            <div class="vip-card disabled">
+                <span class="vip-badge locked-badge">🔒 قريباً</span>
+                <h3 style="color: #94a3b8;">VIP 5 - المستوى المتقدم</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | السعر: $200.00 | سيكون متاحاً للتفعيل قريباً جداً!</p>
+                <button class="btn btn-disabled" disabled>🔒 غير متاح حالياً (قريباً)</button>
+            </div>
+
+            <div class="vip-card disabled">
+                <span class="vip-badge locked-badge">🔒 قريباً</span>
+                <h3 style="color: #94a3b8;">VIP 6 - المستوى الذهبي كبار الشخصيات</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | السعر: $300.00 | سيكون متاحاً للتفعيل قريباً جداً!</p>
+                <button class="btn btn-disabled" disabled>🔒 غير متاح حالياً (قريباً)</button>
+            </div>
+        </div>
+
+        <!-- 4. صفحة مهامي -->
+        <div id="tasks-screen" class="screen">
+            <h2 style="margin-bottom: 10px; color: var(--text-white);">🏨 مهام تقييم الفنادق العالمية</h2>
+            
+            <div class="task-progress-box">
+                <div style="font-size: 0.85rem; color: #bae6fd; margin-bottom: 4px;" id="task-vip-status">العضوية الحالية: غير مشترك</div>
+                <div style="font-size: 1.2rem; font-weight: 800; color: white;" id="task-progress-text">المهام المنجزة: 0 / 0</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">قيّم الفنادق المتاحة بـ 5 نجوم واترك تعليقاً لتحصيل أرباحك اليومية!</div>
+            </div>
+
+            <div id="tasks-container"></div>
+        </div>
+
+        <!-- 5. صفحة فريقي -->
+        <div id="team-screen" class="screen">
+            <h2 style="margin-bottom: 12px; color: var(--text-white);">👥 إدارة وتفاصيل فريقي</h2>
+            
+            <div class="referral-earnings-card">
+                <div style="font-size: 0.85rem; color: #d1fae5; font-weight: bold;">💰 إجمالي مكافآت الإحالة المكتسبة</div>
+                <div style="font-size: 2.2rem; font-weight: 900; color: #ffffff; margin: 4px 0;">$<span id="total-referral-earnings">0.00</span></div>
+                <div style="font-size: 0.75rem; color: #a7f3d0;">تحصل على 10%، 5%، أو 1% فور إيداع أي شخص يدخل عبر رابطك!</div>
+            </div>
+
+            <div class="referral-box">
+                <div style="font-size: 0.85rem; color: #bae6fd; font-weight: bold;">🔑 رمز الدعوة الخاص بك:</div>
+                <div class="copy-input-container">
+                    <input type="text" id="my-invite-code" readonly style="font-weight: 800; color: #fbbf24; text-align: center; letter-spacing: 2px;">
+                    <button class="copy-btn" onclick="copyInviteCode()">نسخ الرمز</button>
+                </div>
+
+                <div style="font-size: 0.85rem; color: #bae6fd; font-weight: bold; margin-top: 12px;">🔗 رابط الدعوة المباشر:</div>
+                <div class="copy-input-container">
+                    <input type="text" id="my-invite-link" readonly style="font-size: 0.8rem;">
+                    <button class="copy-btn" onclick="copyInviteLink()">نسخ الرابط</button>
+                </div>
+            </div>
+
+            <div class="levels-grid">
+                <div class="level-card">
+                    <span class="level-badge lvl-1">المستوى 1</span>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #fbbf24; margin: 4px 0;">10%</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">مكافأة الإيداع</div>
+                    <div style="font-size: 0.7rem; color: #a7f3d0;">المكتسب: <span id="lvl1-earnings">$0.00</span></div>
+                    <div style="font-size: 0.75rem; font-weight: bold; color: white; margin-top: 6px;" id="lvl1-count">0 شخص</div>
+                </div>
+                <div class="level-card">
+                    <span class="level-badge lvl-2">المستوى 2</span>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #60a5fa; margin: 4px 0;">5%</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">مكافأة الإيداع</div>
+                    <div style="font-size: 0.7rem; color: #bfdbfe;">المكتسب: <span id="lvl2-earnings">$0.00</span></div>
+                    <div style="font-size: 0.75rem; font-weight: bold; color: white; margin-top: 6px;" id="lvl2-count">0 شخص</div>
+                </div>
+                <div class="level-card">
+                    <span class="level-badge lvl-3">المستوى 3</span>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #34d399; margin: 4px 0;">1%</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">مكافأة الإيداع</div>
+                    <div style="font-size: 0.7rem; color: #a7f3d0;">المكتسب: <span id="lvl3-earnings">$0.00</span></div>
+                    <div style="font-size: 0.75rem; font-weight: bold; color: white; margin-top: 6px;" id="lvl3-count">0 شخص</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📜 الأشخاص المسجلين ضمن فريقك (<span id="total-team-count">0</span>)</h3>
+                <div id="team-members-list" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+
+        <!-- 6. شاشة ملكي -->
+        <div id="profile-screen" class="screen">
+            <div class="balance-card">
+                <div style="font-size: 0.9rem; opacity: 0.9;">الرصيد المتاح للسحب</div>
+                <div class="balance-amount">$<span id="user-balance">0.00</span></div>
+                <div style="font-size: 0.85rem; opacity: 0.8;" id="user-display-email">email@example.com</div>
+            </div>
+
+            <div class="stats-bar" style="margin-top: 12px; margin-bottom: 15px;">
+                <div class="stat-box">
+                    <div class="stat-num" id="user-total-deposits">$0.00</div>
+                    <div class="stat-lbl">إجمالي الإيداع المقبول</div>
+                    <div id="user-total-deposit-count" style="font-size:.68rem;color:#86efac;margin-top:3px;">0 عملية</div>
+                </div>
+                <div style="height: 25px; width: 1px; background: var(--border-color);"></div>
+                <div class="stat-box">
+                    <div class="stat-num" id="user-total-withdrawals">$0.00</div>
+                    <div class="stat-lbl">إجمالي السحب المقبول</div>
+                    <div id="user-total-withdrawal-count" style="font-size:.68rem;color:#fde68a;margin-top:3px;">0 عملية</div>
+                </div>
+            </div>
+
+            <div class="support-banner-profile" onclick="openSupportModal()">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="support-avatar-box">🎧👩‍💼</div>
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.95rem; color: white;">خدمة العملاء (موظف الاستقبال)</div>
+                        <div style="font-size: 0.78rem; color: #bae6fd;">تواصل مباشر عبر تليجرام</div>
+                    </div>
+                </div>
+                <div style="font-size: 1.2rem; color: white; background: rgba(0,0,0,0.2); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">➔</div>
+            </div>
+
+            <div class="daily-reward-card">
+                <div style="font-weight: bold; color: #c084fc; margin-bottom: 5px;">🎁 مكافأة التسجيل اليومية</div>
+                <div style="font-size: 0.8rem; color: #e9d5ff; margin-bottom: 10px;">احصل على 0.10$ مجاناً كل يوم عند الدخول! تتجدد منتصف الليل (12:00 ليلاً).</div>
+                <button class="btn btn-gold" id="claim-btn" onclick="claimDailyReward()" style="padding: 10px;">طلب 0.10$ اليومية</button>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="btn btn-green" style="flex:1;" onclick="openDepositModal()">💳 إيداع</button>
+                <button class="btn btn-red" style="flex:1;" onclick="openWithdrawModal()">💸 سحب</button>
+            </div>
+
+            <div class="menu-list">
+                <div class="menu-item" onclick="openSubPage('deposit-history-screen')">
+                    <span>💳 سجل الإيداع</span> <span>👈</span>
+                </div>
+                <div class="menu-item" onclick="openSubPage('withdraw-history-screen')">
+                    <span>📜 سجل السحوبات</span> <span>👈</span>
+                </div>
+                <div class="menu-item" onclick="openSubPage('reward-history-screen')">
+                    <span>🎁 سجل المكافآت</span> <span>👈</span>
+                </div>
+                <div class="menu-item" onclick="openSubPage('tx-history-screen')">
+                    <span>📊 المعاملات المالية</span> <span>👈</span>
+                </div>
+                <div class="menu-item" onclick="openChangePasswordModal()">
+                    <span>🔑 تغيير كلمة المرور</span> <span>👈</span>
+                </div>
+                <div id="profile-trial-cancel-item" class="menu-item" style="display:none;" onclick="cancelTrialSelf()">
+                    <span style="color:#f87171;">⛔ إيقاف الفترة التجريبية</span> <span>👈</span>
+                </div>
+                <div class="menu-item">
+                    <span>🌐 لغة التطبيق (Language)</span>
+                    <select onchange="changeLanguage(this.value)">
+                        <option value="ar">العربية (AR)</option>
+                        <option value="fr">Français (FR)</option>
+                        <option value="en">English (EN)</option>
+                        <option value="es">Español (ES)</option>
+                        <option value="zh">中文 (ZH)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn" style="background-color: #451a03; color: #f87171; margin-top: 5px;" onclick="logout()">🚪 تسجيل الخروج</button>
+        </div>
+
+        <!-- السجلات الفرعية -->
+        <div id="deposit-history-screen" class="screen">
+            <div class="subpage-header">
+                <button class="back-btn-arrow" type="button" onclick="switchTab('profile')" aria-label="رجوع">➔</button>
+                <h2 style="color: var(--text-white); font-size: 1.2rem;">💳 سجل الإيداع</h2>
+            </div>
+            <div id="deposit-history-list"></div>
+        </div>
+
+        <div id="reward-history-screen" class="screen">
+            <div class="subpage-header">
+                <button class="back-btn-arrow" type="button" onclick="switchTab('profile')" aria-label="رجوع">➔</button>
+                <h2 style="color: var(--text-white); font-size: 1.2rem;">🎁 سجل المكافآت اليومية</h2>
+            </div>
+            <div id="reward-history-list"></div>
+        </div>
+
+        <div id="withdraw-history-screen" class="screen">
+            <div class="subpage-header">
+                <button class="back-btn-arrow" type="button" onclick="switchTab('profile')" aria-label="رجوع">➔</button>
+                <h2 style="color: var(--text-white); font-size: 1.2rem;">📜 سجل طلبات السحب</h2>
+            </div>
+            <div id="withdraw-history-list"></div>
+        </div>
+
+        <div id="tx-history-screen" class="screen">
+            <div class="subpage-header">
+                <button class="back-btn-arrow" type="button" onclick="switchTab('profile')" aria-label="رجوع">➔</button>
+                <h2 style="color: var(--text-white); font-size: 1.2rem;">📊 سجل المعاملات المالية</h2>
+            </div>
+            <div id="tx-history-list"></div>
+        </div>
+    </main>
+
+    <!-- النوافذ المنبثقة Modal -->
+    <div id="withdraw-success-modal" class="modal">
+        <div class="modal-content" style="padding: 25px;">
+            <div class="success-icon-box" style="margin-bottom: 12px; width: 75px; height: 75px; font-size: 2.8rem;">
+                <i class="fa-solid fa-circle-check" style="color: #34d399;"></i>
+            </div>
+            <h3 style="color: #34d399; margin-bottom: 8px; font-size: 1.25rem;">تم تأكيد طلب السحب</h3>
+            <p id="withdraw-success-msg" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+                لقد تم تأكيد طلب السحب بنجاح، وهو الآن قيد المراجعة وسيتم تحويل المبلغ فور معالجته.
+            </p>
+            <button class="btn btn-primary" onclick="closeWithdrawSuccessModal()">حسناً</button>
+        </div>
+    </div>
+
+    <div id="deposit-success-modal" class="modal">
+        <div class="modal-content" style="padding: 25px;">
+            <div class="success-icon-box" style="margin-bottom: 12px; width: 75px; height: 75px; font-size: 2.8rem;">
+                <i class="fa-solid fa-circle-check" style="color: #34d399;"></i>
+            </div>
+            <h3 style="color: #34d399; margin-bottom: 8px; font-size: 1.25rem;">تم إرسال طلب الإيداع</h3>
+            <p id="deposit-success-msg" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+                تم تسجيل طلب الإيداع بنجاح وهو الآن قيد التحقق من قِبل الإدارة وسيتم إضافته لرصيدك فور تأكيد التحويل.
+            </p>
+            <button class="btn btn-primary" onclick="closeDepositSuccessModal()">حسناً</button>
+        </div>
+    </div>
+
+    <div id="task-success-modal" class="modal">
+        <div class="modal-content" style="padding: 25px;">
+            <div class="success-icon-box" style="margin-bottom: 12px; width: 75px; height: 75px; font-size: 2.8rem;">
+                <i class="fa-solid fa-circle-check" style="color: #34d399;"></i>
+            </div>
+            <h3 style="color: #34d399; margin-bottom: 8px; font-size: 1.25rem;">ألف مبروك!</h3>
+            <p id="task-success-msg" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;"></p>
+            <button class="btn btn-primary" onclick="closeTaskSuccessModal()">حسناً</button>
+        </div>
+    </div>
+
+    <div id="wheel-result-modal" class="modal">
+        <div class="modal-content">
+            <div id="wheel-result-icon" style="font-size: 3.5rem; margin-bottom: 10px;">🎁</div>
+            <h2 id="wheel-result-title" style="color: var(--accent-green); margin-bottom: 8px;">نتيجة عجلة الحظ</h2>
+            <p id="wheel-result-msg" style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;"></p>
+            <button class="btn btn-primary" onclick="closeWheelModal()">رائع، استمرار 🚀</button>
+        </div>
+    </div>
+
+    <div id="copy-toast-modal" class="modal">
+        <div class="modal-content" style="padding: 25px;">
+            <div class="success-icon-box" style="margin-bottom: 10px;">📋</div>
+            <h3 id="copy-toast-title" style="color: var(--accent-green); margin-bottom: 6px;">تم النسخ بنجاح!</h3>
+            <p id="copy-toast-msg" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 18px;"></p>
+            <button class="btn btn-primary" onclick="closeCopyToast()">حسناً</button>
+        </div>
+    </div>
+
+    <div id="login-success-modal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon-box">👋</div>
+            <h2 style="color: var(--accent-green); margin-bottom: 8px;">مرحباً بك مجدداً!</h2>
+            <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+                تم تسجيل دخولك إلى حسابك بنجاح.<br>نتمنى لك رحلة استثمارية موفقة مع SECURO!
+            </p>
+            <button class="btn btn-primary" onclick="closeLoginSuccessModal()">دخول المنصة 🚀</button>
+        </div>
+    </div>
+
+    <div id="login-error-modal" class="modal">
+        <div class="modal-content">
+            <div class="error-icon-box">🔐</div>
+            <h3 style="color: #f87171; margin-bottom: 8px;">خطأ في تسجيل الدخول</h3>
+            <p id="login-error-msg" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+                البريد الإلكتروني غير مسجل في المنصة أو كلمة المرور خاطئة!
+            </p>
+            <button class="btn btn-primary" style="background: var(--bg-light-card);" onclick="closeLoginErrorModal()">حسناً، المحاولة مجدداً</button>
+        </div>
+    </div>
+
+    <div id="support-modal" class="modal">
+        <div class="modal-content">
+            <div style="font-size: 3rem; margin-bottom: 8px;">🎧👩‍💼</div>
+            <h3 style="color: var(--primary-blue); margin-bottom: 6px;">خدمة العملاء والإدارة</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
+                للحصول على دعم سريع، شحن الحساب، أو الاستفسارات، يمكنك التواصل مباشرة مع خدمة العملاء أو الانضمام لقناتنا الرسمية:
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                <a href="https://t.me/Yamno7" target="_blank" class="btn btn-telegram">
+                    💬 خدمة العملاء (موظف الاستقبال) - تليجرام
+                </a>
+                <a href="https://t.me/SecuroChannel" target="_blank" class="btn btn-telegram" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+                    📢 قناة تليجرام الرسمية
+                </a>
+            </div>
+            <button class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeSupportModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- مودال تغيير كلمة المرور -->
+    <div id="change-password-modal" class="modal">
+        <div class="modal-content" style="padding: 25px; text-align: right;">
+            <div style="font-size: 2.5rem; text-align: center; margin-bottom: 10px;">🔑</div>
+            <h3 id="change-password-title" style="color: var(--primary-blue); margin-bottom: 15px; text-align: center;">تغيير كلمة المرور</h3>
+            <form class="form-group" onsubmit="event.preventDefault(); submitChangePassword();" autocomplete="on">
+                <input type="text" id="cp-username" name="username" autocomplete="username" tabindex="-1" aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;height:0;width:0;">
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white);">كلمة المرور الحالية:</label>
+                <input type="password" id="cp-current" name="current-password" placeholder="أدخل كلمة المرور الحالية" autocomplete="current-password">
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white); margin-top: 6px;">كلمة المرور الجديدة:</label>
+                <input type="password" id="cp-new" name="new-password" placeholder="6 أحرف على الأقل" autocomplete="new-password">
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white); margin-top: 6px;">تأكيد كلمة المرور الجديدة:</label>
+                <input type="password" id="cp-confirm" name="confirm-password" placeholder="أعد كتابة كلمة المرور الجديدة" autocomplete="new-password">
+                <div id="cp-error" style="color: #f87171; font-size: 0.82rem; display:none;"></div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 5px;">تأكيد التغيير</button>
+                <button type="button" class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeChangePasswordModal()">إلغاء</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة الإيداع المُعدلة والمطورة -->
+    <div id="deposit-modal" class="modal" style="align-items: flex-end; padding:0;">
+        <div class="modal-content" style="border-radius: 24px 24px 0 0; text-align: right; max-height: 90vh; overflow-y: auto;">
+            <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 10px auto;">
+                💳
+            </div>
+            <h3 style="color: var(--accent-green); margin-bottom: 12px; text-align: center;">شحن رصيد الحساب (USDT TRC20)</h3>
+            
+            <div class="form-group">
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white);">عنوان محفظة الإيداع الرسمية:</label>
+                <div class="copy-input-container">
+                    <input type="text" id="company-wallet-address" value="TKmr5pbXSEWSQ5EfFTtF5wjZRt4Y4KRKxE" readonly style="font-size: 0.78rem; text-align: center;">
+                    <button class="copy-btn" onclick="copyCompanyWallet()">نسخ العنوان</button>
+                </div>
+
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white); margin-top: 6px;">المبلغ المراد إيداعه ($):</label>
+                <input type="number" id="deposit-amount" placeholder="أدخل المبلغ (مثال: 10 أو أي مبلغ آخر)">
+
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white); margin-top: 6px;">معرف المعاملة (TxID / رقم التحويل):</label>
+                <input type="text" id="deposit-txid" placeholder="أدخل رقم أو كود المعاملة بعد التحويل">
+                
+                <div class="deposit-notice-box">
+                    ⚠️ الحد الأدنى للإيداع هو 10 دولار ($10). يرجى التأكد من إرسال المبلغ عبر شبكة TRC20 حصراً.
+                </div>
+
+                <button class="btn btn-green" onclick="submitDeposit()" style="margin-top: 5px;">تأكيد إرسال طلب الإيداع</button>
+                <button class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeDepositModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="congrats-modal" class="modal">
+        <div class="modal-content">
+            <div style="font-size: 3.5rem; margin-bottom: 10px;">🎉</div>
+            <h2 style="color: var(--primary-blue); margin-bottom: 8px;">تهانينا!</h2>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 15px;">تم تسجيل دخولك اليوم بنجاح وحصلت على:</p>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #34d399; background: rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 10px; margin-bottom: 20px;">
+                +0.10 $
+            </div>
+            <button class="btn btn-primary" onclick="closeCongratsModal()">رائع، شكراً!</button>
+        </div>
+    </div>
+
+    <div id="already-claimed-modal" class="modal">
+        <div class="modal-content">
+            <div style="width: 70px; height: 70px; background: rgba(245, 158, 11, 0.15); border: 2px solid #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; margin: 0 auto 12px auto;">
+                ⏳
+            </div>
+            <h3 style="color: #fbbf24; margin-bottom: 8px;">تم الاستلام سابقاً!</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+                لقدحصلت على مكافأة تسجيل الدخول اليومية اليوم بالفعل.<br>تتجدد المكافأة تلقائياً عند الساعة <strong>12:00 منتصف الليل</strong>!
+            </p>
+            <button class="btn btn-primary" onclick="closeAlreadyClaimedModal()">حسناً، فهمت</button>
+        </div>
+    </div>
+
+    <div id="insufficient-modal" class="modal">
+        <div class="modal-content">
+            <div class="warning-icon-box"><span style="font-size: 2rem;">⚠️</span></div>
+            <h3 style="color: #f59e0b; margin-bottom: 8px;">رصيدكم غير كافٍ بالسحب</h3>
+            <p id="insufficient-msg" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;"></p>
+            <button class="btn btn-primary" onclick="closeInsufficientModal()">حسناً، فهمت</button>
+        </div>
+    </div>
+
+    <div id="vip-confirm-modal" class="modal">
+        <div class="modal-content">
+            <div id="vip-modal-icon" style="font-size: 3rem; margin-bottom: 8px;">🛍️</div>
+            <h3 id="vip-modal-title" style="color: var(--text-white); margin-bottom: 10px;">تأكيد شراء العضوية</h3>
+            <p id="vip-modal-msg" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;"></p>
+            <div id="vip-modal-actions" style="display: flex; gap: 10px;">
+                <button type="button" class="btn btn-green" id="vip-confirm-yes-btn" style="flex:1;" onclick="window.confirmBuyVip(event)">نعم</button>
+                <button type="button" class="btn btn-red" style="flex:1;" onclick="closeVipModal()">لا</button>
+            </div>
+            <button type="button" id="vip-modal-close-btn" class="btn btn-primary" style="display:none;" onclick="closeVipModal()">حسناً</button>
+        </div>
+    </div>
+
+    <div id="withdraw-modal" class="modal" style="align-items: flex-end; padding:0;">
+        <div class="modal-content" style="border-radius: 24px 24px 0 0; text-align: right; max-height: 90vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 15px; text-align: center;">💸 اختيار طريقة السحب</h3>
+            <div class="form-group">
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white);">اختر المحفظة الرقمية:</label>
+                <select id="withdraw-bank">
+                    <option value="USDT">🪙 محفظة رقمية (USDT TRC20)</option>
+                    <option value="USDC">🪙 محفظة رقمية (USDC)</option>
+                </select>
+
+                <input type="text" id="withdraw-account" placeholder="أدخل عنوان المحفظة الرقمية (Wallet Address)">
+                <input type="number" id="withdraw-amount" placeholder="المبلغ المراد سحبه ($)">
+                
+                <button class="btn btn-red" onclick="submitWithdraw()">تأكيد طلب السحب</button>
+                <button class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeWithdrawModal()">إلغاء</button>
+            </div>
+
+            <div class="withdraw-info-box">
+                <div style="font-weight: bold; color: var(--text-white); margin-bottom: 4px;">📌 شروط وملاحظات السحب:</div>
+                • <strong>الحد الأدنى للسحب:</strong> هو 10 دولارات ($10) بالضبط.<br>
+                • <strong>الحد الأعلى للسحب:</strong> لا يوجد حد أعلى للسحب.<br>
+                • <strong>أيام وأوقات السحب:</strong> متاحة طيلة أيام الأسبوع من الساعة <strong>08:00 صباحاً</strong> إلى غاية الساعة <strong>05:00 مساءً</strong>.
+            </div>
+        </div>
+    </div>
+
+    <!-- شريط التنقل السفلي -->
+    <nav id="bottom-nav" class="bottom-nav" aria-label="التنقل الرئيسي">
+        <div id="nav-home" class="nav-link active" onclick="switchTab('home')">
+            <span>🏠</span> الرئيسية
+        </div>
+        <div id="nav-vip" class="nav-link" onclick="switchTab('vip')">
+            <span>👑</span> VIP
+        </div>
+        <div id="nav-tasks" class="nav-link" onclick="switchTab('tasks')">
+            <span>⭐</span> مهامي
+        </div>
+        <div id="nav-team" class="nav-link" onclick="switchTab('team')">
+            <span>👥</span> فريقي
+        </div>
+        <div id="nav-profile" class="nav-link" onclick="switchTab('profile')">
+            <span>👤</span> ملكي
+        </div>
+    </nav>
+</div>
+
+<script>
+    let isSignup = false;
+    let currentUser = null;
+    let balance = 0.00;
+    let isAdmin = false;
+    let totalDeposits = 0.00;
+    let totalWithdrawals = 0.00;
+    let totalDepositCount = 0;
+    let totalWithdrawalCount = 0;
+    
+    let teamMembers = [];
+    let referralEarnings = 0.00;
+    let referralEarningsByLevel = {};
+
+    let availableSpins = 0; 
+    let isSpinning = false;
+    let currentWheelRotation = 0;
+
+    let depositLogs = [];
+    let rewardLogs = [];
+    let withdrawLogs = [];
+    let txLogs = [];
+    let lastClaimDate = null;
+    let isClaimingDailyReward = false;
+    let dailyRewardTimerInterval = null;
+    let pendingVip = null;
+
+    let userVip = null;
+    let completedTasksCount = 0;
+    let taskLastResetDate = null;
+    let taskStatuses = [];
+    let taskDaySyncInterval = null;
+    let currentTrialDay = 1;
+    let trialActive = false;
+    let trialUsed = false;
+
+    let activeTaskTimers = {};
+    let midnightTimerInterval = null;
+
+    const wheelSectors = [
+        { label: "حظ سعيد", val: 0, color: "#ef4444" },
+        { label: "$0.50", val: 0.5, color: "#3b82f6" },
+        { label: "$1.00", val: 1.0, color: "#10b981" },
+        { label: "$2.00", val: 2.0, color: "#f59e0b" },
+        { label: "حظ سعيد", val: 0, color: "#ef4444" },
+        { label: "$3.00", val: 3.0, color: "#8b5cf6" },
+        { label: "$50.00", val: 50.0, color: "#ec4899" },
+        { label: "$100.00", val: 100, color: "#eab308" }
+    ];
+
+    const hotelsList = [
+        { name: "فندق برج العرب - دبي", location: "الإمارات العربية المتحدة", img: "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق ذا ريتز كارلتون - نيويورك", location: "الولايات المتحدة الأمريكية", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق فور سيزونز - باريس", location: "فرنسا", img: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80" },
+        { name: "منتجع ماريوت الفاخر - طوكيو", location: "اليابان", img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق أتلانتس البالم - دبي", location: "الإمارات العربية المتحدة", img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق بارك هيات - طوكيو", location: "اليابان", img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق بوليتشيانو - روما", location: "إيطاليا", img: "https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق ماندارين أورينتال - لندن", location: "المملكة المتحدة", img: "https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق إمباسادور - سنغافورة", location: "سنغافورة", img: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=600&q=80" },
+        { name: "منتجع سيكس سينسز - المالديف", location: "جزر المالديف", img: "https://images.unsplash.com/photo-1439130490301-25e322d88054?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق الملك داود - القدس", location: "فلسطين", img: "https://images.unsplash.com/photo-1549918864-48ac978761a4?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق كمبينسكي - جنيف", location: "سويسرا", img: "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=600&q=80" }
+    ];
+
+    function relocateHomeSecondaryContent() {
+        const content = document.getElementById('home-secondary-content');
+        const target = document.getElementById('about-screen-content');
+        if (content && target && !target.contains(content)) target.appendChild(content);
+    }
+
+    function setPlatformMenuMode(adminMode) {
+        const menu = document.getElementById('platform-menu');
+        const menuToggle = document.getElementById('platform-menu-toggle');
+        const accountAction = document.getElementById('header-account-action');
+        if (menu) menu.classList.toggle('admin-mode', Boolean(adminMode));
+        const authenticated = Boolean(currentUser) && !document.getElementById('auth-screen')?.classList.contains('active');
+        if (menuToggle) menuToggle.style.display = authenticated ? 'inline-flex' : 'none';
+        if (accountAction) accountAction.style.display = authenticated && !adminMode ? 'inline-flex' : 'none';
+    }
+
+    function togglePlatformMenu() {
+        const menu = document.getElementById('platform-menu');
+        const toggle = document.getElementById('platform-menu-toggle');
+        if (!menu || document.getElementById('auth-screen')?.classList.contains('active')) return;
+        const open = !menu.classList.contains('is-open');
+        menu.classList.toggle('is-open', open);
+        menu.setAttribute('aria-hidden', String(!open));
+        if (toggle) toggle.setAttribute('aria-expanded', String(open));
+        document.body.classList.toggle('platform-menu-open', open);
+    }
+
+    function closePlatformMenu() {
+        const menu = document.getElementById('platform-menu');
+        const toggle = document.getElementById('platform-menu-toggle');
+        if (!menu) return;
+        menu.classList.remove('is-open');
+        menu.setAttribute('aria-hidden', 'true');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('platform-menu-open');
+    }
+
+    function navigateFromPlatform(target) {
+        closePlatformMenu();
+        if (target === 'admin-dashboard') {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('admin-screen')?.classList.add('active');
+            scrollMainContentToTop();
+            renderAdminDashboard();
+            return;
+        }
+        if (target.endsWith('-screen')) {
+            openSubPage(target);
+        } else {
+            switchTab(target);
+        }
+    }
+
+    function focusAdminSection(sectionId) {
+        closePlatformMenu();
+        const screen = document.getElementById('admin-screen');
+        const section = document.getElementById(sectionId);
+        if (!screen || !section) return;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+        requestAnimationFrame(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
+
+    function setActivePlatformItem(target) {
+        document.querySelectorAll('.platform-menu-item[data-target]').forEach(item => {
+            item.classList.toggle('is-active', item.dataset.target === target);
+        });
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closePlatformMenu();
+    });
+
+    window.addEventListener('load', function() {
+        relocateHomeSecondaryContent();
+        drawWheel();
+        
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slider-slide');
+        if (slides.length > 0) {
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 3500);
+        }
+    });
+
+    function syncGlobalDatabase() {
+        return Promise.resolve();
+    }
+
+    function changeLanguage(lang) {
+        if(lang === 'ar') {
+            document.documentElement.setAttribute('dir', 'rtl');
+            document.documentElement.setAttribute('lang', 'ar');
+        } else {
+            document.documentElement.setAttribute('dir', 'ltr');
+            document.documentElement.setAttribute('lang', lang);
+        }
+    }
+
+    function drawWheel() {
+        const canvas = document.getElementById('wheel-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const numSectors = wheelSectors.length;
+        const radius = canvas.width / 2;
+        const anglePerSector = (2 * Math.PI) / numSectors;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < numSectors; i++) {
+            const startAngle = i * anglePerSector;
+            const endAngle = startAngle + anglePerSector;
+
+            ctx.beginPath();
+            ctx.moveTo(radius, radius);
+            ctx.arc(radius, radius, radius, startAngle, endAngle);
+            ctx.fillStyle = wheelSectors[i].color;
+            ctx.fill();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#ffffff";
+            ctx.stroke();
+
+            ctx.save();
+            ctx.translate(radius, radius);
+            ctx.rotate(startAngle + anglePerSector / 2);
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 13px Segoe UI, sans-serif";
+            ctx.shadowColor = "rgba(0,0,0,0.6)";
+            ctx.shadowBlur = 4;
+            ctx.fillText(wheelSectors[i].label, radius - 15, 5);
+            ctx.restore();
+        }
+        updateWheelUI();
+    }
+
+    function updateWheelUI() {
+        const button = document.getElementById('spin-wheel-button');
+        if (!button) return;
+        const hasSpins = Number(availableSpins || 0) > 0;
+        button.disabled = isSpinning || !hasSpins;
+        button.title = hasSpins ? 'استخدم فرصة عجلة الحظ' : 'لا توجد فرص متاحة حالياً';
+        button.innerText = isSpinning ? '...' : 'دوران';
+    }
+
+    async function spinWheel() {
+        if (isSpinning || Number(availableSpins || 0) < 1) {
+            if (Number(availableSpins || 0) < 1) {
+                showApiError(new Error("لا توجد محاولات حظ متاحة"));
+            }
+            return;
+        }
+        isSpinning = true;
+        updateWheelUI();
+        let result;
+        try {
+            result = await window.securoApi("/api/wheel/spin", { method: "POST" });
+            if (result.user) window.syncServerUser(result.user);
+        } catch (error) {
+            isSpinning = false;
+            updateWheelUI();
+            showApiError(error);
+            return;
+        }
+        const selectedSectorIndex = result.sectorIndex;
+
+        const numSectors = wheelSectors.length;
+        const sectorDegree = 360 / numSectors;
+
+        const targetSectorCenter = (selectedSectorIndex * sectorDegree) + (sectorDegree / 2);
+        const stopAngle = (270 - targetSectorCenter + 360) % 360;
+
+        const extraRotations = 360 * 5; 
+        const totalRotation = currentWheelRotation + extraRotations + (stopAngle - (currentWheelRotation % 360));
+        currentWheelRotation = totalRotation;
+
+        const canvas = document.getElementById('wheel-canvas');
+        canvas.style.transform = `rotate(${totalRotation}deg)`;
+
+        setTimeout(() => {
+            isSpinning = false;
+            updateWheelUI();
+            const wonSector = wheelSectors[selectedSectorIndex];
+            
+            const modal = document.getElementById('wheel-result-modal');
+            const icon = document.getElementById('wheel-result-icon');
+            const title = document.getElementById('wheel-result-title');
+            const msg = document.getElementById('wheel-result-msg');
+
+            if (result.amount > 0) {
+                icon.innerText = "🎉";
+                title.innerText = "تهانينا! لقد فزت!";
+                title.style.color = "var(--accent-green)";
+                msg.innerHTML = `ربحت مبلغ <strong>$${Number(result.amount).toFixed(2)}</strong> وتمت إضافته بنجاح إلى رصيد حسابك!`;
+            } else {
+                icon.innerText = "😔";
+                title.innerText = "حظ سعيد المرة القادمة!";
+                title.style.color = "#f59e0b";
+                msg.innerText = "لم تحالفك أرقام الحظ في هذه الدورة. قم بترقية حسابك أو ادعُ أصدقاء للإيداع للحصول على فرص إضافية آلياً!";
+            }
+
+            modal.style.display = "flex";
+        }, 4000);
+    }
+
+    function closeWheelModal() {
+        document.getElementById('wheel-result-modal').style.display = "none";
+    }
+
+    async function activateTrial() {
+        try {
+            const result = await window.securoApi("/api/vip/trial", { method: "POST" });
+            window.syncServerUser(result.user);
+            document.getElementById('btn-trial-activate').style.display = 'none';
+            document.getElementById('trial-success-section').style.display = 'block';
+            updateVipUIState();
+        } catch (error) {
+            showApiError(error);
+        }
+    }
+
+    function toggleAuth() {
+        isSignup = !isSignup;
+        updateAuthModeUI();
+    }
+
+    function updateAuthModeUI() {
+        document.getElementById('reg-name').style.display = isSignup ? 'block' : 'none';
+        document.getElementById('reg-name-label').style.display = isSignup ? 'block' : 'none';
+        document.getElementById('invite-group').style.display = isSignup ? 'block' : 'none';
+        document.getElementById('auth-title').innerText = isSignup ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
+        document.getElementById('auth-btn').innerText = isSignup ? '🚀 إنشاء الحساب' : '🚀 دخول';
+        document.getElementById('toggle-text').innerText = isSignup ? 'لديك حساب بالفعل؟ دخول' : 'ليس لديك حساب؟ إنشاء حساب جديد';
+        document.getElementById('toggle-text').setAttribute('onclick', 'toggleAuth()');
+    }
+
+    function startDailyRewardClock() {
+        if (dailyRewardTimerInterval) return;
+        dailyRewardTimerInterval = setInterval(() => {
+            if (currentUser && !isAdmin) updateDailyRewardUI();
+        }, 1000);
+    }
+
+    function openLoginErrorModal(msg) {
+        if(msg) document.getElementById('login-error-msg').innerText = msg;
+        document.getElementById('login-error-modal').style.display = 'flex';
+    }
+
+    function closeLoginErrorModal() {
+        document.getElementById('login-error-modal').style.display = 'none';
+    }
+
+    function scrollMainContentToTop() {
+        const content = document.querySelector('.content');
+        if (content) content.scrollTo({ top: 0, behavior: 'auto' });
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }
+
+    function resetAppViewport() {
+        scrollMainContentToTop();
+    }
+
+    function closeLoginSuccessModal() {
+        document.getElementById('login-success-modal').style.display = 'none';
+        resetAppViewport();
+        document.getElementById('auth-screen').classList.remove('active');
+        setPlatformMenuMode(isAdmin);
+        
+        if (isAdmin) {
+            document.querySelector('.app-container').classList.remove('nav-visible');
+            document.getElementById('admin-screen').classList.add('active');
+            document.getElementById('header-title').innerText = "SECURO ADMIN";
+            renderAdminDashboard();
+        } else {
+            document.getElementById('bottom-nav').style.display = 'flex';
+            document.querySelector('.app-container').classList.add('nav-visible');
+            switchTab('home');
+        }
+
+        requestAnimationFrame(resetAppViewport);
+    }
+
+    function loadUserSession(userObj) {
+        currentUser = userObj;
+        isAdmin = userObj.isAdmin || false;
+        balance = userObj.balance || 0.00;
+        availableSpins = userObj.availableSpins || 0;
+        userVip = userObj.userVip || null;
+        completedTasksCount = userObj.completedTasksCount || 0;
+        taskLastResetDate = userObj.taskLastResetDate || null;
+        lastClaimDate = userObj.lastClaimDate || null;
+        currentTrialDay = userObj.currentTrialDay || 1;
+        trialActive = userObj.trialActive || false;
+        trialUsed = userObj.trialUsed || false;
+        depositLogs = userObj.depositLogs || [];
+        rewardLogs = userObj.rewardLogs || [];
+        withdrawLogs = userObj.withdrawLogs || [];
+        txLogs = userObj.txLogs || [];
+
+        checkMidnightReset();
+
+        if (!isAdmin) {
+            document.getElementById('user-balance').innerText = balance.toFixed(2);
+            document.getElementById('home-balance').innerText = balance.toFixed(2);
+            document.getElementById('wheel-spins-count').innerText = availableSpins;
+            document.getElementById('user-display-email').innerText = currentUser.email;
+            setupUserInviteData();
+            updateVipUIState();
+            updateDailyRewardUI();
+
+            if (trialUsed) {
+                document.getElementById('btn-trial-activate').style.display = 'none';
+                document.getElementById('trial-success-section').style.display = 'block';
+            } else {
+                document.getElementById('btn-trial-activate').style.display = 'block';
+                document.getElementById('trial-success-section').style.display = 'none';
+            }
+        }
+        setPlatformMenuMode(isAdmin);
+    }
+
+    function saveUserData() {
+        // Account state is server-owned. This legacy hook intentionally does
+        // nothing; mutations must use an explicit authenticated API endpoint.
+    }
+
+    function checkMidnightReset() {
+        updateDailyRewardUI();
+    }
+
+    function startTaskDaySync() {
+        if (taskDaySyncInterval) return;
+        taskDaySyncInterval = setInterval(async () => {
+            const today = new Date().toISOString().split('T')[0];
+            if (!taskLastResetDate || taskLastResetDate === today || !currentUser || isAdmin) return;
+            try {
+                const payload = await window.securoApi("/api/me");
+                taskStatuses = payload.taskStatuses || [];
+                window.syncServerUser(payload.user);
+                if (document.getElementById('tasks-screen')?.classList.contains('active')) {
+                    renderTasksScreen();
+                }
+            } catch (error) {
+                console.error("Failed to refresh daily task state", error);
+            }
+        }, 30000);
+    }
+
+    function setupUserInviteData() {
+        const code = currentUser.inviteCode || 529993;
+        document.getElementById('my-invite-code').value = code;
+        document.getElementById('my-invite-link').value = `https://securo-vip.com/register?invite=${code}`;
+    }
+
+    function updateVipUIState() {
+        let priceMap = { 1: 14, 2: 24, 3: 54, 4: 120 };
+        for (let i = 1; i <= 4; i++) {
+            const btn = document.getElementById(`btn-buy-vip${i}`);
+            if (!btn) continue;
+            
+            const vipNameCode = `VIP ${i}`;
+            if (userVip && userVip.name === vipNameCode) {
+                btn.innerText = "✔ المستوى الحالي (تم الشراء)";
+                btn.className = "btn btn-disabled";
+                btn.disabled = true;
+            } else {
+                btn.innerText = `شراء العضوية ($${priceMap[i]})`;
+                btn.className = "btn btn-gold";
+                btn.disabled = false;
+            }
+        }
+    }
+
+    function logout() {
+        saveUserData();
+        closePlatformMenu();
+        currentUser = null;
+        isAdmin = false;
+        balance = 0.00;
+        userVip = null;
+        completedTasksCount = 0;
+        if(midnightTimerInterval) clearInterval(midnightTimerInterval);
+        if(taskDaySyncInterval) clearInterval(taskDaySyncInterval);
+        taskDaySyncInterval = null;
+        
+        document.getElementById('bottom-nav').style.display = 'none';
+        document.querySelector('.app-container').classList.remove('nav-visible');
+        document.getElementById('admin-screen').classList.remove('active');
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('auth-screen').classList.add('active');
+        document.getElementById('header-title').innerText = "SECURO";
+        document.getElementById('auth-email').value = '';
+        document.getElementById('auth-pass').value = '';
+        document.getElementById('reg-name').value = '';
+        setPlatformMenuMode(false);
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+
+        const screen = document.getElementById(tabName + '-screen');
+        if (!screen) return;
+        screen.classList.add('active');
+        const nav = document.getElementById('nav-' + tabName);
+        if (nav) nav.classList.add('active');
+        setActivePlatformItem(tabName);
+        scrollMainContentToTop();
+
+        if(tabName === 'tasks') renderTasksScreen();
+        if(tabName === 'team') renderTeamScreen();
+        if(tabName === 'vip') updateVipUIState();
+        if(tabName === 'profile') updateDailyRewardUI();
+    }
+
+    function renderTeamScreen() {
+        let lvl1 = teamMembers.filter(m => m.level === 1).length;
+        let lvl2 = teamMembers.filter(m => m.level === 2).length;
+        let lvl3 = teamMembers.filter(m => m.level === 3).length;
+
+        document.getElementById('lvl1-count').innerText = `${lvl1} شخص`;
+        document.getElementById('lvl2-count').innerText = `${lvl2} شخص`;
+        document.getElementById('lvl3-count').innerText = `${lvl3} شخص`;
+        document.getElementById('total-team-count').innerText = teamMembers.length;
+        document.getElementById('total-referral-earnings').innerText = referralEarnings.toFixed(2);
+
+        const container = document.getElementById('team-members-list');
+        container.innerHTML = "";
+
+        if(teamMembers.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; padding:30px 15px; color:var(--text-muted); background: rgba(15,23,42,0.4); border-radius:12px; border:1px dashed var(--border-color);">
+                    <div style="font-size:2.5rem; margin-bottom:8px;">👥</div>
+                    <div style="font-weight:bold; color:white; margin-bottom:4px;">عدد الدعوات حالياً هو 0</div>
+                    <div style="font-size:0.8rem;">شارِك رابط أو رمز الدعوة مع أصدقائك لبدء تكوين فريقك وكسب عمولات فورية ومحاولات آلية في عجلة الحظ عند إيداعهم!</div>
+                </div>`;
+            return;
+        }
+
+        teamMembers.forEach(m => {
+            let lvlClass = m.level === 1 ? 'lvl-1' : (m.level === 2 ? 'lvl-2' : 'lvl-3');
+            container.innerHTML += `
+                <div class="history-card">
+                    <div class="history-info">
+                        <div class="history-title">👤 ${m.name}</div>
+                        <div class="history-date">📅 تاريخ التسجيل: ${m.date}</div>
+                    </div>
+                    <div>
+                        <span class="level-badge ${lvlClass}">المستوى ${m.level}</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function showCopyToast(title, msg) {
+        document.getElementById('copy-toast-title').innerText = title;
+        document.getElementById('copy-toast-msg').innerText = msg;
+        document.getElementById('copy-toast-modal').style.display = 'flex';
+    }
+
+    function closeCopyToast() {
+        document.getElementById('copy-toast-modal').style.display = 'none';
+    }
+
+    function copyInviteCode() {
+        const input = document.getElementById('my-invite-code');
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        showCopyToast('تم نسخ رمز الدعوة! 🔑', `تم نسخ رمز الدعوة الخاص بك (${input.value}) بنجاح إلى الحافظة.`);
+    }
+
+    function copyInviteLink() {
+        const input = document.getElementById('my-invite-link');
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        showCopyToast('تم نسخ رابط الدعوة! 🔗', 'تم نسخ رابط الدعوة المباشر الخاص بك بنجاح. يمكنك الآن مشاركته مع أصدقائك!');
+    }
+
+    function copyCompanyWallet() {
+        const input = document.getElementById('company-wallet-address');
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        showCopyToast('تم نسخ عنوان المحفظة! 📋', 'تم نسخ عنوان محفظة الشركة (USDT TRC20) بنجاح.');
+    }
+
+    function openSubPage(pageId) {
+        closePlatformMenu();
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const page = document.getElementById(pageId);
+        if (!page) return;
+        page.classList.add('active');
+        setActivePlatformItem(pageId);
+        scrollMainContentToTop();
+
+        if(pageId === 'deposit-history-screen') renderDepositsList();
+        if(pageId === 'reward-history-screen') renderRewardsList();
+        if(pageId === 'withdraw-history-screen') renderWithdrawsList();
+        if(pageId === 'tx-history-screen') renderTxList();
+    }
+
+    function openSupportModal() { document.getElementById('support-modal').style.display = 'flex'; }
+    function closeSupportModal() { document.getElementById('support-modal').style.display = 'none'; }
+    function openDepositModal() { document.getElementById('deposit-modal').style.display = 'flex'; }
+    function closeDepositModal() { document.getElementById('deposit-modal').style.display = 'none'; }
+    function closeDepositSuccessModal() { document.getElementById('deposit-success-modal').style.display = 'none'; }
+    function openWithdrawModal() { document.getElementById('withdraw-modal').style.display = 'flex'; }
+    function closeWithdrawModal() { document.getElementById('withdraw-modal').style.display = 'none'; }
+    function closeWithdrawSuccessModal() { document.getElementById('withdraw-success-modal').style.display = 'none'; }
+    function closeInsufficientModal() { document.getElementById('insufficient-modal').style.display = 'none'; }
+
+    function buyVipProduct(name, price, totalTasks, totalReward) {
+        pendingVip = { name, price, totalTasks, totalReward, isTrial: false };
+        const modal = document.getElementById('vip-confirm-modal');
+        const actions = document.getElementById('vip-modal-actions');
+        const closeBtn = document.getElementById('vip-modal-close-btn');
+        const confirmBtn = document.getElementById('vip-confirm-yes-btn');
+
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.innerText = "نعم";
+            confirmBtn.setAttribute("aria-busy", "false");
+        }
+        // The server is the source of truth for the available balance. Do not
+        // block the purchase here using a possibly stale client-side balance:
+        // VIP purchases are allowed at any time and the API performs the
+        // final atomic balance check after the user confirms with "نعم".
+        document.getElementById('vip-modal-icon').innerText = "❓";
+        document.getElementById('vip-modal-title').innerText = "تأكيد شراء العضوية";
+        document.getElementById('vip-modal-msg').innerText = `هل أنت متأكد من شراء عضوية ${name} بسعر $${price} (مدة الصلاحية: 365 يوماً)؟\nسيتم التحقق من الرصيد المتاح وتنفيذ الشراء فوراً.`;
+        actions.style.display = "flex";
+        closeBtn.style.display = "none";
+        modal.style.display = "flex";
+    }
+
+    async function confirmBuyVip(event) {
+        event?.preventDefault();
+        if (!pendingVip) {
+            showApiError(new Error("يرجى اختيار عضوية VIP أولاً"));
+            return;
+        }
+        const confirmBtn = document.getElementById('vip-confirm-yes-btn');
+        if (confirmBtn?.disabled) return;
+        const vipToBuy = { ...pendingVip };
+        if (!window.securoApi) {
+            showApiError(new Error("الخادم غير جاهز بعد، يرجى المحاولة مرة أخرى"));
+            return;
+        }
+        if (confirmBtn) {
+            confirmBtn.disabled = true;
+            confirmBtn.innerText = "جارٍ التأكيد...";
+            confirmBtn.setAttribute("aria-busy", "true");
+        }
+        try {
+            const result = await window.securoApi("/api/vip/purchase", {
+                method: "POST",
+                body: JSON.stringify({ name: vipToBuy.name }),
+            });
+            if (!result?.user) throw new Error("لم يرجع الخادم بيانات العضوية");
+            window.syncServerUser(result.user);
+            // The purchase endpoint returns the new day's task state as well.
+            // Replace the local cache before opening "مهامي" so VIP1's tasks
+            // are rendered immediately and not only after a later refresh.
+            taskStatuses = result.taskStatuses || [];
+            activeTaskTimers = {};
+            pendingVip = null;
+            closeVipModal();
+            alert(`🎉 تم تفعيل الاشتراك ${result.user.userVip.name} بنجاح. بدأت الآن مهام ${result.user.userVip.name} الخاصة بك.`);
+            switchTab('tasks');
+        } catch (error) {
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerText = "نعم";
+                confirmBtn.setAttribute("aria-busy", "false");
+            }
+            const message = document.getElementById('vip-modal-msg');
+            if (message) {
+                message.innerText = error.message || "تعذر تأكيد شراء العضوية";
+                message.style.color = "#fca5a5";
+            }
+            showApiError(error);
+        }
+    }
+
+    window.confirmBuyVip = confirmBuyVip;
+
+    function closeVipModal() { document.getElementById('vip-confirm-modal').style.display = "none"; }
+
+    function renderTasksScreen() {
+        const statusEl = document.getElementById('task-vip-status');
+        const progressEl = document.getElementById('task-progress-text');
+        const container = document.getElementById('tasks-container');
+        container.innerHTML = "";
+
+        if(!userVip) {
+            statusEl.innerText = "العضوية الحالية: غير مشترك";
+            progressEl.innerText = "المهام المنجزة: 0 / 0";
+            container.innerHTML = `
+                <div class="card" style="text-align: center; padding: 30px;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">🔒</div>
+                    <h3 style="color: #fbbf24; margin-bottom: 8px;">لا توجد عضوية نشطة</h3>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 20px;">
+                        يمكنك تفعيل **الفترة التجريبية** أو شراء عضوية مدفوعة من قسم <strong>VIP</strong> لتسليم تقييماتك واستلام أرباحك!
+                    </p>
+                    <button class="btn btn-gold" onclick="switchTab('vip')">👑 الانتقال لصفحة VIP</button>
+                </div>
+            `;
+            return;
+        }
+
+        const taskReward = userVip.totalReward / userVip.totalTasks;
+        statusEl.innerText = `العضوية النشطة: ${userVip.name} (دخل المهمة: $${taskReward.toFixed(2)})`;
+        progressEl.innerText = `المهام المنجزة اليوم: ${completedTasksCount} / ${userVip.totalTasks}`;
+
+        if (completedTasksCount >= userVip.totalTasks) {
+            let trialDayText = userVip.isTrial ? ` (تجربة من 4 مهام إجمالاً)` : " (صالحة لمدة 365 يوماً)";
+            container.innerHTML = `
+                <div class="task-complete-card">
+                    <div class="task-complete-icon-box">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h3 style="color: #34d399; font-size: 1.3rem; margin-bottom: 8px;">لقد قمت بمهام اليوم${trialDayText} بنجاح!</h3>
+                    <p style="color: #a7f3d0; font-size: 0.9rem; line-height: 1.5; margin-bottom: 10px;">
+                        يجب عليك العودة غداً للقيام بمهام الفترة الجديدة.
+                    </p>
+                    <div id="midnight-countdown" style="font-size: 0.9rem; font-weight: bold; color: #fbbf24; margin-bottom: 12px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px;"></div>
+                    <div class="commission-badge-box">
+                        <span style="color: #94a3b8; font-size: 0.82rem; display: block; margin-bottom: 4px;">إجمالي العمولة المكتسبة لهذه الجلسة:</span>
+                        <span style="color: #fbbf24; font-size: 1.6rem; font-weight: 900;">+$${userVip.totalReward.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+            startMidnightCountdown();
+            return;
+        }
+
+        const taskCount = Math.min(Number(userVip.totalTasks), hotelsList.length); // hotelsList now has 12 hotels
+        for (let taskIndex = 0; taskIndex < taskCount; taskIndex++) {
+            const i = taskIndex;
+            const hotel = hotelsList[i];
+            const status = taskStatuses.find((item) => Number(item.taskIndex) === taskIndex);
+            const isCompleted = Boolean(status && status.completed);
+            const isRunning = Boolean(!isCompleted && (
+                activeTaskTimers[taskIndex]?.running || status?.startedAt
+            ));
+            const elapsed = status?.startedAt
+                ? Math.floor((Date.now() - new Date(status.startedAt).getTime()) / 1000)
+                : 0;
+            const currentSec = isRunning
+                ? Math.max(0, activeTaskTimers[taskIndex]?.timeLeft ?? (60 - elapsed))
+                : 60;
+            const buttonText = isCompleted
+                ? "✅ مكتملة اليوم — المكافأة مستلمة"
+                : isRunning
+                    ? `⏳ المهمة قيد المراجعة (${currentSec}ث)...`
+                    : `📤 إرسال التقييم واستلام العمولة ($${taskReward.toFixed(2)})`;
+
+            container.innerHTML += `
+                <div class="hotel-card" id="hotel-card-${taskIndex}">
+                    <div class="hotel-img" style="background-image: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent), url('${hotel.img}');">
+                        <div class="hotel-badge">⭐ 5.0 عالمي</div>
+                        <div style="padding: 12px; width: 100%;">
+                            <div style="font-weight: bold; font-size: 1.05rem; color: white;">${hotel.name}</div>
+                            <div style="font-size: 0.78rem; color: #bae6fd;">📍 ${hotel.location}</div>
+                        </div>
+                    </div>
+                    <div class="hotel-info" id="hotel-info-${taskIndex}">
+                        <textarea id="comment-${taskIndex}" placeholder="اكتب تعليقاً إيجابياً مميزاً..." style="margin-top: 8px; font-size: 0.85rem; height: 60px;" ${isRunning || isCompleted ? 'disabled' : ''}>${status?.comment || 'فندق ممتاز وخدمة راقية جداً!'}</textarea>
+                        <button class="btn ${isRunning || isCompleted ? 'btn-disabled' : 'btn-primary'}" id="btn-task-${taskIndex}" style="margin-top: 10px; padding: 10px;" ${isRunning || isCompleted ? 'disabled' : ''} onclick="submitHotelTask(${taskIndex})">
+                            ${buttonText}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (isRunning || isCompleted) {
+                let btn = document.getElementById(`btn-task-${taskIndex}`);
+                if(btn) {
+                    btn.style.backgroundColor = "#fef3c7";
+                    btn.style.color = "#d97706";
+                    btn.style.border = "1px solid #fde68a";
+                }
+            }
+            if (isRunning && status?.startedAt && !activeTaskTimers[taskIndex]) {
+                startTaskTimer(taskIndex, status.comment || "", status.startedAt);
+            }
+        }
+    }
+
+    function startMidnightCountdown() {
+        if (midnightTimerInterval) clearInterval(midnightTimerInterval);
+        
+        midnightTimerInterval = setInterval(() => {
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(24, 0, 0, 0);
+            let timeLeftMs = midnight - now;
+
+            if (timeLeftMs <= 0) {
+                clearInterval(midnightTimerInterval);
+                window.refreshServerMe?.().finally(() => renderTasksScreen());
+                return;
+            }
+
+            let hours = Math.floor((timeLeftMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((timeLeftMs % (1000 * 60)) / 1000);
+
+            const timerEl = document.getElementById('midnight-countdown');
+            if (timerEl) {
+                timerEl.innerText = `⏳ الوقت المتبقي لتجديد المهام تلقائياً: ${hours}س ${minutes}د ${seconds}ث`;
+            }
+        }, 1000);
+    }
+
+    function startTaskTimer(taskIdx, comment, startedAtValue) {
+        if (activeTaskTimers[taskIdx]?.running) return;
+        const startedAt = new Date(startedAtValue).getTime();
+        activeTaskTimers[taskIdx] = {
+            running: true,
+            timeLeft: Math.max(0, 60 - Math.floor((Date.now() - startedAt) / 1000))
+        };
+
+        const timer = setInterval(() => {
+            if (!activeTaskTimers[taskIdx]) {
+                clearInterval(timer);
+                return;
+            }
+
+            activeTaskTimers[taskIdx].timeLeft--;
+            const timeLeft = activeTaskTimers[taskIdx].timeLeft;
+            const currentBtn = document.getElementById(`btn-task-${taskIdx}`);
+            if (currentBtn) {
+                currentBtn.innerHTML = `⏳ المهمة قيد المراجعة (${Math.max(0, timeLeft)}ث)...`;
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                delete activeTaskTimers[taskIdx];
+                window.securoApi(`/api/tasks/${taskIdx}/complete`, {
+                    method: "POST",
+                    body: JSON.stringify({ comment }),
+                }).then((result) => {
+                    window.syncServerUser(result.user);
+                    taskStatuses = [
+                        ...taskStatuses.filter((item) => Number(item.taskIndex) !== Number(taskIdx)),
+                        { taskIndex: Number(result.taskIndex ?? taskIdx), completed: true },
+                    ];
+                    if (result.alreadyCompleted) {
+                        renderTasksScreen();
+                        return;
+                    }
+                    document.getElementById('task-success-msg').innerHTML =
+                        `لقد ربحت <strong>$${Number(result.reward).toFixed(2)}</strong> عن إتمام المهمة بنجاح وتضافرت الأرباح إلى رصيدك.`;
+                    document.getElementById('task-success-modal').style.display = 'flex';
+                    renderTasksScreen();
+                }).catch((error) => {
+                    showApiError(error);
+                    renderTasksScreen();
+                });
+            }
+        }, 1000);
+    }
+
+    async function submitHotelTask(taskIdx) {
+        if (activeTaskTimers[taskIdx] && activeTaskTimers[taskIdx].running) return;
+        const existingStatus = taskStatuses.find((item) => Number(item.taskIndex) === Number(taskIdx));
+        if (existingStatus?.completed) return;
+        const btn = document.getElementById(`btn-task-${taskIdx}`);
+        const textarea = document.getElementById(`comment-${taskIdx}`);
+        const comment = textarea ? textarea.value.trim() : "";
+        if (comment.length < 5) {
+            showApiError(new Error("يرجى كتابة تعليق صحيح"));
+            return;
+        }
+        let started;
+        try {
+            started = await window.securoApi(`/api/tasks/${taskIdx}/start`, {
+                method: "POST",
+                body: JSON.stringify({ comment }),
+            });
+        } catch (error) {
+            showApiError(error);
+            return;
+        }
+        if (started.completed) {
+            taskStatuses = taskStatuses.map((item) =>
+                Number(item.taskIndex) === Number(taskIdx) ? { ...item, completed: true } : item
+            );
+            renderTasksScreen();
+            return;
+        }
+        if(textarea) textarea.disabled = true;
+        if(btn) {
+            btn.disabled = true;
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-disabled');
+            btn.style.backgroundColor = "#fef3c7";
+            btn.style.color = "#d97706";
+            btn.style.border = "1px solid #fde68a";
+        }
+
+        taskStatuses = [
+            ...taskStatuses.filter((item) => Number(item.taskIndex) !== Number(taskIdx)),
+            {
+                taskIndex: Number(started.taskIndex ?? taskIdx),
+                comment,
+                startedAt: started.startedAt,
+                completed: false
+            },
+        ];
+        startTaskTimer(taskIdx, comment, started.startedAt);
+    }
+
+    function closeTaskSuccessModal() {
+        document.getElementById('task-success-modal').style.display = 'none';
+    }
+
+    function openChangePasswordModal() {
+        const username = document.getElementById('cp-username');
+        if (username) username.value = currentUser?.email || '';
+        document.getElementById('cp-current').value = '';
+        document.getElementById('cp-new').value = '';
+        document.getElementById('cp-confirm').value = '';
+        document.getElementById('cp-error').style.display = 'none';
+        const title = document.getElementById('change-password-title');
+        if (title) title.innerText = isAdmin ? 'تغيير كلمة مرور لوحة التحكم' : 'تغيير كلمة المرور';
+        document.getElementById('change-password-modal').style.display = 'flex';
+    }
+    function closeChangePasswordModal() {
+        document.getElementById('change-password-modal').style.display = 'none';
+    }
+
+    async function submitChangePassword() {
+        const current = document.getElementById('cp-current').value;
+        const newPass = document.getElementById('cp-new').value;
+        const confirm = document.getElementById('cp-confirm').value;
+        const errEl = document.getElementById('cp-error');
+        errEl.style.display = 'none';
+
+        if (newPass.length < 6) {
+            errEl.innerText = 'كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف';
+            errEl.style.display = 'block';
+            return;
+        }
+        if (newPass !== confirm) {
+            errEl.innerText = 'كلمة المرور الجديدة وتأكيدها غير متطابقتين';
+            errEl.style.display = 'block';
+            return;
+        }
+        try {
+            const endpoint = isAdmin ? '/api/admin/password' : '/api/me/password';
+            await window.securoApi(endpoint, {
+                method: 'POST',
+                body: JSON.stringify({ currentPassword: current, newPassword: newPass }),
+            });
+            closeChangePasswordModal();
+            showCopyToast(
+                'تم تغيير كلمة المرور ✅',
+                isAdmin
+                    ? 'تم تحديث كلمة مرور لوحة التحكم في قاعدة البيانات بنجاح.'
+                    : 'تم تحديث كلمة مرورك بنجاح. استخدم كلمة المرور الجديدة في تسجيل الدخول القادم.',
+            );
+        } catch (error) {
+            errEl.innerText = error.message || 'تعذر تغيير كلمة المرور';
+            errEl.style.display = 'block';
+        }
+    }
+
+    async function cancelTrialSelf() {
+        if (!window.confirm('هل أنت متأكد من إيقاف الفترة التجريبية؟ لن تتمكن من إعادة تفعيلها لاحقاً.')) return;
+        try {
+            const result = await window.securoApi('/api/vip/trial/cancel', { method: 'POST' });
+            window.syncServerUser(result.user);
+            document.getElementById('btn-trial-activate').style.display = 'none';
+            document.getElementById('trial-success-section').style.display = 'none';
+            const profileItem = document.getElementById('profile-trial-cancel-item');
+            if (profileItem) profileItem.style.display = 'none';
+            showCopyToast('تم إيقاف الفترة التجريبية', 'تم إنهاء الفترة التجريبية. يمكنك الآن الترقية لعضوية مدفوعة من قسم VIP.');
+        } catch (error) {
+            showApiError(error);
+        }
+    }
+
+    function updateDailyRewardUI() {
+        const claimBtn = document.getElementById('claim-btn');
+        if (!claimBtn) return;
+        startDailyRewardClock();
+
+        const today = new Date().toISOString().split('T')[0];
+        if (isClaimingDailyReward) {
+            claimBtn.disabled = true;
+            return;
+        }
+
+        if (lastClaimDate === today) {
+            claimBtn.disabled = true;
+            claimBtn.className = "btn btn-disabled";
+            claimBtn.innerText = "✔ تم استلام مكافأة اليوم (تتجدد 12 ليلاً)";
+        } else {
+            claimBtn.disabled = false;
+            claimBtn.className = "btn btn-gold";
+            claimBtn.innerText = "طلب 0.10$ اليومية";
+        }
+    }
+
+    async function claimDailyReward() {
+        if (isClaimingDailyReward) return;
+        isClaimingDailyReward = true;
+        updateDailyRewardUI();
+        try {
+            const result = await window.securoApi("/api/rewards/daily", { method: "POST" });
+            window.syncServerUser(result.user);
+            updateDailyRewardUI();
+            document.getElementById('congrats-modal').style.display = 'flex';
+        } catch (error) {
+            if (error.message.includes("مسبقاً")) {
+                try {
+                    const payload = await window.securoApi("/api/me");
+                    window.syncServerUser(payload.user);
+                } catch (syncError) {
+                    console.error("Failed to sync daily reward state", syncError);
+                }
+                document.getElementById('already-claimed-modal').style.display = 'flex';
+                return;
+            }
+            showApiError(error);
+        } finally {
+            isClaimingDailyReward = false;
+            updateDailyRewardUI();
+        }
+    }
+
+    function closeCongratsModal() { document.getElementById('congrats-modal').style.display = 'none'; }
+    function closeAlreadyClaimedModal() { document.getElementById('already-claimed-modal').style.display = 'none'; }
+
+    function renderDepositsList() {
+        const container = document.getElementById('deposit-history-list');
+        container.innerHTML = "";
+        if(depositLogs.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد عمليات إيداع مسجلة بعد.</div>';
+            return;
+        }
+        depositLogs.forEach(item => {
+            container.innerHTML += `
+                <div class="history-card">
+                    <div class="history-info">
+                        <div class="history-title">💳 ${item.title}</div>
+                        <div class="history-date">📅 ${item.date}</div>
+                    </div>
+                    <div style="text-align:left;">
+                        <div style="font-weight:bold; color:#34d399;">${item.amount}</div>
+                        <span class="history-badge badge-orange">${item.status}</span>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function renderRewardsList() {
+        // Rewards come from txLogs filtered by reward types (no separate rewardLogs)
+        const container = document.getElementById('reward-history-list');
+        const rewardTypes = ['مكافأة', 'عجلة الحظ', 'إحالة', 'مهمة'];
+        const rewardItems = txLogs.filter(item => rewardTypes.includes(item.type));
+        if (rewardItems.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">لا توجد مكافآت مسجلة بعد.</div>';
+            return;
+        }
+        const iconMap = { 'مكافأة': '🎁', 'عجلة الحظ': '🎡', 'إحالة': '👥', 'مهمة': '⭐' };
+        container.innerHTML = rewardItems.map(item => `
+            <div class="history-card">
+                <div class="history-info">
+                    <div class="history-title">${iconMap[item.type] || '🎁'} ${item.title}</div>
+                    <div class="history-date">📅 ${new Date(item.date).toLocaleString('ar-DZ', { dateStyle: 'medium', timeStyle: 'short' })}</div>
+                </div>
+                <div style="text-align:left;">
+                    <div style="font-weight:bold; color:#34d399;">${item.amount}</div>
+                    <span class="history-badge badge-green">${item.type}</span>
+                </div>
+            </div>`).join('');
+    }
+
+</script>
+<script src="client-api.js"></script>
+</body>
+</html>
