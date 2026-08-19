@@ -181,11 +181,13 @@
 
   function enterApp(payload) {
     hydrate(payload);
+    const appContainer = document.querySelector(".app-container");
+    appContainer?.classList.add("is-authenticated");
     document.querySelectorAll(".screen").forEach((screen) => screen.classList.remove("active"));
     document.getElementById("auth-screen").classList.remove("active");
     if (isAdmin) {
       if (typeof setPlatformMenuMode === "function") setPlatformMenuMode(true);
-      document.querySelector(".app-container").classList.remove("nav-visible");
+      appContainer?.classList.remove("nav-visible");
       document.getElementById("admin-screen").classList.add("active");
       document.getElementById("header-title").innerText = "SECURO ADMIN";
       renderAdminDashboard();
@@ -194,7 +196,7 @@
       if (typeof setPlatformMenuMode === "function") setPlatformMenuMode(false);
       stopAdminDashboardRefresh();
       document.getElementById("bottom-nav").style.display = "flex";
-      document.querySelector(".app-container").classList.add("nav-visible");
+      appContainer?.classList.add("nav-visible");
       document.getElementById("header-title").innerText = "SECURO";
       switchTab("home");
     }
@@ -653,6 +655,7 @@
     await api("/api/auth/logout", { method: "POST" }).catch(() => {});
     currentUser = null;
     isAdmin = false;
+    document.querySelector(".app-container")?.classList.remove("is-authenticated");
     document.getElementById("bottom-nav").style.display = "none";
     document.querySelector(".app-container").classList.remove("nav-visible");
     document.querySelectorAll(".screen").forEach((screen) => screen.classList.remove("active"));

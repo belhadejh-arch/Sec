@@ -1644,6 +1644,71 @@
                   margin-bottom: 0 !important;
               }
           }
+
+          /*
+           * HARD APP SHELL RESET
+           * Authenticated screens must use ordinary document flow. The legacy
+           * flex shell and :has()-based auth rules can otherwise leave a
+           * viewport-sized lead-in on mobile after login.
+           */
+          .app-container {
+              display: block !important;
+              min-height: 0 !important;
+              height: auto !important;
+          }
+          .app-container > .site-header {
+              display: grid !important;
+              position: relative !important;
+              top: auto !important;
+          }
+          .app-container:not(.is-authenticated) > .site-header {
+              display: none !important;
+          }
+          .app-container.is-authenticated > .site-header {
+              display: grid !important;
+          }
+          .app-container > .content {
+              display: block !important;
+              position: relative !important;
+              width: 100% !important;
+              height: auto !important;
+              min-height: 0 !important;
+              margin: 0 !important;
+              padding: 0 0 var(--content-pad-bottom) !important;
+          }
+          .app-container > .content > .screen:not(.active) {
+              display: none !important;
+              height: 0 !important;
+              min-height: 0 !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              overflow: hidden !important;
+          }
+          .app-container > .content > .screen.active {
+              display: block !important;
+              width: 100% !important;
+              height: auto !important;
+              min-height: 0 !important;
+              margin: 0 auto !important;
+              padding: 0 !important;
+              transform: none !important;
+          }
+          .app-container.is-authenticated > .content > .screen.active > :first-child {
+              margin-top: 0 !important;
+          }
+          @media (max-width: 760px) {
+              .app-container > .content {
+                  padding-inline: 0 !important;
+                  padding-top: 0 !important;
+              }
+              .app-container.is-authenticated > .content > .screen.active {
+                  padding-inline: var(--page-gutter) !important;
+              }
+              .app-container.is-authenticated > .content > #home-screen.active,
+              .app-container.is-authenticated > .content > #admin-screen.active {
+                  padding-inline: 0 !important;
+              }
+          }
     </style>
 </head>
 <body>
@@ -2788,6 +2853,7 @@
         document.getElementById('login-success-modal').style.display = 'none';
         resetAppViewport();
         document.getElementById('auth-screen').classList.remove('active');
+        document.querySelector('.app-container')?.classList.add('is-authenticated');
         setPlatformMenuMode(isAdmin);
         
         if (isAdmin) {
@@ -2900,6 +2966,7 @@
         closePlatformMenu();
         currentUser = null;
         isAdmin = false;
+        document.querySelector('.app-container')?.classList.remove('is-authenticated');
         balance = 0.00;
         userVip = null;
         completedTasksCount = 0;
