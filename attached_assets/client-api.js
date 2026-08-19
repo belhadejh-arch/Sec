@@ -455,17 +455,17 @@
 
         <!-- إجماليات الإيداع والسحب -->
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;padding:8px 10px;background:rgba(15,23,42,.45);border:1px solid var(--border-color);border-radius:10px">
-          <div style="flex:1;min-width:110px;text-align:center">
+          <div style="flex:1 1 0;min-width:0;text-align:center">
             <div style="font-size:.68rem;color:var(--text-muted);margin-bottom:2px">إجمالي الإيداع</div>
             <div style="font-weight:800;color:#34d399;font-size:.95rem">$${totalDep}</div>
           </div>
           <div style="width:1px;background:var(--border-color);align-self:stretch"></div>
-          <div style="flex:1;min-width:110px;text-align:center">
+          <div style="flex:1 1 0;min-width:0;text-align:center">
             <div style="font-size:.68rem;color:var(--text-muted);margin-bottom:2px">إجمالي السحب</div>
             <div style="font-weight:800;color:#f87171;font-size:.95rem">$${totalWith}</div>
           </div>
           <div style="width:1px;background:var(--border-color);align-self:stretch"></div>
-          <div style="flex:1;min-width:110px;text-align:center">
+          <div style="flex:1 1 0;min-width:0;text-align:center">
             <div style="font-size:.68rem;color:var(--text-muted);margin-bottom:2px">عضوية VIP</div>
             <span class="history-badge ${vipStatus.className}" style="display:inline-block">${escapeHtml(vipStatus.label)}</span>
             ${vipExpiry}
@@ -475,12 +475,12 @@
         <!-- أزرار الإجراءات الخاصة بالمستخدمين فقط -->
         ${!user.isAdmin ? `
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid var(--border-color);padding-top:8px">
-            <button class="btn btn-green"  style="flex:1;min-width:100px;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminAdjustBalance(${user.id},${Number(user.balance).toFixed(2)})">✏️ تعديل الرصيد</button>
-            <button class="btn btn-gold"   style="flex:1;min-width:100px;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminChangeVip(${user.id})">👑 تغيير VIP</button>
-            <button class="btn"            style="flex:1;min-width:100px;padding:6px 8px;font-size:.72rem;min-height:38px;background:#6366f1;color:white" onclick="adminResetTasks(${user.id})">🔄 تصفير المهام</button>
-            <button class="btn"            style="flex:1;min-width:100px;padding:6px 8px;font-size:.72rem;min-height:38px;background:#0891b2;color:white" onclick="adminGrantSpin(${user.id})">🎡 منح فرصة عجلة</button>
-            ${hasTrial ? `<button class="btn btn-red" style="flex:1;min-width:100px;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminCancelTrial(${user.id})">🚫 إلغاء التجربة</button>` : ""}
-            <button class="btn ${user.isBlocked ? "btn-green" : "btn-red"}" style="flex:1;min-width:100px;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminToggleBlock(${user.id},${!user.isBlocked})">${user.isBlocked ? "✅ رفع الحظر" : "🚫 حظر"}</button>
+          <button class="btn btn-green"  style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminAdjustBalance(${user.id},${Number(user.balance).toFixed(2)})">✏️ تعديل الرصيد</button>
+          <button class="btn btn-gold"   style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminChangeVip(${user.id})">👑 تغيير VIP</button>
+          <button class="btn"            style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px;background:#6366f1;color:white" onclick="adminResetTasks(${user.id})">🔄 تصفير المهام</button>
+          <button class="btn"            style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px;background:#0891b2;color:white" onclick="adminGrantSpin(${user.id})">🎡 منح فرصة عجلة</button>
+          ${hasTrial ? `<button class="btn btn-red" style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminCancelTrial(${user.id})">🚫 إلغاء التجربة</button>` : ""}
+          <button class="btn ${user.isBlocked ? "btn-green" : "btn-red"}" style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminToggleBlock(${user.id},${!user.isBlocked})">${user.isBlocked ? "✅ رفع الحظر" : "🚫 حظر"}</button>
           </div>
         ` : ""}
       </div>`;

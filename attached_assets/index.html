@@ -1371,6 +1371,221 @@
             h1, h2, h3, p { margin-top: 0 !important; } 
             * { box-sizing: border-box !important; } 
         }
+
+         /* ==========================================================
+          * FINAL RESPONSIVE LAYOUT CONTRACT
+          * This is the single final layer for the imported legacy CSS.
+          * It fixes sizing at the source instead of hiding a wider child.
+          * ========================================================== */
+         html, body {
+             width: 100%;
+             max-width: 100%;
+             min-width: 0;
+             margin: 0;
+             padding: 0;
+         }
+         body { display: block; }
+         .app-container,
+         .app-container > .content,
+         .screen {
+             width: 100%;
+             max-width: 100%;
+             min-width: 0;
+         }
+         .app-container {
+             min-height: 100dvh;
+             height: auto;
+             overflow: visible;
+         }
+         .app-container > .content {
+             display: block !important;
+             height: auto !important;
+             min-height: 0 !important;
+             margin: 0;
+             padding: 12px clamp(12px, 3vw, 40px) 32px;
+             overflow: visible;
+         }
+         .screen,
+         .screen.active {
+             min-height: 0 !important;
+             height: auto !important;
+             margin: 0 auto !important;
+             padding: 0 !important;
+             transform: none;
+         }
+         .screen > *,
+         .screen .card,
+         .screen .vip-card,
+         .screen .hotel-card,
+         .screen .history-card,
+         .screen .admin-panel,
+         .screen .wheel-card,
+         .screen .balance-card,
+         .screen .referral-box,
+         .screen .daily-reward-card,
+         .screen .task-progress-box,
+         .screen .support-banner-profile {
+             max-width: 100%;
+             min-width: 0;
+         }
+         img, video, canvas, svg, iframe { max-width: 100%; }
+         .home-overview,
+         .quick-actions,
+         .admin-stats,
+         .levels-grid,
+         .stats-bar {
+             width: 100%;
+             min-width: 0;
+         }
+         .home-overview > *,
+         .quick-actions > *,
+         .admin-stats > *,
+         .levels-grid > *,
+         .stats-bar > * {
+             min-width: 0;
+             max-width: 100%;
+         }
+         .home-welcome p,
+         .home-status,
+         .card p,
+         .vip-card p,
+         .history-info,
+         .history-title,
+         .history-date {
+             overflow-wrap: anywhere;
+             word-break: break-word;
+         }
+         .home-status-value { min-width: 0; }
+         .copy-input-container,
+         .support-banner-profile,
+         .admin-hero,
+         .admin-hero-copy,
+         .subpage-header,
+         .history-card {
+             min-width: 0;
+             max-width: 100%;
+         }
+         .copy-input-container input,
+         .support-banner-profile > div,
+         .admin-hero-copy > div,
+         .history-card > div {
+             min-width: 0;
+             max-width: 100%;
+         }
+         input, select, textarea, button, .btn {
+             max-width: 100%;
+         }
+         input, select, textarea { min-width: 0; }
+         .modal,
+         .modal-content,
+         .platform-menu-panel { max-width: 100%; min-width: 0; }
+
+         @media (max-width: 760px) {
+             :root {
+                 --page-gutter: clamp(10px, 3.2vw, 14px);
+                 --content-pad-bottom: max(22px, env(safe-area-inset-bottom));
+             }
+             .site-header {
+                 width: 100%;
+                 min-height: 56px !important;
+                 padding: 8px var(--page-gutter) !important;
+                 gap: 6px;
+             }
+             .brand-lockup { gap: 7px; }
+             .brand-copy h1 { font-size: clamp(.9rem, 4vw, 1.05rem); }
+             .header-menu-button,
+             .header-account-button {
+                 flex: 0 0 40px;
+                 width: 40px;
+                 min-height: 40px;
+                 padding: 0;
+             }
+             .app-container > .content {
+                 padding: 10px var(--page-gutter) var(--content-pad-bottom) !important;
+             }
+             .app-container:has(#home-screen.active) > .content,
+             .app-container:has(#admin-screen.active) > .content {
+                 padding-top: 0 !important;
+             }
+             .home-overview {
+                 display: grid;
+                 grid-template-columns: minmax(0, 1fr);
+                 gap: 8px;
+                 margin: 0 0 10px !important;
+             }
+             .home-welcome {
+                 padding: 14px;
+                 border-radius: 0 0 14px 14px;
+             }
+             .home-welcome h2 { font-size: 1.15rem; }
+             .home-welcome p { font-size: .78rem; line-height: 1.55; }
+             .home-status {
+                 display: flex;
+                 flex-direction: row;
+                 align-items: center;
+                 justify-content: space-between;
+                 gap: 10px;
+                 padding: 12px 14px;
+             }
+             .home-status-value { font-size: 1.35rem; }
+             .home-status-note { margin-top: 0; }
+             .quick-actions {
+                 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                 gap: 8px !important;
+                 margin-bottom: 0;
+             }
+             .action-item {
+                 min-height: 70px;
+                 padding: 9px 4px;
+                 gap: 5px;
+             }
+             .action-icon { width: 32px; height: 32px; font-size: 1rem; }
+             .action-title { font-size: clamp(.62rem, 2.5vw, .72rem); }
+             .screen:not(#home-screen):not(#admin-screen) { padding-top: 4px !important; }
+             .card, .vip-card, .admin-panel, .wheel-card,
+             .balance-card, .referral-box, .daily-reward-card,
+             .task-progress-box { padding: 14px; margin-bottom: 10px; }
+             .stats-bar {
+                 display: grid;
+                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                 gap: 8px;
+                 padding: 10px;
+             }
+             .stats-bar > .stat-box { min-width: 0; }
+             .levels-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+             .level-card { padding: 10px 5px; }
+             .copy-input-container { flex-direction: column; gap: 7px; }
+             .copy-input-container input,
+             .copy-input-container .copy-btn { width: 100%; }
+             .history-card {
+                 display: flex;
+                 flex-wrap: wrap;
+                 align-items: flex-start;
+                 gap: 8px;
+             }
+             .history-card > * { flex: 1 1 100%; }
+             .history-card > div:last-child { text-align: right !important; }
+             .admin-hero { padding: 13px; }
+             .admin-stats { grid-template-columns: 1fr; }
+             .admin-panel { padding: 12px; }
+             .modal { padding-inline: var(--page-gutter); }
+             .modal-content { width: 100%; padding: 16px; }
+         }
+         @media (max-width: 380px) {
+             .app-container > .content { padding-inline: 8px !important; }
+             .site-header { padding-inline: 8px !important; }
+             .home-welcome { padding: 12px; }
+             .home-status { padding-inline: 12px; }
+             .quick-actions { gap: 6px !important; }
+             .action-item { min-height: 66px; }
+             .action-title { font-size: .6rem; }
+             .levels-grid { grid-template-columns: 1fr !important; }
+         }
+         @media (min-width: 761px) {
+             .app-container > .content { padding-bottom: 40px; }
+             .home-overview { grid-template-columns: minmax(0, 1.4fr) minmax(180px, .6fr); }
+             .quick-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+         }
     </style>
 </head>
 <body>
@@ -1628,10 +1843,6 @@
                 <div class="action-item" onclick="switchTab('tasks')">
                     <div class="action-icon">⭐</div>
                     <div class="action-title">مهامي</div>
-                </div>
-                <div class="action-item" onclick="switchTab('spin')">
-                    <div class="action-icon">🎡</div>
-                    <div class="action-title">عجلة الحظ</div>
                 </div>
             </div>
 
