@@ -1205,15 +1205,28 @@ app.post("/api/admin/users/:id/spins", requireAdmin, async (req, res) => {
   if (!Number.isInteger(userId) || userId <= 0) return appError(res, 400, "معرّف المستخدم غير صحيح");
   if (!Number.isInteger(count) || count < 1 || count > 100) return appError(res, 400, "عدد المحاولات غير صحيح");
   try {
-    const result = await pool.query(
-      `UPDATE users SET available_spins = available_spins + $1, updated_at = NOW()
-       WHERE id = $2 AND is_admin = FALSE RETURNING *`,
-      [count, userId],
-    );
-    if (!result.rowCount) return appError(res, 404, "المستخدم غير موجود أو حساب إداري");
-    res.json({ user: publicUser(result.rows[0]) });
-  } catch {
-    appError(res, 500, "تعذر منح محاولات عجلة الحظ");
+    const result = await withTransaction(async (client) => {
+      const updated = await client.query(
+        `UPDATE users SET available_spins = available_spins + $1, updated_at = NOW()
+         WHERE id = $2 AND is_admin = FALSE RETURNING *`,
+        [count, userId],
+      );
+      if (!updated.rowCount) {
+        throw Object.assign(new Error("المستخدم غير موجود أو حساب إداري"), { status: 404 });
+      }
+      await client.query(
+        `INSERT INTO wheel_spin_grants (user_id, granted_by, amount)
+         VALUES ($1, $2, $3)`,
+        [userId, req.session.userId, count],
+      );
+      return publicUser(updated.rows[0]);
+    });
+    res.json({ user: result, granted: count });
+  } catch (error) {
+    if (error.code === "42P01") {
+      return appError(res, 503, "جدول منح فرص العجلة غير مهيأ. شغّل تهيئة قاعدة البيانات أولاً");
+    }
+    appError(res, error.status || 500, error.status ? error.message : "تعذر منح محاولات عجلة الحظ");
   }
 });
 

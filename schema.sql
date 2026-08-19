@@ -38,6 +38,18 @@ ALTER TABLE users
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS trial_tasks_completed INTEGER NOT NULL DEFAULT 0;
 
+-- Every administrative wheel grant is auditable and tied to the granting admin.
+CREATE TABLE IF NOT EXISTS wheel_spin_grants (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  granted_by BIGINT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  amount INTEGER NOT NULL CHECK (amount > 0),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS wheel_spin_grants_user_idx
+  ON wheel_spin_grants(user_id, created_at DESC);
+
 DO $$
 BEGIN
   IF NOT EXISTS (
