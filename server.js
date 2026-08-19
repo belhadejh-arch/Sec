@@ -36,7 +36,7 @@ const allowedOrigins = frontendUrl
   .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 const isProduction = process.env.NODE_ENV === "production";
-const cookieSameSite = process.env.COOKIE_SAME_SITE || (isProduction ? "none" : "lax");
+const cookieSameSite = process.env.COOKIE_SAME_SITE || ("none");
 
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
@@ -78,13 +78,14 @@ app.use((req, res, next) => {
 });
 app.use(
   session({
+    store: new pgSession({ pool: pool, tableName: 'user_sessions' }),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: cookieSameSite,
-      secure: isProduction || cookieSameSite === "none",
+      sameSite: "none",
+      secure: true,
       maxAge: 1000 * 60 * 60 * 24 * 30,
     },
   }),
