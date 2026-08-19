@@ -36,7 +36,7 @@ const allowedOrigins = frontendUrl
   .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 const isProduction = process.env.NODE_ENV === "production";
-const cookieSameSite = process.env.COOKIE_SAME_SITE || ("none");
+const cookieSameSite = process.env.COOKIE_SAME_SITE || (isProduction ? "none" : "lax");
 
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
@@ -84,8 +84,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: "none",
-      secure: true,
+      sameSite: cookieSameSite,
+      secure: isProduction || cookieSameSite === "none",
       maxAge: 1000 * 60 * 60 * 24 * 30,
     },
   }),
