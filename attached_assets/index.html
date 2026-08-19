@@ -1586,6 +1586,64 @@
              .home-overview { grid-template-columns: minmax(0, 1.4fr) minmax(180px, .6fr); }
              .quick-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
          }
+
+          /*
+           * HEADER-TO-CONTENT GAP CONTRACT
+           * The imported stylesheet contains several legacy layout layers.
+           * Keep this final contract last so no earlier viewport/flex rule can
+           * reserve vertical space between the shared header and any screen.
+           */
+          .app-container > .content,
+          .app-container:has(#auth-screen.active) > .content,
+          .app-container:has(#home-screen.active) > .content,
+          .app-container:has(#admin-screen.active) > .content {
+              display: block !important;
+              flex: 0 0 auto !important;
+              align-items: initial !important;
+              justify-content: flex-start !important;
+              height: auto !important;
+              min-height: 0 !important;
+              margin: 0 !important;
+              padding-top: 0 !important;
+              padding-bottom: var(--content-pad-bottom) !important;
+          }
+
+          .screen,
+          .screen.active {
+              display: none;
+              height: auto !important;
+              min-height: 0 !important;
+              margin: 0 auto !important;
+              padding-top: 0 !important;
+          }
+
+          .screen.active { display: block !important; }
+          .screen > :first-child { margin-top: 0 !important; }
+          .auth-layout {
+              min-height: 0 !important;
+              height: auto !important;
+              margin-top: 0 !important;
+              padding-top: 0 !important;
+          }
+
+          @media (max-width: 760px) {
+              .app-container > .content,
+              .app-container:has(#auth-screen.active) > .content,
+              .app-container:has(#home-screen.active) > .content,
+              .app-container:has(#admin-screen.active) > .content {
+                  padding-inline: var(--page-gutter) !important;
+                  padding-top: 0 !important;
+                  padding-bottom: var(--content-pad-bottom) !important;
+              }
+
+              .screen:not(#home-screen):not(#admin-screen) {
+                  padding-top: 0 !important;
+              }
+
+              .site-header {
+                  margin-bottom: 0 !important;
+              }
+          }
     </style>
 </head>
 <body>
