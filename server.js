@@ -28,7 +28,7 @@ try {
 }
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT || 5000);
 const publicDir = path.join(__dirname, "attached_assets");
 const frontendUrl = String(process.env.FRONTEND_URL || "").trim().replace(/\/+$/, "");
 const allowedOrigins = frontendUrl
