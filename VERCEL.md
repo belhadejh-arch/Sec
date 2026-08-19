@@ -107,13 +107,13 @@ attached_assets/vercel.json
 واستبدل:
 
 ```text
-https://securo-jmd1.onrender.com
+https://securov2.onrender.com
 ```
 
 برابط خدمة Render الحقيقي، مثل:
 
 ```text
-https://securo-jmd1.onrender.com
+https://securov2.onrender.com
 ```
 
 > إذا كان اسم خدمة Render مختلفاً، يجب استبدال الرابط الموجود في
@@ -128,7 +128,7 @@ https://securo-jmd1.onrender.com
 2. شغّل `npm run db:init` مرة واحدة.
 3. انشر Backend على Render.
 4. انسخ رابط Render.
-5. استخدم رابط Render الصحيح `https://securo-jmd1.onrender.com` في `attached_assets/vercel.json`.
+5. استخدم رابط Render الصحيح `https://securov2.onrender.com` في `attached_assets/vercel.json`.
 6. انشر `attached_assets` على Vercel.
 7. اضبط `FRONTEND_URL` في Render على `https://securo-m9ei-seven.vercel.app`.
 8. أعد تشغيل Render واختبر تسجيل الدخول.
