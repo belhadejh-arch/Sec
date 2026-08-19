@@ -46,6 +46,17 @@ app.use(express.json({ limit: "32kb" }));
 function requestOriginIsAllowed(req, origin) {
   if (!origin) return true;
   if (allowedOrigins.includes(origin)) return true;
+  try {
+    const parsed = new URL(origin);
+    if (
+      parsed.protocol === "https:" &&
+      /^securo(?:[-a-z0-9]*)\.vercel\.app$/i.test(parsed.hostname)
+    ) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
   const forwardedProtocol = String(req.headers["x-forwarded-proto"] || "")
     .split(",")[0]
     .trim();
@@ -55,7 +66,7 @@ function requestOriginIsAllowed(req, origin) {
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && requestOriginIsAllowed(req, origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Vary", "Origin");
     res.setHeader("Access-Control-Allow-Credentials", "true");
