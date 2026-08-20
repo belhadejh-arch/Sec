@@ -439,6 +439,9 @@
   };
 
   async function adminReview(kind, id, status) {
+    if (!["deposits", "withdrawals"].includes(kind)) {
+      return showApiError(new Error("نوع طلب إداري غير صالح"));
+    }
     try {
       await api(`/api/admin/${kind}/${id}/review`, {
         method: "POST",
@@ -449,6 +452,9 @@
       showApiError(error);
     }
   }
+  // Review buttons are rendered as inline handlers in dynamic admin cards.
+  // Expose the handler explicitly so those buttons call the real API.
+  window.adminReview = adminReview;
 
   function adminRequestCard(item, kind) {
     const isDeposit = kind === "deposits";
