@@ -172,6 +172,7 @@ function publicUser(row) {
     trialTasksCompleted: Number(row.trial_tasks_completed || 0),
     trialActive: Boolean(row.trial_active),
     trialUsed: Boolean(row.trial_used),
+    trialCancelled: Boolean(row.trial_cancelled),
     vipExpiresAt: row.vip_expires_at || null,
     availableSpins: Number(row.available_spins || 0),
     createdAt: row.created_at,
@@ -623,7 +624,8 @@ app.post("/api/vip/trial", requireUser, async (req, res) => {
       const vip = { name: "الفترة التجريبية (Trial)", price: 0, totalTasks: trialMaxTasks, totalReward: trialMaxTasks * 1, isTrial: true };
       const updated = await client.query(
         `UPDATE users SET user_vip = $1::jsonb, trial_active = TRUE, trial_used = TRUE,
-          current_trial_day = 1, trial_tasks_completed = 0, completed_tasks_count = 0,
+          trial_cancelled = FALSE, current_trial_day = 1, trial_tasks_completed = 0,
+          completed_tasks_count = 0,
           task_last_reset_date = CURRENT_DATE,
            vip_expires_at = NOW() + ($2 * INTERVAL '1 day'),
           updated_at = NOW() WHERE id = $3 RETURNING *`,
@@ -1205,7 +1207,7 @@ app.post("/api/vip/trial/cancel", requireUser, async (req, res) => {
       const updated = await client.query(
         `UPDATE users
          SET trial_active = FALSE, trial_used = TRUE, user_vip = NULL,
-             vip_expires_at = NULL, updated_at = NOW()
+             trial_cancelled = FALSE, vip_expires_at = NULL, updated_at = NOW()
          WHERE id = $1 RETURNING *`,
         [req.session.userId],
       );
@@ -1340,7 +1342,7 @@ app.post("/api/admin/users/:id/trial/cancel", requireAdmin, async (req, res) => 
       const updated = await client.query(
         `UPDATE users
          SET trial_active = FALSE, trial_used = TRUE, user_vip = NULL,
-             vip_expires_at = NULL, updated_at = NOW()
+             trial_cancelled = TRUE, vip_expires_at = NULL, updated_at = NOW()
          WHERE id = $1 RETURNING *`,
         [userId],
       );

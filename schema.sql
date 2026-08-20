@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
   trial_tasks_completed INTEGER NOT NULL DEFAULT 0,
   trial_active BOOLEAN NOT NULL DEFAULT FALSE,
   trial_used BOOLEAN NOT NULL DEFAULT FALSE,
+  trial_cancelled BOOLEAN NOT NULL DEFAULT FALSE,
   available_spins INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -37,6 +38,9 @@ ALTER TABLE users
 
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS trial_tasks_completed INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS trial_cancelled BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- Every administrative wheel grant is auditable and tied to the granting admin.
 CREATE TABLE IF NOT EXISTS wheel_spin_grants (

@@ -62,8 +62,11 @@
   }
 
   function adminVipStatus(user) {
+    if (user.trialCancelled) {
+      return { label: "الفترة التجريبية ملغاة", className: "badge-orange" };
+    }
     if (user.trialUsed && !user.trialActive && !user.userVip) {
-      return { label: "التجربة ملغاة / مستهلكة", className: "badge-orange" };
+      return { label: "التجربة منتهية / مستهلكة", className: "badge-orange" };
     }
     if (!user.userVip) return { label: "غير مشترك", className: "badge-orange" };
     if (user.userVip.isTrial) {
