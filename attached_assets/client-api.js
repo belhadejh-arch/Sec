@@ -16,6 +16,8 @@
       : configuredApiBaseUrl.replace(/\/+$/, "");
   let adminRefreshInterval = null;
   let adminRefreshInFlight = false;
+  let depositSubmissionInFlight = false;
+  let withdrawalSubmissionInFlight = false;
 
   async function api(url, options) {
     const requestUrl = /^https?:\/\//i.test(url) ? url : `${apiBaseUrl}${url}`;
@@ -260,12 +262,20 @@
   };
 
   window.submitDeposit = async function () {
+    if (depositSubmissionInFlight) return;
     const amount = Number(document.getElementById("deposit-amount").value);
     const txid = document.getElementById("deposit-txid").value.trim();
     if (!Number.isFinite(amount) || amount < 10) {
       return showApiError(new Error("الحد الأدنى للإيداع هو 10 دولارات"));
     }
     if (!txid) return showApiError(new Error("يرجى إدخال معرف المعاملة"));
+    const button = document.getElementById("deposit-submit-btn");
+    depositSubmissionInFlight = true;
+    if (button) {
+      button.disabled = true;
+      button.setAttribute("aria-busy", "true");
+      button.innerText = "جارٍ إرسال الطلب...";
+    }
     try {
       await api("/api/deposit-requests", {
         method: "POST",
@@ -280,10 +290,18 @@
       await refreshMe();
     } catch (error) {
       showApiError(error);
+    } finally {
+      depositSubmissionInFlight = false;
+      if (button) {
+        button.disabled = false;
+        button.removeAttribute("aria-busy");
+        button.innerText = "تأكيد إرسال طلب الإيداع";
+      }
     }
   };
 
   window.submitWithdraw = async function () {
+    if (withdrawalSubmissionInFlight) return;
     const bank = document.getElementById("withdraw-bank").value;
     const account = document.getElementById("withdraw-account").value.trim();
     const amount = Number(document.getElementById("withdraw-amount").value);
@@ -298,6 +316,13 @@
       document.getElementById("insufficient-modal").style.display = "flex";
       return;
     }
+    const button = document.getElementById("withdraw-submit-btn");
+    withdrawalSubmissionInFlight = true;
+    if (button) {
+      button.disabled = true;
+      button.setAttribute("aria-busy", "true");
+      button.innerText = "جارٍ إرسال الطلب...";
+    }
     try {
       await api("/api/withdrawal-requests", {
         method: "POST",
@@ -310,13 +335,28 @@
       await refreshMe();
     } catch (error) {
       showApiError(error);
+    } finally {
+      withdrawalSubmissionInFlight = false;
+      if (button) {
+        button.disabled = false;
+        button.removeAttribute("aria-busy");
+        button.innerText = "تأكيد طلب السحب";
+      }
     }
   };
 
   async function refreshMe() {
     if (!currentUser || isAdmin) return;
+    const activeScreen = document.querySelector(".screen.active")?.id;
     try {
       enterApp(await api("/api/me"));
+      if (activeScreen && activeScreen !== "auth-screen" && document.getElementById(activeScreen)) {
+        if (activeScreen.endsWith("-screen") && activeScreen !== "home-screen") {
+          openSubPage(activeScreen);
+        } else {
+          switchTab(activeScreen.replace(/-screen$/, ""));
+        }
+      }
     } catch (error) {
       console.error("Failed to refresh account", error);
     }

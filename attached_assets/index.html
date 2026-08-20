@@ -2127,13 +2127,13 @@
                 <div style="font-size: 0.85rem; color: #bae6fd; font-weight: bold;">🔑 رمز الدعوة الخاص بك:</div>
                 <div class="copy-input-container">
                     <input type="text" id="my-invite-code" readonly style="font-weight: 800; color: #fbbf24; text-align: center; letter-spacing: 2px;">
-                    <button class="copy-btn" onclick="copyInviteCode()">نسخ الرمز</button>
+                    <button type="button" class="copy-btn" onclick="copyInviteCode()">نسخ الرمز</button>
                 </div>
 
                 <div style="font-size: 0.85rem; color: #bae6fd; font-weight: bold; margin-top: 12px;">🔗 رابط الدعوة المباشر:</div>
                 <div class="copy-input-container">
                     <input type="text" id="my-invite-link" readonly style="font-size: 0.8rem;">
-                    <button class="copy-btn" onclick="copyInviteLink()">نسخ الرابط</button>
+                    <button type="button" class="copy-btn" onclick="copyInviteLink()">نسخ الرابط</button>
                 </div>
             </div>
 
@@ -2408,7 +2408,7 @@
                 <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white);">عنوان محفظة الإيداع الرسمية:</label>
                 <div class="copy-input-container">
                     <input type="text" id="company-wallet-address" value="TKmr5pbXSEWSQ5EfFTtF5wjZRt4Y4KRKxE" readonly style="font-size: 0.78rem; text-align: center;">
-                    <button class="copy-btn" onclick="copyCompanyWallet()">نسخ العنوان</button>
+                    <button type="button" class="copy-btn" onclick="copyCompanyWallet()">نسخ العنوان</button>
                 </div>
 
                 <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white); margin-top: 6px;">المبلغ المراد إيداعه ($):</label>
@@ -2421,8 +2421,8 @@
                     ⚠️ الحد الأدنى للإيداع هو 10 دولار ($10). يرجى التأكد من إرسال المبلغ عبر شبكة TRC20 حصراً.
                 </div>
 
-                <button class="btn btn-green" onclick="submitDeposit()" style="margin-top: 5px;">تأكيد إرسال طلب الإيداع</button>
-                <button class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeDepositModal()">إلغاء</button>
+                <button type="button" id="deposit-submit-btn" class="btn btn-green" onclick="submitDeposit()" style="margin-top: 5px;">تأكيد إرسال طلب الإيداع</button>
+                <button type="button" class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeDepositModal()">إلغاء</button>
             </div>
         </div>
     </div>
@@ -2487,8 +2487,8 @@
                 <input type="text" id="withdraw-account" placeholder="أدخل عنوان المحفظة الرقمية (Wallet Address)">
                 <input type="number" id="withdraw-amount" placeholder="المبلغ المراد سحبه ($)">
                 
-                <button class="btn btn-red" onclick="submitWithdraw()">تأكيد طلب السحب</button>
-                <button class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeWithdrawModal()">إلغاء</button>
+                <button type="button" id="withdraw-submit-btn" class="btn btn-red" onclick="submitWithdraw()">تأكيد طلب السحب</button>
+                <button type="button" class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeWithdrawModal()">إلغاء</button>
             </div>
 
             <div class="withdraw-info-box">
@@ -3066,25 +3066,35 @@
         document.getElementById('copy-toast-modal').style.display = 'none';
     }
 
+    async function copyTextFromInput(inputId, successTitle, successMessage) {
+        const input = document.getElementById(inputId);
+        if (!input) return showApiError(new Error("العنصر المطلوب نسخه غير موجود"));
+        const value = input.value || "";
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(value);
+            } else {
+                input.focus();
+                input.select();
+                if (!document.execCommand('copy')) throw new Error("تعذر الوصول إلى الحافظة");
+            }
+            showCopyToast(successTitle, successMessage);
+        } catch (error) {
+            showApiError(new Error("تعذر نسخ النص. يرجى تحديده ونسخه يدوياً."));
+        }
+    }
+
     function copyInviteCode() {
         const input = document.getElementById('my-invite-code');
-        input.select();
-        navigator.clipboard.writeText(input.value);
-        showCopyToast('تم نسخ رمز الدعوة! 🔑', `تم نسخ رمز الدعوة الخاص بك (${input.value}) بنجاح إلى الحافظة.`);
+        return copyTextFromInput('my-invite-code', 'تم نسخ رمز الدعوة! 🔑', `تم نسخ رمز الدعوة الخاص بك (${input?.value || ''}) بنجاح إلى الحافظة.`);
     }
 
     function copyInviteLink() {
-        const input = document.getElementById('my-invite-link');
-        input.select();
-        navigator.clipboard.writeText(input.value);
-        showCopyToast('تم نسخ رابط الدعوة! 🔗', 'تم نسخ رابط الدعوة المباشر الخاص بك بنجاح. يمكنك الآن مشاركته مع أصدقائك!');
+        return copyTextFromInput('my-invite-link', 'تم نسخ رابط الدعوة! 🔗', 'تم نسخ رابط الدعوة المباشر الخاص بك بنجاح إلى الحافظة.');
     }
 
     function copyCompanyWallet() {
-        const input = document.getElementById('company-wallet-address');
-        input.select();
-        navigator.clipboard.writeText(input.value);
-        showCopyToast('تم نسخ عنوان المحفظة! 📋', 'تم نسخ عنوان محفظة الشركة (USDT TRC20) بنجاح.');
+        return copyTextFromInput('company-wallet-address', 'تم نسخ عنوان المحفظة! 📋', 'تم نسخ عنوان محفظة الشركة (USDT TRC20) بنجاح إلى الحافظة.');
     }
 
     function openSubPage(pageId) {
