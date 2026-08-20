@@ -29,7 +29,7 @@ npm run db:init
 ```text
 Root Directory: (فارغ — جذر المستودع)
 Runtime: Node
-Build Command: npm ci --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/ --replace-registry-host=never && npm run build
+Build Command: npm ci --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/ && npm run build
 Start Command: npm start
 Health Check Path: /api/health
 ```
@@ -54,7 +54,7 @@ COOKIE_SAME_SITE=none
 ### أوامر Backend المطلوبة
 
 ```text
-Build Command: npm ci --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/ --replace-registry-host=never && npm run build
+Build Command: npm ci --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/ && npm run build
 Start Command: npm start
 ```
 
