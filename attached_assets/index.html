@@ -3211,7 +3211,15 @@
             return;
         }
 
-        const taskReward = userVip.totalReward / userVip.totalTasks;
+        const totalRewardCents = Math.round(Number(userVip.totalReward) * 100);
+        const totalTasks = Number(userVip.totalTasks);
+        const baseRewardCents = Math.floor(totalRewardCents / totalTasks);
+        const taskRewardFor = (taskIndex) => {
+            const rewardCents = Number(taskIndex) === totalTasks - 1
+                ? totalRewardCents - (baseRewardCents * (totalTasks - 1))
+                : baseRewardCents;
+            return rewardCents / 100;
+        };
         statusEl.innerText = `العضوية النشطة: ${userVip.name} (دخل المهمة: $${taskReward.toFixed(2)})`;
         progressEl.innerText = `المهام المنجزة اليوم: ${completedTasksCount} / ${userVip.totalTasks}`;
 
@@ -3237,10 +3245,11 @@
             return;
         }
 
-        const taskCount = Math.min(Number(userVip.totalTasks), hotelsList.length); // hotelsList now has 12 hotels
+        const taskCount = Math.min(totalTasks, hotelsList.length); // hotelsList now has 12 hotels
         for (let taskIndex = 0; taskIndex < taskCount; taskIndex++) {
             const i = taskIndex;
             const hotel = hotelsList[i];
+            const taskReward = taskRewardFor(taskIndex);
             const status = taskStatuses.find((item) => Number(item.taskIndex) === taskIndex);
             const isCompleted = Boolean(status && status.completed);
             const isRunning = Boolean(!isCompleted && (
@@ -3340,15 +3349,12 @@
             if (timeLeft <= 0) {
                 clearInterval(timer);
                 delete activeTaskTimers[taskIdx];
-                window.securoApi(`/api/tasks/${taskIdx}/complete`, {
+                    window.securoApi(`/api/tasks/${taskIdx}/complete`, {
                     method: "POST",
                     body: JSON.stringify({ comment }),
                 }).then((result) => {
                     window.syncServerUser(result.user);
-                    taskStatuses = [
-                        ...taskStatuses.filter((item) => Number(item.taskIndex) !== Number(taskIdx)),
-                        { taskIndex: Number(result.taskIndex ?? taskIdx), completed: true },
-                    ];
+                        taskStatuses = result.taskStatuses || taskStatuses;
                     if (result.alreadyCompleted) {
                         renderTasksScreen();
                         return;

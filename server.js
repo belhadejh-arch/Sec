@@ -729,6 +729,7 @@ app.post("/api/tasks/:taskIndex/start", requireUser, async (req, res) => {
       if (existing.rowCount) {
          return {
            taskIndex: Number(existing.rows[0].task_index),
+            comment: existing.rows[0].comment,
            startedAt: existing.rows[0].started_at,
            completed: Boolean(existing.rows[0].completed_at),
          };
@@ -845,12 +846,19 @@ app.post("/api/tasks/:taskIndex/complete", requireUser, async (req, res) => {
         }
       }
 
-      const finalUser = trialCancelled
-        ? await getUserById(req.session.userId)
-        : updated.rows[0];
+       // Do not query through the pool while this transaction still owns the
+       // user row lock. The pool query would wait for this transaction to
+       // commit, while this transaction is waiting for that query.
+       const finalUser = trialCancelled
+         ? (await client.query("SELECT * FROM users WHERE id = $1", [req.session.userId])).rows[0]
+         : updated.rows[0];
        return { user: publicUser(finalUser), reward, taskIndex, alreadyCompleted: false, trialCancelled };
     });
-    res.json(result);
+    // Return the authoritative task list after the transaction commits. This
+    // keeps the UI synchronized with task_attempts instead of trusting a
+    // locally assembled status object.
+    const payload = await loadUserPayload(req.session.userId);
+    res.json({ ...result, user: payload.user, taskStatuses: payload.taskStatuses });
   } catch (error) {
     appError(res, error.status || 500, error.status ? error.message : "تعذر إكمال المهمة");
   }
