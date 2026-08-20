@@ -93,5 +93,9 @@ Those values are changed only by authenticated backend transactions:
 - `/api/tasks/:taskIndex/start` and `/complete` use `task_attempts`; the server
   validates membership, order, one attempt per day, comment, and the 60-second
   minimum duration.
+- Each successful paid VIP activation increments `users.available_spins` and
+  records exactly one `vip_activation` grant in `wheel_spin_grants` within the
+  same PostgreSQL transaction. `/api/wheel/spin` locks the user row and
+  atomically consumes one persisted opportunity before crediting any prize.
 
 After schema changes, run `npm run db:init` against the intended Neon database.
