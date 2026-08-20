@@ -2555,6 +2555,7 @@
     let currentTrialDay = 1;
     let trialActive = false;
     let trialUsed = false;
+    let currentLanguage = localStorage.getItem('securo-language') || 'ar';
 
     let activeTaskTimers = {};
     let midnightTimerInterval = null;
@@ -2661,6 +2662,7 @@
     window.addEventListener('load', function() {
         relocateHomeSecondaryContent();
         drawWheel();
+        changeLanguage(localStorage.getItem('securo-language') || 'ar');
         
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slider-slide');
@@ -2677,13 +2679,129 @@
         return Promise.resolve();
     }
 
+    const languageTranslations = {
+        en: {
+            'منصة': 'Platform', 'حسابي': 'My account', 'مساحتك المالية الذكية': 'Your smart financial space',
+            'منصة SECURO': 'SECURO platform', 'كل أقسام المنصة في مكان واحد': 'All platform sections in one place',
+            'الوصول السريع': 'Quick access', 'الرئيسية': 'Home', 'عن SECURO والمعلومات': 'About SECURO',
+            'نشاط المنصة': 'Platform activity', 'مستويات ومنتجات VIP': 'VIP levels and products',
+            'مهامي اليومية': 'My daily tasks', 'فريقي والإحالات': 'My team and referrals',
+            'الحساب والسجلات': 'Account and records', 'حسابي والرصيد': 'My account and balance',
+            'سجل الإيداع': 'Deposit history', 'سجل السحوبات': 'Withdrawal history',
+            'سجل المكافآت': 'Rewards history', 'المعاملات المالية': 'Financial transactions',
+            'خدمة العملاء والدعم': 'Customer support', 'لغة التطبيق': 'App language', 'تسجيل الخروج': 'Log out',
+            'إغلاق القائمة': 'Close menu', 'تسجيل الدخول': 'Log in', 'إنشاء حساب جديد': 'Create a new account',
+            'ليس لديك حساب؟ إنشاء حساب جديد': 'Don’t have an account? Create one',
+            'لديك حساب بالفعل؟ دخول': 'Already have an account? Log in', 'كلمة المرور': 'Password',
+            'كلمة المرور الجديدة:': 'New password:', 'كلمة المرور الحالية:': 'Current password:',
+            'رمز الدعوة': 'Invitation code', 'دخول': 'Log in', '🚀 دخول': '🚀 Log in',
+            '🚀 إنشاء الحساب': '🚀 Create account', 'خدمة العملاء (موظف الاستقبال)': 'Customer service (reception)',
+            'تواصل مباشر عبر تليجرام': 'Direct contact via Telegram', 'خدمة العملاء والإدارة': 'Customer service and management',
+            'إغلاق': 'Close', 'حسناً': 'OK', 'نعم': 'Yes', 'لا': 'No', 'نسخ الرابط': 'Copy link',
+            'نسخ الرمز': 'Copy code', 'نسخ العنوان': 'Copy address', 'تحديث البيانات': 'Refresh data',
+            'عن SECURO': 'About SECURO', 'مهامي': 'My tasks', 'حسابي': 'My account',
+            'سحب': 'Withdraw', 'إيداع': 'Deposit', 'عجلة الحظ': 'Lucky wheel',
+            'فريق': 'Team', 'تأكيد': 'Confirm'
+        },
+        fr: {
+            'منصة': 'Plateforme', 'حسابي': 'Mon compte', 'مساحتك المالية الذكية': 'Votre espace financier intelligent',
+            'منصة SECURO': 'Plateforme SECURO', 'كل أقسام المنصة في مكان واحد': 'Toutes les sections au même endroit',
+            'الوصول السريع': 'Accès rapide', 'الرئيسية': 'Accueil', 'عن SECURO والمعلومات': 'À propos de SECURO',
+            'نشاط المنصة': 'Activité de la plateforme', 'مستويات ومنتجات VIP': 'Niveaux et produits VIP',
+            'مهامي اليومية': 'Mes tâches quotidiennes', 'فريقي والإحالات': 'Mon équipe et mes parrainages',
+            'الحساب والسجلات': 'Compte et historiques', 'حسابي والرصيد': 'Mon compte et mon solde',
+            'سجل الإيداع': 'Historique des dépôts', 'سجل السحوبات': 'Historique des retraits',
+            'سجل المكافآت': 'Historique des récompenses', 'المعاملات المالية': 'Transactions financières',
+            'خدمة العملاء والدعم': 'Service client', 'لغة التطبيق': 'Langue de l’application', 'تسجيل الخروج': 'Déconnexion',
+            'إغلاق القائمة': 'Fermer le menu', 'تسجيل الدخول': 'Connexion', 'إنشاء حساب جديد': 'Créer un compte',
+            'ليس لديك حساب؟ إنشاء حساب جديد': 'Pas de compte ? Créer un compte',
+            'لديك حساب بالفعل؟ دخول': 'Vous avez déjà un compte ? Connexion', 'كلمة المرور': 'Mot de passe',
+            'رمز الدعوة': 'Code d’invitation', 'دخول': 'Connexion', '🚀 دخول': '🚀 Connexion',
+            '🚀 إنشاء الحساب': '🚀 Créer un compte', 'خدمة العملاء (موظف الاستقبال)': 'Service client (réception)',
+            'تواصل مباشر عبر تليجرام': 'Contact direct via Telegram', 'خدمة العملاء والإدارة': 'Service client et administration',
+            'إغلاق': 'Fermer', 'حسناً': 'OK', 'نعم': 'Oui', 'لا': 'Non', 'نسخ الرابط': 'Copier le lien',
+            'تحديث البيانات': 'Actualiser les données', 'عن SECURO': 'À propos de SECURO',
+            'مهامي': 'Mes tâches', 'سحب': 'Retirer', 'إيداع': 'Déposer', 'عجلة الحظ': 'Roue de la chance'
+        },
+        es: {
+            'منصة': 'Plataforma', 'حسابي': 'Mi cuenta', 'مساحتك المالية الذكية': 'Tu espacio financiero inteligente',
+            'منصة SECURO': 'Plataforma SECURO', 'كل أقسام المنصة في مكان واحد': 'Todas las secciones en un solo lugar',
+            'الوصول السريع': 'Acceso rápido', 'الرئيسية': 'Inicio', 'عن SECURO والمعلومات': 'Acerca de SECURO',
+            'نشاط المنصة': 'Actividad de la plataforma', 'مستويات ومنتجات VIP': 'Niveles y productos VIP',
+            'مهامي اليومية': 'Mis tareas diarias', 'فريقي والإحالات': 'Mi equipo y referidos',
+            'الحساب والسجلات': 'Cuenta e historial', 'حسابي والرصيد': 'Mi cuenta y saldo',
+            'سجل الإيداع': 'Historial de depósitos', 'سجل السحوبات': 'Historial de retiros',
+            'سجل المكافآت': 'Historial de recompensas', 'المعاملات المالية': 'Transacciones financieras',
+            'خدمة العملاء والدعم': 'Atención al cliente', 'لغة التطبيق': 'Idioma de la aplicación', 'تسجيل الخروج': 'Cerrar sesión',
+            'إغلاق القائمة': 'Cerrar menú', 'تسجيل الدخول': 'Iniciar sesión', 'إنشاء حساب جديد': 'Crear una cuenta',
+            'ليس لديك حساب؟ إنشاء حساب جديد': '¿No tienes cuenta? Crear una',
+            'لديك حساب بالفعل؟ دخول': '¿Ya tienes cuenta? Iniciar sesión', 'كلمة المرور': 'Contraseña',
+            'رمز الدعوة': 'Código de invitación', 'دخول': 'Iniciar sesión', '🚀 دخول': '🚀 Iniciar sesión',
+            '🚀 إنشاء الحساب': '🚀 Crear cuenta', 'خدمة العملاء (موظف الاستقبال)': 'Atención al cliente (recepción)',
+            'تواصل مباشر عبر تليجرام': 'Contacto directo por Telegram', 'خدمة العملاء والإدارة': 'Atención al cliente y administración',
+            'إغلاق': 'Cerrar', 'حسناً': 'Aceptar', 'نعم': 'Sí', 'لا': 'No', 'نسخ الرابط': 'Copiar enlace',
+            'تحديث البيانات': 'Actualizar datos', 'عن SECURO': 'Acerca de SECURO', 'مهامي': 'Mis tareas',
+            'سحب': 'Retirar', 'إيداع': 'Depositar', 'عجلة الحظ': 'Ruleta de la suerte'
+        },
+        zh: {
+            'منصة': '平台', 'حسابي': '我的账户', 'مساحتك المالية الذكية': '您的智能金融空间',
+            'منصة SECURO': 'SECURO 平台', 'كل أقسام المنصة في مكان واحد': '所有平台功能一处查看',
+            'الوصول السريع': '快速访问', 'الرئيسية': '首页', 'عن SECURO والمعلومات': '关于 SECURO',
+            'نشاط المنصة': '平台活动', 'مستويات ومنتجات VIP': 'VIP 等级和产品',
+            'مهامي اليومية': '我的每日任务', 'فريقي والإحالات': '我的团队和推荐',
+            'الحساب والسجلات': '账户和记录', 'حسابي والرصيد': '我的账户和余额',
+            'سجل الإيداع': '充值记录', 'سجل السحوبات': '提现记录', 'سجل المكافآت': '奖励记录',
+            'المعاملات المالية': '财务交易', 'خدمة العملاء والدعم': '客户支持',
+            'لغة التطبيق': '应用语言', 'تسجيل الخروج': '退出登录', 'إغلاق القائمة': '关闭菜单',
+            'تسجيل الدخول': '登录', 'إنشاء حساب جديد': '创建新账户',
+            'ليس لديك حساب؟ إنشاء حساب جديد': '还没有账户？创建账户',
+            'لديك حساب بالفعل؟ دخول': '已有账户？登录', 'كلمة المرور': '密码',
+            'رمز الدعوة': '邀请码', 'دخول': '登录', '🚀 دخول': '🚀 登录',
+            '🚀 إنشاء الحساب': '🚀 创建账户', 'خدمة العملاء (موظف الاستقبال)': '客户服务（接待）',
+            'تواصل مباشر عبر تليجرام': '通过 Telegram 直接联系', 'خدمة العملاء والإدارة': '客户服务与管理',
+            'إغلاق': '关闭', 'حسناً': '确定', 'نعم': '是', 'لا': '否', 'نسخ الرابط': '复制链接',
+            'تحديث البيانات': '刷新数据', 'عن SECURO': '关于 SECURO', 'مهامي': '我的任务',
+            'سحب': '提现', 'إيداع': '充值', 'عجلة الحظ': '幸运转盘'
+        }
+    };
+    const originalLanguageText = new WeakMap();
+
+    function translatePage(lang) {
+        const dictionary = languageTranslations[lang] || {};
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) {
+            const node = walker.currentNode;
+            if (!node.parentElement || ['SCRIPT', 'STYLE', 'OPTION'].includes(node.parentElement.tagName)) continue;
+            const original = originalLanguageText.get(node) || node.nodeValue;
+            if (/[ء-ي]/.test(original.trim())) {
+                originalLanguageText.set(node, original);
+                nodes.push([node, original.trim()]);
+            }
+        }
+        nodes.forEach(([node, original]) => {
+            const translated = dictionary[original] || original;
+            node.nodeValue = node.nodeValue.replace(node.nodeValue.trim(), translated);
+        });
+        document.querySelectorAll('#auth-email').forEach((input) => {
+            input.placeholder = lang === 'ar' ? 'name@example.com' : 'name@example.com';
+        });
+        document.querySelectorAll('#platform-language-select, .menu-item select').forEach((select) => {
+            select.value = lang;
+        });
+    }
+
     function changeLanguage(lang) {
-        if(lang === 'ar') {
+        const supportedLanguages = ['ar', 'fr', 'en', 'es', 'zh'];
+        currentLanguage = supportedLanguages.includes(lang) ? lang : 'ar';
+        localStorage.setItem('securo-language', currentLanguage);
+        translatePage(currentLanguage);
+        if(currentLanguage === 'ar') {
             document.documentElement.setAttribute('dir', 'rtl');
             document.documentElement.setAttribute('lang', 'ar');
         } else {
             document.documentElement.setAttribute('dir', 'ltr');
-            document.documentElement.setAttribute('lang', lang);
+            document.documentElement.setAttribute('lang', currentLanguage);
         }
     }
 
@@ -2831,6 +2949,7 @@
         document.getElementById('auth-btn').innerText = isSignup ? '🚀 إنشاء الحساب' : '🚀 دخول';
         document.getElementById('toggle-text').innerText = isSignup ? 'لديك حساب بالفعل؟ دخول' : 'ليس لديك حساب؟ إنشاء حساب جديد';
         document.getElementById('toggle-text').setAttribute('onclick', 'toggleAuth()');
+        translatePage(currentLanguage);
     }
 
     function startDailyRewardClock() {
