@@ -112,6 +112,8 @@ const rates = [0.1, 0.05, 0.01];
 const dailyRewardAmount = 0.1;
 const trialDurationDays = 30; // backup expiry; trial ends after 4 total tasks
 const trialMaxTasks = 4;
+const trialDailyMaxTasks = 2;
+const trialMaxDays = 2;
 const vipProducts = {
   "VIP 1": { price: 14, totalTasks: 3, totalReward: 1.2 },
   "VIP 2": { price: 24, totalTasks: 6, totalReward: 2.5 },
@@ -207,14 +209,34 @@ async function syncDailyTaskState(clientOrPool, userId) {
      SET completed_tasks_count = 0,
          task_last_reset_date = ${currentDateSql()},
          current_trial_day = CASE
-           WHEN user_vip->>'isTrial' = 'true' AND task_last_reset_date IS NOT NULL
+           WHEN user_vip->>'isTrial' = 'true'
+             AND task_last_reset_date IS NOT NULL
+             AND current_trial_day < $2
              THEN current_trial_day + 1
            ELSE current_trial_day
+         END,
+         trial_active = CASE
+           WHEN user_vip->>'isTrial' = 'true'
+             AND (current_trial_day >= $2 OR trial_tasks_completed >= $3)
+             THEN FALSE
+           ELSE trial_active
+         END,
+         user_vip = CASE
+           WHEN user_vip->>'isTrial' = 'true'
+             AND (current_trial_day >= $2 OR trial_tasks_completed >= $3)
+             THEN NULL
+           ELSE user_vip
+         END,
+         vip_expires_at = CASE
+           WHEN user_vip->>'isTrial' = 'true'
+             AND (current_trial_day >= $2 OR trial_tasks_completed >= $3)
+             THEN NULL
+           ELSE vip_expires_at
          END,
          updated_at = NOW()
      WHERE id = $1
        AND (task_last_reset_date IS NULL OR task_last_reset_date < CURRENT_DATE)`,
-    [userId],
+    [userId, trialMaxDays, trialMaxTasks],
   );
 }
 
@@ -718,6 +740,17 @@ app.post("/api/tasks/:taskIndex/start", requireUser, async (req, res) => {
       const user = locked.rows[0];
       const vip = user && user.user_vip;
       if (!user || !vip) throw Object.assign(new Error("لا توجد عضوية نشطة"), { status: 400 });
+      if (vip.isTrial) {
+        if (Number(user.trial_tasks_completed) >= trialMaxTasks || Number(user.current_trial_day) > trialMaxDays) {
+          throw Object.assign(new Error("انتهت الفترة التجريبية"), { status: 409 });
+        }
+        if (Number(user.completed_tasks_count) >= trialDailyMaxTasks) {
+          throw Object.assign(new Error("اكتملت مهمتا اليوم. ستظهر مهمتان جديدتان عند بداية اليوم التالي"), { status: 409 });
+        }
+        if (taskIndex >= trialDailyMaxTasks) {
+          throw Object.assign(new Error("رقم المهمة غير صالح للفترة التجريبية اليوم"), { status: 400 });
+        }
+      }
        if (taskIndex >= Number(vip.totalTasks)) {
          throw Object.assign(new Error("رقم المهمة غير صالح لهذه العضوية"), { status: 400 });
        }
@@ -768,6 +801,17 @@ app.post("/api/tasks/:taskIndex/complete", requireUser, async (req, res) => {
       const user = locked.rows[0];
       const vip = user && user.user_vip;
       if (!user || !vip) throw Object.assign(new Error("لا توجد عضوية نشطة"), { status: 400 });
+      if (vip.isTrial) {
+        if (Number(user.trial_tasks_completed) >= trialMaxTasks || Number(user.current_trial_day) > trialMaxDays) {
+          throw Object.assign(new Error("انتهت الفترة التجريبية"), { status: 409 });
+        }
+        if (Number(user.completed_tasks_count) >= trialDailyMaxTasks) {
+          throw Object.assign(new Error("اكتملت مهمتا اليوم. ستظهر مهمتان جديدتان عند بداية اليوم التالي"), { status: 409 });
+        }
+        if (taskIndex >= trialDailyMaxTasks) {
+          throw Object.assign(new Error("رقم المهمة غير صالح للفترة التجريبية اليوم"), { status: 400 });
+        }
+      }
        if (taskIndex >= Number(vip.totalTasks)) {
          throw Object.assign(new Error("رقم المهمة غير صالح لهذه العضوية"), { status: 400 });
        }

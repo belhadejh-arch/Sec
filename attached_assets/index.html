@@ -3231,10 +3231,15 @@
             return rewardCents / 100;
         };
         statusEl.innerText = `العضوية النشطة: ${userVip.name} (المكافأة حسب المهمة: $${(baseRewardCents / 100).toFixed(2)} إلى $${(taskRewardFor(totalTasks - 1)).toFixed(2)})`;
-        progressEl.innerText = `المهام المنجزة اليوم: ${completedTasksCount} / ${userVip.totalTasks}`;
+        const dailyTaskLimit = userVip.isTrial ? 2 : totalTasks;
+        progressEl.innerText = userVip.isTrial
+            ? `إجمالي المهام التجريبية: ${Number(currentUser?.trialTasksCompleted || 0)} / 4 — اليوم ${currentTrialDay}: ${completedTasksCount} / ${dailyTaskLimit}`
+            : `المهام المنجزة اليوم: ${completedTasksCount} / ${userVip.totalTasks}`;
 
-        if (completedTasksCount >= userVip.totalTasks) {
-            let trialDayText = userVip.isTrial ? ` (تجربة من 4 مهام إجمالاً)` : " (صالحة لمدة 365 يوماً)";
+        if (completedTasksCount >= dailyTaskLimit) {
+            let trialDayText = userVip.isTrial
+                ? ` (اليوم ${currentTrialDay} من يومين — 2 مهمة يومياً)`
+                : " (صالحة لمدة 365 يوماً)";
             container.innerHTML = `
                 <div class="task-complete-card">
                     <div class="task-complete-icon-box">
@@ -3242,7 +3247,9 @@
                     </div>
                     <h3 style="color: #34d399; font-size: 1.3rem; margin-bottom: 8px;">لقد قمت بمهام اليوم${trialDayText} بنجاح!</h3>
                     <p style="color: #a7f3d0; font-size: 0.9rem; line-height: 1.5; margin-bottom: 10px;">
-                        يجب عليك العودة غداً للقيام بمهام الفترة الجديدة.
+                        ${userVip.isTrial && currentTrialDay < 2
+                            ? "توقفت مهام الفترة التجريبية لباقي اليوم. ستظهر مهمتان جديدتان عند بداية اليوم التالي."
+                            : "اكتملت مهام الفترة التجريبية اليومية. سيتم تحديث المهام عند بداية اليوم التالي."}
                     </p>
                     <div id="midnight-countdown" style="font-size: 0.9rem; font-weight: bold; color: #fbbf24; margin-bottom: 12px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px;"></div>
                     <div class="commission-badge-box">
@@ -3255,7 +3262,7 @@
             return;
         }
 
-        const taskCount = Math.min(totalTasks, hotelsList.length); // hotelsList now has 12 hotels
+        const taskCount = Math.min(userVip.isTrial ? 2 : totalTasks, hotelsList.length); // hotelsList now has 12 hotels
         for (let taskIndex = 0; taskIndex < taskCount; taskIndex++) {
             const i = taskIndex;
             const hotel = hotelsList[i];
