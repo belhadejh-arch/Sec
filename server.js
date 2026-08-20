@@ -660,7 +660,8 @@ app.post("/api/vip/purchase", requireUser, async (req, res) => {
       const vip = { name, ...product, isTrial: false };
       await client.query(
         `UPDATE users SET balance = balance - $1, user_vip = $2::jsonb,
-          trial_active = FALSE, trial_tasks_completed = 0, completed_tasks_count = 0,
+          trial_active = FALSE, trial_cancelled = FALSE, trial_tasks_completed = 0,
+          completed_tasks_count = 0,
           task_last_reset_date = CURRENT_DATE,
            vip_expires_at = NOW() + INTERVAL '365 days',
            available_spins = available_spins + 1, updated_at = NOW()
@@ -1125,6 +1126,7 @@ app.post("/api/admin/users/:id/vip", requireAdmin, async (req, res) => {
          SET user_vip = $1::jsonb,
              vip_expires_at = NOW() + INTERVAL '365 days',
              trial_active = FALSE,
+             trial_cancelled = FALSE,
              trial_used = TRUE,
              trial_tasks_completed = 0,
              completed_tasks_count = 0,
