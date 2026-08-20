@@ -535,6 +535,7 @@
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;border-top:1px solid var(--border-color);padding-top:8px">
           <button class="btn btn-green"  style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminAdjustBalance(${user.id},${Number(user.balance).toFixed(2)})">✏️ تعديل الرصيد</button>
           <button class="btn btn-gold"   style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminChangeVip(${user.id})">👑 تغيير VIP</button>
+          <button class="btn"            style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px;background:#7c3aed;color:white" onclick="adminChangeUserPassword(${user.id})">🔑 تغيير كلمة المرور</button>
           <button class="btn"            style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px;background:#6366f1;color:white" onclick="adminResetTasks(${user.id})">🔄 تصفير المهام</button>
           <button class="btn"            style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px;background:#0891b2;color:white" onclick="adminGrantSpin(${user.id})">🎡 منح فرصة عجلة</button>
           ${hasTrial ? `<button class="btn btn-red" style="flex:1 1 150px;min-width:0;padding:6px 8px;font-size:.72rem;min-height:38px" onclick="adminCancelTrial(${user.id})">🚫 إلغاء التجربة</button>` : ""}
@@ -644,6 +645,23 @@
         body: JSON.stringify({ name: name.trim() }),
       });
       await window.renderAdminDashboard();
+    } catch (error) {
+      showApiError(error);
+    }
+  };
+  window.adminChangeUserPassword = async function (userId) {
+    const newPassword = window.prompt("أدخل كلمة المرور الجديدة للمستخدم (6 أحرف على الأقل):", "");
+    if (newPassword === null) return;
+    if (newPassword.length < 6 || newPassword.length > 128) {
+      return showApiError(new Error("كلمة المرور الجديدة يجب أن تكون بين 6 و128 حرفاً"));
+    }
+    if (!window.confirm("هل تريد حفظ كلمة المرور الجديدة لهذا المستخدم؟")) return;
+    try {
+      await api(`/api/admin/users/${encodeURIComponent(userId)}/password`, {
+        method: "POST",
+        body: JSON.stringify({ newPassword }),
+      });
+      window.alert("تم تغيير كلمة مرور المستخدم بنجاح.");
     } catch (error) {
       showApiError(error);
     }

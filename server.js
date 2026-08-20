@@ -1264,6 +1264,19 @@ function validatePasswordChange(req, res) {
   return { currentPassword, newPassword };
 }
 
+function validateAdminPasswordReset(req, res) {
+  const newPassword = String(req.body.newPassword || "");
+  if (newPassword.length < 6) {
+    appError(res, 400, "كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف");
+    return null;
+  }
+  if (newPassword.length > 128) {
+    appError(res, 400, "كلمة المرور الجديدة طويلة جداً");
+    return null;
+  }
+  return newPassword;
+}
+
 // A regular user changes only their own password. Admins use the dedicated
 // control-panel route below, so this endpoint cannot be used by an admin.
 app.post("/api/me/password", requireUser, async (req, res) => {
@@ -1275,6 +1288,39 @@ app.post("/api/me/password", requireUser, async (req, res) => {
   } catch (error) {
     console.error("Password update failed:", error.code || error.message);
     appError(res, error.status || 500, error.status ? error.message : "تعذر تغيير كلمة المرور");
+  }
+});
+
+app.post("/api/admin/users/:id/password", requireAdmin, async (req, res) => {
+  const userId = Number(req.params.id);
+  const newPassword = validateAdminPasswordReset(req, res);
+  if (!newPassword) return;
+  if (!Number.isInteger(userId) || userId <= 0) {
+    return appError(res, 400, "معرّف المستخدم غير صحيح");
+  }
+  try {
+    const result = await withTransaction(async (client) => {
+      const locked = await client.query(
+        "SELECT * FROM users WHERE id = $1 AND is_admin = FALSE FOR UPDATE",
+        [userId],
+      );
+      if (!locked.rowCount) {
+        throw Object.assign(new Error("المستخدم غير موجود أو حساب إداري"), { status: 404 });
+      }
+      const passwordHash = await bcrypt.hash(newPassword, 12);
+      const updated = await client.query(
+        `UPDATE users
+         SET password_hash = $1, updated_at = NOW()
+         WHERE id = $2
+         RETURNING *`,
+        [passwordHash, userId],
+      );
+      return publicUser(updated.rows[0]);
+    });
+    res.json({ ok: true, user: result });
+  } catch (error) {
+    console.error("Admin user password reset failed:", error.code || error.message);
+    appError(res, error.status || 500, error.status ? error.message : "تعذر تغيير كلمة مرور المستخدم");
   }
 });
 
