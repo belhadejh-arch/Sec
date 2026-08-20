@@ -3220,7 +3220,7 @@
                 : baseRewardCents;
             return rewardCents / 100;
         };
-        statusEl.innerText = `العضوية النشطة: ${userVip.name} (دخل المهمة: $${taskReward.toFixed(2)})`;
+        statusEl.innerText = `العضوية النشطة: ${userVip.name} (المكافأة حسب المهمة: $${(baseRewardCents / 100).toFixed(2)} إلى $${(taskRewardFor(totalTasks - 1)).toFixed(2)})`;
         progressEl.innerText = `المهام المنجزة اليوم: ${completedTasksCount} / ${userVip.totalTasks}`;
 
         if (completedTasksCount >= userVip.totalTasks) {
@@ -3237,7 +3237,7 @@
                     <div id="midnight-countdown" style="font-size: 0.9rem; font-weight: bold; color: #fbbf24; margin-bottom: 12px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px;"></div>
                     <div class="commission-badge-box">
                         <span style="color: #94a3b8; font-size: 0.82rem; display: block; margin-bottom: 4px;">إجمالي العمولة المكتسبة لهذه الجلسة:</span>
-                        <span style="color: #fbbf24; font-size: 1.6rem; font-weight: 900;">+$${userVip.totalReward.toFixed(2)}</span>
+                        <span style="color: #fbbf24; font-size: 1.6rem; font-weight: 900;">+$${Number(userVip.totalReward).toFixed(2)}</span>
                     </div>
                 </div>
             `;

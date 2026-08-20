@@ -2,3 +2,4 @@
 - [Server-owned financial state](server-owned-financial-state.md) — كل الرصيد والمكافآت والحجوزات تتغير عبر Backend/PostgreSQL فقط.
 - [Responsive CSS layering](responsive-css-layering.md) — قواعد responsive المتكررة قد تلغي الإصلاح؛ يجب وضع override النهائي في آخر CSS.
 - [Imported app runtime](imported-app-runtime.md) — تطبيقات Express المستوردة يجب أن تحترم PORT المعطى، وقد يتطلب npm تثبيتاً صريحاً مع registry العام.
+- [Task transaction locking](task-transaction-locking.md) — لا تستخدم pool داخل معاملة تملك قفل المستخدم؛ استخدم نفس client لتجنب انتظار متبادل أثناء إكمال المهام.
