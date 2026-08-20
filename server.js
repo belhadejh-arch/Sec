@@ -643,11 +643,20 @@ app.post("/api/vip/purchase", requireUser, async (req, res) => {
          WHERE id = $3 RETURNING *`,
         [product.price.toFixed(2), JSON.stringify(vip), req.session.userId],
       );
-      await client.query(
+      const transaction = await client.query(
         `INSERT INTO transactions
           (user_id, type, amount, direction, description, reference_type, reference_id)
-         VALUES ($1, 'شراء', $2, 'debit', $3, 'vip_purchase', NULL)`,
+          VALUES ($1, 'شراء', $2, 'debit', $3, 'vip_purchase', NULL)
+          RETURNING id`,
         [req.session.userId, product.price.toFixed(2), `شراء عضوية ${name}`],
+      );
+      await client.query(
+        `INSERT INTO wheel_spin_grants
+          (user_id, granted_by, amount, source_type, source_reference)
+         VALUES ($1, NULL, 1, 'vip_activation', $2)
+         ON CONFLICT (user_id, source_type, source_reference) WHERE source_reference IS NOT NULL
+         DO NOTHING`,
+        [req.session.userId, transaction.rows[0].id],
       );
     });
     // Return the complete, freshly-loaded task state with the purchase result.
@@ -673,9 +682,13 @@ app.post("/api/wheel/spin", requireUser, async (req, res) => {
       const amount = wheelSectors[sectorIndex].amount;
       const updated = await client.query(
         `UPDATE users SET available_spins = available_spins - 1,
-          balance = balance + $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
+          balance = balance + $1, updated_at = NOW()
+          WHERE id = $2 AND available_spins > 0 RETURNING *`,
         [amount.toFixed(2), req.session.userId],
       );
+      if (!updated.rowCount) {
+        throw Object.assign(new Error("لا توجد محاولات حظ متاحة"), { status: 400 });
+      }
       if (amount > 0) {
         await client.query(
           `INSERT INTO transactions
@@ -1045,24 +1058,49 @@ app.post("/api/admin/users/:id/vip", requireAdmin, async (req, res) => {
     return appError(res, 400, "عضوية VIP غير صالحة");
   }
   try {
-    const result = await pool.query(
-      `UPDATE users
-       SET user_vip = $1::jsonb,
-           vip_expires_at = NOW() + INTERVAL '365 days',
-           trial_active = FALSE,
-           trial_used = TRUE,
-           trial_tasks_completed = 0,
-           completed_tasks_count = 0,
-           task_last_reset_date = CURRENT_DATE,
-           updated_at = NOW()
-       WHERE id = $2 AND is_admin = FALSE
-       RETURNING *`,
-      [JSON.stringify({ name, ...product, isTrial: false }), userId],
-    );
-    if (!result.rowCount) return appError(res, 404, "المستخدم غير موجود أو حساب إداري");
-    res.json({ user: publicUser(result.rows[0]) });
-  } catch {
-    appError(res, 500, "تعذر تغيير عضوية المستخدم");
+    const result = await withTransaction(async (client) => {
+      const locked = await client.query(
+        "SELECT * FROM users WHERE id = $1 AND is_admin = FALSE FOR UPDATE",
+        [userId],
+      );
+      if (!locked.rowCount) {
+        throw Object.assign(new Error("المستخدم غير موجود أو حساب إداري"), { status: 404 });
+      }
+      const updated = await client.query(
+        `UPDATE users
+         SET user_vip = $1::jsonb,
+             vip_expires_at = NOW() + INTERVAL '365 days',
+             trial_active = FALSE,
+             trial_used = TRUE,
+             trial_tasks_completed = 0,
+             completed_tasks_count = 0,
+             task_last_reset_date = CURRENT_DATE,
+             available_spins = available_spins + 1,
+             updated_at = NOW()
+         WHERE id = $2
+         RETURNING *`,
+        [JSON.stringify({ name, ...product, isTrial: false }), userId],
+      );
+      const activation = await client.query(
+        `INSERT INTO transactions
+          (user_id, type, amount, direction, description, reference_type, reference_id)
+         VALUES ($1, 'إدارة', 0, 'credit', $2, 'vip_activation', $3)
+         RETURNING id`,
+        [userId, `تفعيل ${name} بواسطة الإدارة`, req.session.userId],
+      );
+      await client.query(
+        `INSERT INTO wheel_spin_grants
+          (user_id, granted_by, amount, source_type, source_reference)
+         VALUES ($1, $2, 1, 'vip_activation', $3)
+         ON CONFLICT (user_id, source_type, source_reference) WHERE source_reference IS NOT NULL
+         DO NOTHING`,
+        [userId, req.session.userId, activation.rows[0].id],
+      );
+      return publicUser(updated.rows[0]);
+    });
+    res.json({ user: result });
+  } catch (error) {
+    appError(res, error.status || 500, error.status ? error.message : "تعذر تغيير عضوية المستخدم");
   }
 });
 

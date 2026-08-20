@@ -2022,7 +2022,7 @@
         <div id="spin-screen" class="screen">
             <h2 style="margin-bottom: 15px; color: var(--text-white);">🎡 عجلة الحظ المباشرة</h2>
             <div class="wheel-card">
-                <p style="font-size: 0.78rem; color: #c7d2fe; text-align: center; margin-bottom: 12px;">تُمنح محاولات عجلة الحظ تلقائياً عند إجراء الترقية أو إيداع صديق عن طريق رابط دعواتك!</p>
+                <p id="wheel-status-message" style="font-size: 0.78rem; color: #c7d2fe; text-align: center; margin-bottom: 12px;">تُمنح فرصة واحدة تلقائياً عند كل تفعيل VIP ناجح.</p>
                 
                 <div class="wheel-container-wrapper">
                     <div class="wheel-pointer"></div>
@@ -2726,11 +2726,20 @@
 
     function updateWheelUI() {
         const button = document.getElementById('spin-wheel-button');
+        const status = document.getElementById('wheel-status-message');
         if (!button) return;
         const hasSpins = Number(availableSpins || 0) > 0;
         button.disabled = isSpinning || !hasSpins;
         button.title = hasSpins ? 'استخدم فرصة عجلة الحظ' : 'لا توجد فرص متاحة حالياً';
         button.innerText = isSpinning ? '...' : 'دوران';
+        if (status) {
+            status.innerText = isSpinning
+                ? 'جارٍ تنفيذ الدوران والتحقق من النتيجة...'
+                : hasSpins
+                    ? 'لديك فرصة متاحة. اضغط دوران لاستخدامها.'
+                    : 'لا توجد فرص متاحة حالياً. فعّل VIP للحصول على فرصة جديدة.';
+            status.style.color = hasSpins ? '#a7f3d0' : '#c7d2fe';
+        }
     }
 
     async function spinWheel() {

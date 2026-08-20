@@ -42,10 +42,25 @@ ALTER TABLE users
 CREATE TABLE IF NOT EXISTS wheel_spin_grants (
   id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  granted_by BIGINT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  granted_by BIGINT REFERENCES users(id) ON DELETE RESTRICT,
   amount INTEGER NOT NULL CHECK (amount > 0),
+  source_type VARCHAR(32) NOT NULL DEFAULT 'admin',
+  source_reference BIGINT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE wheel_spin_grants
+  ALTER COLUMN granted_by DROP NOT NULL;
+
+ALTER TABLE wheel_spin_grants
+  ADD COLUMN IF NOT EXISTS source_type VARCHAR(32) NOT NULL DEFAULT 'admin';
+
+ALTER TABLE wheel_spin_grants
+  ADD COLUMN IF NOT EXISTS source_reference BIGINT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS wheel_spin_grants_source_unique
+  ON wheel_spin_grants(user_id, source_type, source_reference)
+  WHERE source_reference IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS wheel_spin_grants_user_idx
   ON wheel_spin_grants(user_id, created_at DESC);
