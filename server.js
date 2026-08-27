@@ -18,6 +18,7 @@ try {
     ssl: { rejectUnauthorized: false },
     max: 10,
   });
+  pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS can_withdraw BOOLEAN NOT NULL DEFAULT TRUE;`).catch(() => {});
 } catch {
   console.warn('DB not connected — mock active');
   pool = {
