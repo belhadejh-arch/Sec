@@ -496,6 +496,10 @@
       : "";
     const totalDep  = Number(user.totalDeposits  || 0).toFixed(2);
     const totalWith = Number(user.totalWithdrawals || 0).toFixed(2);
+    const teamSize = Number(user.teamSize || 0);
+    const vipTeamSize = Number(user.vipTeamSize || 0);
+    const canWithdraw = user.canWithdraw !== false;
+
     return `
       <div class="history-card" style="display:block">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
@@ -509,6 +513,19 @@
             <strong style="color:#60a5fa;font-size:1.05rem">$${Number(user.balance).toFixed(2)}</strong><br>
             <span class="history-badge ${accountStatus.className}" style="margin-top:4px;display:inline-block">${accountStatus.label}</span>
           </div>
+        </div>
+
+        <!-- حجم الفريق وحالة السحب -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;padding:8px 10px;background:rgba(15,23,42,.45);border:1px solid var(--border-color);border-radius:10px;align-items:center;justify-content:space-between">
+          <div style="font-size:.78rem;color:#cbd5e1">
+            👥 حجم الفريق: <strong style="color:#60a5fa">${teamSize}</strong> | 👑 VIP مفعل: <strong style="color:#34d399">${vipTeamSize}</strong>
+          </div>
+          ${!user.isAdmin ? `
+            <div>
+              <span style="font-size:.75rem;color:var(--text-muted);margin-left:4px">السحب:</span>
+              <button class="btn" style="display:inline-flex;padding:3px 8px;font-size:.72rem;background:${canWithdraw ? '#10b981' : '#ef4444'};color:white;border-radius:6px;cursor:pointer;width:auto;min-height:auto" onclick="adminToggleWithdrawal(${user.id}, ${!canWithdraw})">${canWithdraw ? 'ON' : 'OFF'}</button>
+            </div>
+          ` : ''}
         </div>
 
         <!-- إجماليات الإيداع والسحب -->
@@ -544,6 +561,18 @@
         ` : ""}
       </div>`;
   }
+
+  window.adminToggleWithdrawal = async function (userId, canWithdraw) {
+    try {
+      await api(`/api/admin/users/${userId}/withdrawal-status`, {
+        method: "POST",
+        body: JSON.stringify({ canWithdraw }),
+      });
+      await renderAdminDashboard();
+    } catch (error) {
+      showApiError(error);
+    }
+  };
 
   function renderUsersList(users) {
     const container = document.getElementById("admin-users-list");

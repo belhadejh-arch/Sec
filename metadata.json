@@ -1,0 +1,8 @@
+{
+  "name": "SECURO VIP",
+  "description": "SECURO VIP - الإدارة والمستخدم (Admin & User Management Platform)",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

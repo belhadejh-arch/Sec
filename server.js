@@ -161,6 +161,7 @@ function publicUser(row) {
     isAdmin: Boolean(row.is_admin),
     isBlocked: Boolean(row.is_blocked),
     isActive: !Boolean(row.is_blocked),
+    canWithdraw: row.can_withdraw !== undefined ? Boolean(row.can_withdraw) : true,
     balance: money(row.balance),
     reservedBalance: money(row.reserved_balance),
     availableBalance: money(Number(row.balance) - Number(row.reserved_balance)),
@@ -175,6 +176,8 @@ function publicUser(row) {
     trialCancelled: Boolean(row.trial_cancelled),
     vipExpiresAt: row.vip_expires_at || null,
     availableSpins: Number(row.available_spins || 0),
+    teamSize: Number(row.team_size || 0),
+    vipTeamSize: Number(row.vip_team_size || 0),
     createdAt: row.created_at,
   };
 }
@@ -938,14 +941,18 @@ app.post("/api/withdrawal-requests", requireUser, async (req, res) => {
   try {
     const result = await withTransaction(async (client) => {
       const locked = await client.query(
-        "SELECT balance, reserved_balance FROM users WHERE id = $1 FOR UPDATE",
+        "SELECT can_withdraw, balance, reserved_balance FROM users WHERE id = $1 FOR UPDATE",
         [req.session.userId],
       );
       if (!locked.rowCount) {
         throw Object.assign(new Error("الحساب غير موجود"), { status: 404 });
       }
+      const userRecord = locked.rows[0];
+      if (userRecord.can_withdraw === false) {
+        throw Object.assign(new Error("خاصية السحب غير مفعلة، يرجى الاتصال بخدمة العملاء."), { status: 403 });
+      }
       const availableBalance =
-        Number(locked.rows[0].balance) - Number(locked.rows[0].reserved_balance);
+        Number(userRecord.balance) - Number(userRecord.reserved_balance);
       if (availableBalance < amount) {
         throw Object.assign(new Error("رصيدك غير كافٍ"), { status: 400 });
       }
@@ -971,13 +978,15 @@ app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
   try {
     const [users, deposits, withdrawals, stats] = await Promise.all([
       pool.query(
-        `SELECT u.id, u.email, u.name, u.referral_code, u.is_admin, u.is_blocked,
+        `SELECT u.id, u.email, u.name, u.referral_code, u.is_admin, u.is_blocked, u.can_withdraw,
                 u.balance, u.reserved_balance, u.user_vip, u.created_at,
                 u.vip_expires_at, u.trial_active, u.trial_used,
                 u.available_spins, u.completed_tasks_count,
                 u.task_last_reset_date, u.last_claim_date, u.current_trial_day,
                 COALESCE(d.total_dep, 0) AS total_deposits,
-                COALESCE(w.total_with, 0) AS total_withdrawals
+                COALESCE(w.total_with, 0) AS total_withdrawals,
+                COALESCE(t.team_size, 0) AS team_size,
+                COALESCE(t.vip_team_size, 0) AS vip_team_size
          FROM users u
          LEFT JOIN (
            SELECT user_id, SUM(amount) AS total_dep
@@ -989,6 +998,22 @@ app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
            FROM withdrawal_requests WHERE status = 'accepted'
            GROUP BY user_id
          ) w ON w.user_id = u.id
+         LEFT JOIN LATERAL (
+           WITH RECURSIVE team_tree AS (
+             SELECT child.id, child.user_vip, child.vip_expires_at, 1 AS level
+             FROM users child
+             WHERE child.referred_by = u.id
+             UNION ALL
+             SELECT grandchild.id, grandchild.user_vip, grandchild.vip_expires_at, tt.level + 1
+             FROM users grandchild
+             JOIN team_tree tt ON grandchild.referred_by = tt.id
+             WHERE tt.level < 3
+           )
+           SELECT
+             COUNT(*) AS team_size,
+             COUNT(*) FILTER (WHERE user_vip IS NOT NULL AND (vip_expires_at IS NULL OR vip_expires_at > NOW())) AS vip_team_size
+           FROM team_tree
+         ) t ON TRUE
          ORDER BY u.created_at DESC`,
       ),
       pool.query(
@@ -1054,6 +1079,27 @@ app.post("/api/admin/users/:id/status", requireAdmin, async (req, res) => {
     res.json({ user: publicUser(result.rows[0]) });
   } catch {
     appError(res, 500, "تعذر تحديث حالة المستخدم");
+  }
+});
+
+app.post("/api/admin/users/:id/withdrawal-status", requireAdmin, async (req, res) => {
+  const userId = Number(req.params.id);
+  const canWithdraw = req.body.canWithdraw;
+  if (!Number.isInteger(userId) || userId <= 0 || typeof canWithdraw !== "boolean") {
+    return appError(res, 400, "بيانات غير صحيحة");
+  }
+  try {
+    const result = await pool.query(
+      `UPDATE users
+       SET can_withdraw = $1, updated_at = NOW()
+       WHERE id = $2 AND is_admin = FALSE
+       RETURNING *`,
+      [canWithdraw, userId],
+    );
+    if (!result.rowCount) return appError(res, 404, "المستخدم غير موجود أو حساب إداري");
+    res.json({ user: publicUser(result.rows[0]) });
+  } catch {
+    appError(res, 500, "تعذر تحديث خاصية السحب للمستخدم");
   }
 });
 
