@@ -28,6 +28,19 @@ try {
   };
 }
 
+const platformSettingsReady = pool.query(`
+  CREATE TABLE IF NOT EXISTS platform_settings (
+    setting_key VARCHAR(64) PRIMARY KEY,
+    enabled BOOLEAN NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+  INSERT INTO platform_settings (setting_key, enabled)
+  VALUES ('tasks_enabled', TRUE)
+  ON CONFLICT (setting_key) DO NOTHING;
+`).catch((error) => {
+  console.error("Platform settings initialization failed:", error.code || error.message);
+});
+
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
 const publicDir = path.join(__dirname, "attached_assets");
@@ -192,6 +205,14 @@ async function getUserById(id) {
   return result.rows[0] || null;
 }
 
+async function getTasksEnabled(clientOrPool = pool) {
+  await platformSettingsReady;
+  const result = await clientOrPool.query(
+    "SELECT enabled FROM platform_settings WHERE setting_key = 'tasks_enabled'",
+  );
+  return result.rowCount ? Boolean(result.rows[0].enabled) : true;
+}
+
 function parseMoney(value) {
   const amount = Number(value);
   if (!Number.isFinite(amount) || amount <= 0) return null;
@@ -264,6 +285,7 @@ async function loadUserPayload(userId) {
   await syncDailyTaskState(pool, userId);
   const user = await getUserById(userId);
   if (!user) return null;
+  const tasksEnabled = await getTasksEnabled();
 
   const [deposits, withdrawals, transactions, taskAttempts, team, commissions, commissionsByLevel, totals] =
     await Promise.all([
@@ -331,6 +353,7 @@ async function loadUserPayload(userId) {
 
   return {
     user: publicUser(user),
+    tasksEnabled,
     deposits: deposits.rows.map((item) => ({
       title: `إيداع عبر ${item.network} (مرجع: ${item.txid.slice(0, 8)}...)`,
       amount: `+$${money(item.amount).toFixed(2)}`,
@@ -747,6 +770,9 @@ app.post("/api/tasks/:taskIndex/start", requireUser, async (req, res) => {
       const user = locked.rows[0];
       const vip = user && user.user_vip;
       if (!user || !vip) throw Object.assign(new Error("لا توجد عضوية نشطة"), { status: 400 });
+       if (!vip.isTrial && !(await getTasksEnabled(client))) {
+         throw Object.assign(new Error("المهام متوقفة حالياً من قِبل الإدارة"), { status: 409 });
+       }
       if (vip.isTrial) {
         if (Number(user.trial_tasks_completed) >= trialMaxTasks || Number(user.current_trial_day) > trialMaxDays) {
           throw Object.assign(new Error("انتهت الفترة التجريبية"), { status: 409 });
@@ -808,6 +834,9 @@ app.post("/api/tasks/:taskIndex/complete", requireUser, async (req, res) => {
       const user = locked.rows[0];
       const vip = user && user.user_vip;
       if (!user || !vip) throw Object.assign(new Error("لا توجد عضوية نشطة"), { status: 400 });
+       if (!vip.isTrial && !(await getTasksEnabled(client))) {
+         throw Object.assign(new Error("المهام متوقفة حالياً من قِبل الإدارة"), { status: 409 });
+       }
       if (vip.isTrial) {
         if (Number(user.trial_tasks_completed) >= trialMaxTasks || Number(user.current_trial_day) > trialMaxDays) {
           throw Object.assign(new Error("انتهت الفترة التجريبية"), { status: 409 });
@@ -909,7 +938,12 @@ app.post("/api/tasks/:taskIndex/complete", requireUser, async (req, res) => {
     // keeps the UI synchronized with task_attempts instead of trusting a
     // locally assembled status object.
     const payload = await loadUserPayload(req.session.userId);
-    res.json({ ...result, user: payload.user, taskStatuses: payload.taskStatuses });
+    res.json({
+      ...result,
+      user: payload.user,
+      taskStatuses: payload.taskStatuses,
+      tasksEnabled: payload.tasksEnabled,
+    });
   } catch (error) {
     appError(res, error.status || 500, error.status ? error.message : "تعذر إكمال المهمة");
   }
@@ -977,7 +1011,7 @@ app.post("/api/withdrawal-requests", requireUser, async (req, res) => {
 
 app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
   try {
-    const [users, deposits, withdrawals, stats] = await Promise.all([
+    const [users, deposits, withdrawals, stats, tasksEnabled] = await Promise.all([
       pool.query(
         `SELECT u.id, u.email, u.name, u.referral_code, u.is_admin, u.is_blocked, u.can_withdraw,
                 u.balance, u.reserved_balance, u.user_vip, u.created_at,
@@ -1037,6 +1071,7 @@ app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
            (SELECT COALESCE(SUM(amount), 0) FROM withdrawal_requests WHERE status = 'accepted') AS withdrawals,
            (SELECT COUNT(*) FROM withdrawal_requests WHERE status = 'accepted') AS withdrawal_count`,
       ),
+      getTasksEnabled(),
     ]);
     res.json({
       users: users.rows.map((row) => ({
@@ -1053,9 +1088,31 @@ app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
         depositCount: Number(stats.rows[0].deposit_count || 0),
         withdrawalCount: Number(stats.rows[0].withdrawal_count || 0),
       },
+      tasksEnabled,
     });
   } catch {
     appError(res, 500, "تعذر تحميل لوحة الإدارة");
+  }
+});
+
+app.post("/api/admin/tasks/status", requireAdmin, async (req, res) => {
+  const enabled = req.body.enabled;
+  if (typeof enabled !== "boolean") {
+    return appError(res, 400, "حالة المهام غير صحيحة");
+  }
+  try {
+    await platformSettingsReady;
+    const result = await pool.query(
+      `INSERT INTO platform_settings (setting_key, enabled)
+       VALUES ('tasks_enabled', $1)
+       ON CONFLICT (setting_key)
+       DO UPDATE SET enabled = EXCLUDED.enabled, updated_at = NOW()
+       RETURNING enabled`,
+      [enabled],
+    );
+    res.json({ tasksEnabled: Boolean(result.rows[0].enabled) });
+  } catch {
+    appError(res, 500, "تعذر تحديث حالة المهام");
   }
 });
 

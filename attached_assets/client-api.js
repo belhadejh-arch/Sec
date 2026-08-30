@@ -16,6 +16,7 @@
       : configuredApiBaseUrl.replace(/\/+$/, "");
   let adminRefreshInterval = null;
   let adminRefreshInFlight = false;
+  let adminTasksEnabled = true;
   let depositSubmissionInFlight = false;
   let withdrawalSubmissionInFlight = false;
 
@@ -93,6 +94,9 @@
     completedTasksCount = Number(payload.user.completedTasksCount || 0);
     taskLastResetDate = payload.user.taskLastResetDate || null;
     taskStatuses = payload.taskStatuses || [];
+    if (typeof window.syncTaskAvailability === "function") {
+      window.syncTaskAvailability(payload.tasksEnabled);
+    }
     lastClaimDate = payload.user.lastClaimDate || null;
     currentTrialDay = Number(payload.user.currentTrialDay || 1);
     trialActive = Boolean(payload.user.trialActive);
@@ -601,6 +605,20 @@
     adminRefreshInFlight = true;
     try {
       const data = await api("/api/admin/overview");
+      adminTasksEnabled = data.tasksEnabled !== false;
+      const tasksToggle = document.getElementById("admin-tasks-toggle");
+      const tasksToggleStatus = document.getElementById("admin-tasks-toggle-status");
+      if (tasksToggle) {
+        tasksToggle.innerText = adminTasksEnabled ? "ON" : "OFF";
+        tasksToggle.className = `btn ${adminTasksEnabled ? "btn-green" : "btn-red"}`;
+        tasksToggle.setAttribute("aria-pressed", String(adminTasksEnabled));
+      }
+      if (tasksToggleStatus) {
+        tasksToggleStatus.innerText = adminTasksEnabled
+          ? "المهام المدفوعة متاحة الآن لمستخدمي VIP1–VIP4."
+          : "المهام المدفوعة متوقفة الآن لمستخدمي VIP1–VIP4.";
+        tasksToggleStatus.style.color = adminTasksEnabled ? "#86efac" : "#fca5a5";
+      }
       _allAdminUsers = data.users;
       document.getElementById("admin-total-users").innerText = data.stats.users;
       document.getElementById("admin-total-deposits").innerText = `$${Number(data.stats.deposits).toFixed(2)}`;
@@ -626,6 +644,20 @@
       showApiError(error);
     } finally {
       adminRefreshInFlight = false;
+    }
+  };
+  window.adminToggleTasks = async function () {
+    const nextEnabled = !adminTasksEnabled;
+    const action = nextEnabled ? "تشغيل مهام VIP1–VIP4" : "إيقاف مهام VIP1–VIP4";
+    if (!window.confirm(`هل تريد ${action}؟ الفترة التجريبية لن تتأثر بهذا الزر.`)) return;
+    try {
+      await api("/api/admin/tasks/status", {
+        method: "POST",
+        body: JSON.stringify({ enabled: nextEnabled }),
+      });
+      await window.renderAdminDashboard();
+    } catch (error) {
+      showApiError(error);
     }
   };
   window.adminToggleBlock = async function (userId, blocked) {

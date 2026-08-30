@@ -202,3 +202,15 @@ CREATE INDEX IF NOT EXISTS task_attempts_user_day_idx
 CREATE UNIQUE INDEX IF NOT EXISTS transactions_task_attempt_unique
   ON transactions(user_id, reference_type, reference_id)
   WHERE reference_type = 'task_attempt' AND reference_id IS NOT NULL;
+
+-- Global task availability is controlled by admins, while trial users bypass
+-- this setting and keep their independent two-per-day/four-total allowance.
+CREATE TABLE IF NOT EXISTS platform_settings (
+  setting_key VARCHAR(64) PRIMARY KEY,
+  enabled BOOLEAN NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO platform_settings (setting_key, enabled)
+VALUES ('tasks_enabled', TRUE)
+ON CONFLICT (setting_key) DO NOTHING;

@@ -1903,6 +1903,19 @@
                 </div>
             </div>
 
+            <div class="card admin-panel" style="margin-top:15px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                    <div>
+                        <h3 style="border:none;padding:0;margin:0 0 5px;"><i class="fa-solid fa-list-check" style="color:#fbbf24;"></i> التحكم في المهام</h3>
+                        <div style="font-size:.78rem;color:var(--text-muted);line-height:1.6;">
+                            يتحكم هذا الزر في مهام VIP1–VIP4 فقط. الفترة التجريبية مستقلة تماماً وتستمر بمهمتين يومياً، 4 مهام إجمالاً.
+                        </div>
+                    </div>
+                    <button id="admin-tasks-toggle" class="btn btn-green" type="button" aria-pressed="true" onclick="adminToggleTasks()" style="min-width:90px;font-weight:900;">ON</button>
+                </div>
+                <div id="admin-tasks-toggle-status" style="font-size:.78rem;margin-top:8px;color:#86efac;">المهام المدفوعة متاحة الآن لمستخدمي VIP1–VIP4.</div>
+            </div>
+
             <div id="admin-users-panel" class="card admin-panel admin-section-anchor">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid rgba(148,163,184,.12);">
                     <h3 style="border:none;padding:0;margin:0;"><i class="fa-solid fa-users" style="color:#60a5fa;"></i> الحسابات المسجلة في المنصة</h3>
@@ -2555,6 +2568,7 @@
     let currentTrialDay = 1;
     let trialActive = false;
     let trialUsed = false;
+    let tasksEnabled = true;
     let currentLanguage = localStorage.getItem('securo-language') || 'ar';
 
     let activeTaskTimers = {};
@@ -3013,6 +3027,7 @@
         currentTrialDay = userObj.currentTrialDay || 1;
         trialActive = userObj.trialActive || false;
         trialUsed = userObj.trialUsed || false;
+        tasksEnabled = userObj.tasksEnabled !== false;
         depositLogs = userObj.depositLogs || [];
         rewardLogs = userObj.rewardLogs || [];
         withdrawLogs = userObj.withdrawLogs || [];
@@ -3340,6 +3355,21 @@
             return;
         }
 
+        if (!userVip.isTrial && !tasksEnabled) {
+            statusEl.innerText = `العضوية النشطة: ${userVip.name}`;
+            progressEl.innerText = "المهام متوقفة مؤقتاً";
+            container.innerHTML = `
+                <div class="card" style="text-align:center;padding:30px;">
+                    <div style="font-size:3rem;margin-bottom:10px;">⏸️</div>
+                    <h3 style="color:#fbbf24;margin-bottom:8px;">المهام متوقفة مؤقتاً</h3>
+                    <p style="color:var(--text-muted);font-size:.88rem;line-height:1.6;">
+                        تم إيقاف مهام VIP1–VIP4 مؤقتاً من قِبل الإدارة. ستعود المهام عند تشغيلها مرة أخرى.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
         const totalRewardCents = Math.round(Number(userVip.totalReward) * 100);
         const totalTasks = Number(userVip.totalTasks);
         const baseRewardCents = Math.floor(totalRewardCents / totalTasks);
@@ -3490,6 +3520,9 @@
                     body: JSON.stringify({ comment }),
                 }).then((result) => {
                     window.syncServerUser(result.user);
+                    if (typeof window.syncTaskAvailability === "function") {
+                        window.syncTaskAvailability(result.tasksEnabled);
+                    }
                         taskStatuses = result.taskStatuses || taskStatuses;
                     if (result.alreadyCompleted) {
                         renderTasksScreen();
@@ -3501,7 +3534,7 @@
                     renderTasksScreen();
                 }).catch((error) => {
                     showApiError(error);
-                    renderTasksScreen();
+                    window.refreshServerMe?.().finally(() => renderTasksScreen());
                 });
             }
         }, 1000);
@@ -3526,6 +3559,7 @@
             });
         } catch (error) {
             showApiError(error);
+            window.refreshServerMe?.().finally(() => renderTasksScreen());
             return;
         }
         if (started.completed) {
@@ -3556,6 +3590,10 @@
         ];
         startTaskTimer(taskIdx, comment, started.startedAt);
     }
+
+    window.syncTaskAvailability = function (enabled) {
+        tasksEnabled = enabled !== false;
+    };
 
     function closeTaskSuccessModal() {
         document.getElementById('task-success-modal').style.display = 'none';
