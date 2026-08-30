@@ -12,12 +12,14 @@ description: قاعدة ربط واجهة Vercel مع Backend Render مع جلس
 **How to apply:** عند تغيير رابط خدمة Render أو نطاق Vercel، حدّث رابط rewrite
 في إعدادات الواجهة وقيمة `FRONTEND_URL` في Backend معاً، ثم أعد النشر.
 
-عند النشر خارج Replit، يجب أن تكون كل حقول `resolved` في `package-lock.json`
-موجهة إلى `https://registry.npmjs.org/`؛ روابط `package-firewall.replit.local`
-تعمل داخل Replit فقط وتفشل على Render.
+عند النشر خارج Replit، يجب ألا تصل روابط `package-firewall.replit.local`
+إلى Render؛ هذه الروابط تعمل داخل Replit فقط وتفشل على Render. إذا تعذر
+إعادة توليد lockfile بروابط npm الرسمية، استخدم `npm install` من registry
+العام في إعداد البناء بدل شحن lockfile المولّد داخل Replit.
 
 **Why:** `npm ci` على Render يقرأ الروابط المحفوظة في lockfile مباشرة، حتى مع
 تحديد registry عام في أمر البناء.
 
 **How to apply:** بعد أي تثبيت حزم داخل Replit، افحص lockfile قبل النشر وابحث عن
-`package-firewall.replit.local` واستبدله بروابط npm الرسمية ثم اختبر `npm ci`.
+`package-firewall.replit.local`؛ أعد توليده رسميًا أو احذفه واضبط Render على
+`npm install --registry=https://registry.npmjs.org/`.
