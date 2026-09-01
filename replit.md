@@ -14,7 +14,7 @@ The project is intentionally split into two services:
 Create the Render service from the repository root. The checked-in `render.yaml`
 contains the service configuration:
 
-- Build command: `npm ci --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/ && npm run build`
+- Build command: `npm install --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/ && npm run build`
 - Start command: `npm start`
 - Health check: `/api/health`
 - Runtime: Node.js 20 (`.node-version` / `NODE_VERSION`)
@@ -30,7 +30,7 @@ Required environment variables:
 Run database initialization once before first use:
 
 ```bash
-npm ci --omit=dev
+    npm install --omit=dev --registry=https://registry.npmjs.org/
 npm run db:init
 ```
 
