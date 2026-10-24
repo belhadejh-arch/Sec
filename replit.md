@@ -24,7 +24,7 @@ Required environment variables:
 - `NODE_ENV=production`
 - `NEON_DATABASE_URL` — PostgreSQL/Neon connection string
 - `SESSION_SECRET` — long random session secret
-- `FRONTEND_URL` — `https://securo-m9ei-seven.vercel.app`
+- `FRONTEND_URL` — `https://sec-rosy.vercel.app`
 - `COOKIE_SAME_SITE=none`
 
 Run database initialization once before first use:
