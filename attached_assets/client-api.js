@@ -16,19 +16,23 @@
       : configuredApiBaseUrl.replace(/\/+$/, "");
   let adminRefreshInterval = null;
   let adminRefreshInFlight = false;
+  let adminVisibilityHandler = null;
   let adminTasksEnabled = true;
   let depositSubmissionInFlight = false;
   let withdrawalSubmissionInFlight = false;
+  const ADMIN_LIST_PAGE_SIZE = 25;
 
   async function api(url, options) {
     const requestUrl = /^https?:\/\//i.test(url) ? url : `${apiBaseUrl}${url}`;
     let response;
     try {
-      response = await fetch(requestUrl, {
-        credentials: "include",
-        headers: { "Content-Type": "application/json", ...(options && options.headers) },
-        ...options,
-      });
+      const requestOptions = { ...(options || {}), credentials: "include" };
+      const headers = new Headers(options?.headers || {});
+      if (options?.body != null && !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
+      }
+      requestOptions.headers = headers;
+      response = await fetch(requestUrl, requestOptions);
     } catch (error) {
       console.error("API request failed:", requestUrl, error);
       throw new Error("تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى.");
@@ -579,12 +583,71 @@
     }
   };
 
+  function renderAdminListInBatches(container, items, renderItem, emptyMarkup, moreLabel) {
+    const list = Array.isArray(items) ? items : [];
+    container.replaceChildren();
+    if (!list.length) {
+      container.innerHTML = emptyMarkup;
+      return;
+    }
+
+    let renderedCount = 0;
+    function appendNextBatch() {
+      container.querySelector(".admin-load-more")?.remove();
+      const batch = list.slice(renderedCount, renderedCount + ADMIN_LIST_PAGE_SIZE);
+      container.insertAdjacentHTML("beforeend", batch.map(renderItem).join(""));
+      renderedCount += batch.length;
+
+      if (renderedCount < list.length) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "btn admin-load-more";
+        button.textContent = `${moreLabel} (${renderedCount} من ${list.length})`;
+        button.style.cssText = "display:block;width:100%;margin:10px 0;padding:11px;font-size:.82rem;background:rgba(59,130,246,.12);border:1px solid var(--border-color);color:#bfdbfe";
+        button.addEventListener("click", appendNextBatch);
+        container.appendChild(button);
+      }
+    }
+
+    appendNextBatch();
+  }
+
   function renderUsersList(users) {
     const container = document.getElementById("admin-users-list");
     if (!container) return;
-    container.innerHTML = users.length
-      ? users.map(buildUserCard).join("")
-      : '<div class="history-date" style="padding:20px;text-align:center">لا توجد نتائج.</div>';
+    renderAdminListInBatches(
+      container,
+      users,
+      buildUserCard,
+      '<div class="history-date" style="padding:20px;text-align:center">لا توجد نتائج.</div>',
+      "عرض المزيد من الحسابات",
+    );
+  }
+
+  function renderAdminRequestList(containerId, items, kind, emptyText) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    renderAdminListInBatches(
+      container,
+      items,
+      (item) => adminRequestCard(item, kind),
+      `<div class="history-date">${emptyText}</div>`,
+      "عرض المزيد من الطلبات",
+    );
+  }
+
+  function showAdminInitialLoading() {
+    const placeholders = [
+      ["admin-users-list", "جارٍ تحميل الحسابات..."],
+      ["admin-deposit-requests", "جارٍ تحميل طلبات الإيداع..."],
+      ["admin-withdrawal-requests", "جارٍ تحميل طلبات السحب..."],
+    ];
+    for (const [id, message] of placeholders) {
+      const container = document.getElementById(id);
+      if (container && !container.childElementCount) {
+        container.innerHTML = `<div class="history-date" data-admin-loading="true" role="status" aria-live="polite" style="padding:16px;text-align:center">${message}</div>`;
+      }
+    }
   }
 
   window.adminSearchUsers = function () {
@@ -604,6 +667,7 @@
   window.renderAdminDashboard = async function () {
     if (adminRefreshInFlight) return;
     adminRefreshInFlight = true;
+    showAdminInitialLoading();
     try {
       const data = await api("/api/admin/overview");
       adminTasksEnabled = data.tasksEnabled !== false;
@@ -637,12 +701,15 @@
         renderUsersList(_allAdminUsers);
       }
 
-      document.getElementById("admin-deposit-requests").innerHTML = data.deposits.map((item) => adminRequestCard(item, "deposits")).join("")
-        || '<div class="history-date">لا توجد طلبات إيداع.</div>';
-      document.getElementById("admin-withdrawal-requests").innerHTML = data.withdrawals.map((item) => adminRequestCard(item, "withdrawals")).join("")
-        || '<div class="history-date">لا توجد طلبات سحب.</div>';
+      renderAdminRequestList("admin-deposit-requests", data.deposits, "deposits", "لا توجد طلبات إيداع.");
+      renderAdminRequestList("admin-withdrawal-requests", data.withdrawals, "withdrawals", "لا توجد طلبات سحب.");
       renderAdminPlatformSettings(data.settings);
+      document.documentElement.dataset.adminDashboardLoaded = "true";
     } catch (error) {
+      document.querySelectorAll("[data-admin-loading]").forEach((placeholder) => {
+        placeholder.textContent = "تعذر تحميل المحتوى. اضغط «تحديث البيانات» للمحاولة مجدداً.";
+        placeholder.removeAttribute("data-admin-loading");
+      });
       showApiError(error);
     } finally {
       adminRefreshInFlight = false;
@@ -827,16 +894,34 @@
 
   function startAdminDashboardRefresh() {
     stopAdminDashboardRefresh();
-    adminRefreshInterval = window.setInterval(() => {
-      if (isAdmin && document.getElementById("admin-screen")?.classList.contains("active")) {
+    adminVisibilityHandler = () => {
+      if (
+        document.visibilityState === "visible" &&
+        isAdmin &&
+        document.getElementById("admin-screen")?.classList.contains("active")
+      ) {
         renderAdminDashboard();
       }
-    }, 5000);
+    };
+    document.addEventListener("visibilitychange", adminVisibilityHandler);
+    adminRefreshInterval = window.setInterval(() => {
+      if (
+        document.visibilityState === "visible" &&
+        isAdmin &&
+        document.getElementById("admin-screen")?.classList.contains("active")
+      ) {
+        renderAdminDashboard();
+      }
+    }, 60000);
   }
   function stopAdminDashboardRefresh() {
     if (adminRefreshInterval) {
       window.clearInterval(adminRefreshInterval);
       adminRefreshInterval = null;
+    }
+    if (adminVisibilityHandler) {
+      document.removeEventListener("visibilitychange", adminVisibilityHandler);
+      adminVisibilityHandler = null;
     }
   }
   window.adminReview = adminReview;

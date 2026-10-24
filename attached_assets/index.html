@@ -6,6 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Vault - الإدارة والمستخدم</title>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com">
     <!-- مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -2034,6 +2036,12 @@
             .auth-card input[type="email"],
             .auth-card input[type="password"],
             .auth-card input[type="text"] { min-height: 42px; }
+        }
+        .screen.active { animation-duration: .12s !important; }
+        .btn, .platform-menu-item { transition-duration: .12s !important; }
+        @media (prefers-reduced-motion: reduce) {
+            .screen.active { animation: none !important; }
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
         }
     </style>
 </head>
