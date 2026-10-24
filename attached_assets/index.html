@@ -9,6 +9,9 @@
     <link rel="icon" type="image/png" href="1000054548-removebg-preview_1792852307429.png">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -2081,6 +2084,166 @@
             .auth-brand img { width: 108px; height: 108px; }
             .auth-card { padding-top: 14px !important; }
         }
+
+        /* Vault brand system — one warm gold identity across every screen */
+        :root {
+            --vault-gold: #e8bb55;
+            --vault-gold-bright: #f4d782;
+            --vault-gold-deep: #b9852e;
+            --vault-ink: #0b0a07;
+            --bg-body: #0b0a07;
+            --bg-card: #17140f;
+            --bg-light-card: #211d15;
+            --text-white: #f7f1e2;
+            --text-muted: #b7ad97;
+            --text-soft: #d8ceb6;
+            --primary-blue: var(--vault-gold);
+            --primary-gradient: linear-gradient(135deg, #f4d782 0%, #e8bb55 52%, #bd882b 100%);
+            --vip-gold: linear-gradient(135deg, #f4d782 0%, #e8bb55 52%, #bd882b 100%);
+            --vip-disabled: linear-gradient(135deg, #62573e 0%, #393326 100%);
+            --telegram-blue: var(--vault-gold);
+            --border-color: rgba(232, 187, 85, .22);
+            --surface-0: #0d0b08;
+            --surface-1: #17140f;
+            --line-soft: rgba(232, 187, 85, .17);
+            --line-strong: rgba(232, 187, 85, .4);
+            --shadow-lg: 0 12px 28px rgba(143, 98, 17, .22);
+        }
+        html, body {
+            background: var(--vault-ink) !important;
+            color: var(--text-white);
+        }
+        body {
+            background:
+                radial-gradient(900px 480px at 50% -12%, rgba(232, 187, 85, .13), transparent 70%),
+                radial-gradient(700px 480px at 100% 100%, rgba(133, 101, 43, .1), transparent 70%),
+                var(--vault-ink) !important;
+        }
+        body, body :not(i), body button, body input, body select, body textarea {
+            font-family: "Changa", Tahoma, Arial, sans-serif !important;
+        }
+        .app-container {
+            background: linear-gradient(180deg, #17140e 0%, #0b0a07 34rem) !important;
+        }
+        .app-container:has(#auth-screen.active) {
+            background:
+                radial-gradient(ellipse at 50% 12%, rgba(232, 187, 85, .15), transparent 36rem),
+                radial-gradient(ellipse at 12% 90%, rgba(133, 101, 43, .09), transparent 30rem),
+                #100e0a !important;
+        }
+        .site-header, header, .bottom-nav {
+            background: rgba(12, 10, 7, .96) !important;
+            border-color: var(--line-soft) !important;
+        }
+        .brand-copy h1 {
+            background: linear-gradient(90deg, #fff0b6, var(--vault-gold)) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+        }
+        .brand-copy small, .home-status-label { color: var(--text-muted) !important; }
+        .brand-lockup .brand-symbol { filter: drop-shadow(0 2px 8px rgba(232, 187, 85, .22)); }
+        .header-menu-button, .header-account-button {
+            color: var(--vault-gold-bright) !important;
+            background: rgba(232, 187, 85, .09) !important;
+            border-color: var(--line-soft) !important;
+        }
+        .header-menu-button:hover, .header-account-button:hover,
+        .platform-menu-item:hover, .platform-menu-item.is-active {
+            background: rgba(232, 187, 85, .15) !important;
+            border-color: var(--line-strong) !important;
+        }
+        .header-account-button i, .platform-menu-label, .platform-menu-item i,
+        .platform-menu-item .menu-item-icon, .home-kicker, .nav-link.active,
+        .stat-num, .admin-vip-prices strong, .hotel-badge, .admin-panel h3 i,
+        .home-status-value {
+            color: var(--vault-gold-bright) !important;
+        }
+        .platform-menu-panel {
+            background: linear-gradient(180deg, #1d190f 0%, #110f0b 58%, #0b0a07 100%) !important;
+            border-color: var(--line-soft) !important;
+        }
+        .platform-menu-item, .platform-menu-close, .platform-menu-language {
+            color: var(--text-white) !important;
+            background-color: rgba(232, 187, 85, .045) !important;
+            border-color: var(--line-soft) !important;
+        }
+        .platform-menu-item .menu-item-arrow { color: var(--text-muted) !important; }
+        .card, .vip-card, .hotel-card, .wheel-card, .history-card, .admin-panel,
+        .referral-box, .daily-reward-card, .task-progress-box, .stats-bar, .stat-box,
+        .home-welcome, .home-status, .action-item, .menu-item, .level-card,
+        .modal-content, .withdraw-info-box, .admin-vip-prices, .admin-panel .history-card {
+            color: var(--text-white);
+            background: linear-gradient(145deg, #1d1911 0%, #12100c 100%) !important;
+            border-color: var(--line-soft) !important;
+        }
+        .admin-hero {
+            background: linear-gradient(135deg, #28200f 0%, #392b12 58%, #15120c 140%) !important;
+            border-color: var(--line-strong) !important;
+        }
+        .home-welcome::after { background: rgba(232, 187, 85, .1) !important; }
+        .action-item:hover { border-color: var(--line-strong) !important; }
+        .balance-card, .referral-box, .referral-earnings-card, .support-banner-profile,
+        .daily-reward-card, .task-progress-box {
+            background: linear-gradient(145deg, #28200f 0%, #17130b 100%) !important;
+            border-color: var(--line-strong) !important;
+        }
+        .vip-card.trial {
+            background: linear-gradient(145deg, #28200f 0%, #17130b 100%) !important;
+            border-color: var(--line-strong) !important;
+        }
+        .vip-card.disabled { border-color: rgba(232, 187, 85, .13) !important; }
+        .btn-primary, .btn-gold, .copy-btn, .admin-refresh, .spin-center-btn {
+            color: #191306 !important;
+            background: var(--primary-gradient) !important;
+            border-color: rgba(244, 215, 130, .55) !important;
+            box-shadow: 0 7px 20px rgba(143, 98, 17, .2) !important;
+        }
+        .input, input, select, textarea, .menu-item select {
+            color: var(--text-white) !important;
+            background: #100e0a !important;
+            border-color: var(--line-soft) !important;
+        }
+        .input:focus, input:focus, select:focus, textarea:focus {
+            border-color: var(--vault-gold) !important;
+            box-shadow: 0 0 0 3px rgba(232, 187, 85, .13) !important;
+        }
+        input::placeholder, textarea::placeholder { color: #9f967f !important; opacity: 1; }
+        .nav-link.active { text-shadow: 0 0 14px rgba(232, 187, 85, .25); }
+        .lvl-1, .lvl-2, .lvl-3, .badge-orange, .badge-blue {
+            color: var(--vault-gold-bright) !important;
+            background: rgba(232, 187, 85, .12) !important;
+            border-color: var(--line-strong) !important;
+        }
+        .modal { background: rgba(8, 7, 5, .88) !important; }
+        .auth-card {
+            background: linear-gradient(155deg, rgba(28, 24, 15, .98), rgba(10, 9, 7, .98)) !important;
+            border-color: var(--line-strong) !important;
+        }
+        .auth-card input { background: rgba(0, 0, 0, .48) !important; }
+        .auth-card #toggle-text, .auth-note i { color: var(--vault-gold-bright) !important; }
+        .screen a:not(.btn):not(.platform-menu-logout) { color: var(--vault-gold-bright); }
+        [style*="#60a5fa"], [style*="#7dd3fc"], [style*="#38bdf8"],
+        [style*="#3b82f6"], [style*="#2563eb"], [style*="#4c9dff"] {
+            color: var(--vault-gold-bright) !important;
+        }
+        [style*="rgba(59,130,246"], [style*="rgba(59, 130, 246"],
+        [style*="rgba(37,99,235"], [style*="rgba(37, 99, 235"],
+        [style*="rgba(96,165,250"], [style*="rgba(96, 165, 250"] {
+            background-color: rgba(232, 187, 85, .1) !important;
+            border-color: var(--line-soft) !important;
+        }
+        [style*="background:#3b82f6"], [style*="background: #3b82f6"],
+        [style*="background-color:#3b82f6"], [style*="background-color: #3b82f6"],
+        [style*="background:#2563eb"], [style*="background: #2563eb"] {
+            color: #191306 !important;
+            background: var(--primary-gradient) !important;
+            border-color: var(--line-strong) !important;
+        }
+        ::selection { color: #191306; background: var(--vault-gold-bright); }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--vault-gold-bright), var(--vault-gold-deep));
+            border-radius: 999px;
+        }
     </style>
 </head>
 <body>
@@ -2981,14 +3144,14 @@
     let midnightTimerInterval = null;
 
     const wheelSectors = [
-        { label: "حظ سعيد", val: 0, color: "#ef4444" },
-        { label: "$0.50", val: 0.5, color: "#3b82f6" },
-        { label: "$1.00", val: 1.0, color: "#10b981" },
-        { label: "$2.00", val: 2.0, color: "#f59e0b" },
-        { label: "حظ سعيد", val: 0, color: "#ef4444" },
-        { label: "$3.00", val: 3.0, color: "#8b5cf6" },
-        { label: "$50.00", val: 50.0, color: "#ec4899" },
-        { label: "$100.00", val: 100, color: "#eab308" }
+        { label: "حظ سعيد", val: 0, color: "#806329" },
+        { label: "$0.50", val: 0.5, color: "#bd882b" },
+        { label: "$1.00", val: 1.0, color: "#d5a640" },
+        { label: "$2.00", val: 2.0, color: "#f4d782" },
+        { label: "حظ سعيد", val: 0, color: "#6d5425" },
+        { label: "$3.00", val: 3.0, color: "#e8bb55" },
+        { label: "$50.00", val: 50.0, color: "#a97422" },
+        { label: "$100.00", val: 100, color: "#ffe7a1" }
     ];
 
     const hotelsList = [
@@ -3085,6 +3248,11 @@
     window.addEventListener('load', function() {
         relocateHomeSecondaryContent();
         drawWheel();
+        if (document.fonts?.ready) {
+            document.fonts.ready.then(() => {
+                if (document.getElementById('wheel-canvas')) drawWheel();
+            });
+        }
         changeLanguage(localStorage.getItem('securo-language') || 'ar');
         
         let currentSlide = 0;
@@ -3256,7 +3424,7 @@
             ctx.rotate(startAngle + anglePerSector / 2);
             ctx.textAlign = "right";
             ctx.fillStyle = "#ffffff";
-            ctx.font = "bold 13px Segoe UI, sans-serif";
+            ctx.font = "bold 13px Changa, sans-serif";
             ctx.shadowColor = "rgba(0,0,0,0.6)";
             ctx.shadowBlur = 4;
             ctx.fillText(wheelSectors[i].label, radius - 15, 5);
@@ -3279,7 +3447,7 @@
                 : hasSpins
                     ? 'لديك فرصة متاحة. اضغط دوران لاستخدامها.'
                     : 'لا توجد فرص متاحة حالياً. فعّل VIP للحصول على فرصة جديدة.';
-            status.style.color = hasSpins ? '#a7f3d0' : '#c7d2fe';
+            status.style.color = hasSpins ? '#a7f3d0' : '#f4d782';
         }
     }
 

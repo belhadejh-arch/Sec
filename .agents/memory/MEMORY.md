@@ -3,5 +3,5 @@
 - [Responsive CSS layering](responsive-css-layering.md) — قواعد responsive المتكررة قد تلغي الإصلاح؛ يجب وضع override النهائي في آخر CSS.
 - [Imported app runtime](imported-app-runtime.md) — تطبيقات Express المستوردة يجب أن تحترم PORT المعطى، وقد يتطلب npm تثبيتاً صريحاً مع registry العام.
 - [Task transaction locking](task-transaction-locking.md) — لا تستخدم pool داخل معاملة تملك قفل المستخدم؛ استخدم نفس client لتجنب انتظار متبادل أثناء إكمال المهام.
-- [شعار Vault الرسمي](vault-brand-logo.md) — استخدم الشعار الذهبي الشفاف كاملاً في شاشة الدخول ورأس المنصة، دون قصّ.
+- [هوية Vault الرسمية](vault-brand-logo.md) — وحّد الذهب والأسود وخط Changa في جميع الشاشات، مع إظهار الشعار الشفاف كاملاً.
 - [تتبّع أصول Vercel](static-asset-tracking.md) — صور `attached_assets` قد تعمل محلياً رغم استبعادها من Git؛ تحقق من تتبع كل أصل منشور.
