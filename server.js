@@ -100,6 +100,8 @@ const allowedOrigins = [
   frontendUrl,
   "https://securo-m9ei-seven.vercel.app",
   "https://sec-rosy.vercel.app",
+  "https://valutpro.online",
+  "https://www.valutpro.online",
 ]
   .flatMap((value) => value.split(","))
   .map((origin) => origin.trim().replace(/\/+$/, ""))
