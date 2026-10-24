@@ -9,7 +9,7 @@ services:
       - key: NODE_ENV
         value: production
       - key: NODE_VERSION
-        value: 20.20.0
+        value: 24.0.0
       - key: SESSION_SECRET
         generateValue: true
       - key: NEON_DATABASE_URL
