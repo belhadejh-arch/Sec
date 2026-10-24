@@ -3066,7 +3066,7 @@
                 </select>
 
                 <input type="text" id="withdraw-account" placeholder="أدخل عنوان المحفظة الرقمية (Wallet Address)">
-                <input type="number" id="withdraw-amount" placeholder="المبلغ المراد سحبه ($)">
+                <input type="number" id="withdraw-amount" min="7" step="0.01" placeholder="المبلغ المراد سحبه (الحد الأدنى $7)">
                 
                 <button type="button" id="withdraw-submit-btn" class="btn btn-red" onclick="submitWithdraw()">تأكيد طلب السحب</button>
                 <button type="button" class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeWithdrawModal()">إلغاء</button>
@@ -3074,7 +3074,7 @@
 
             <div class="withdraw-info-box">
                 <div style="font-weight: bold; color: var(--text-white); margin-bottom: 4px;">📌 شروط وملاحظات السحب:</div>
-                • <strong>الحد الأدنى للسحب:</strong> هو 10 دولارات ($10) بالضبط.<br>
+                • <strong>الحد الأدنى للسحب:</strong> 7 دولارات ($7).<br>
                 • <strong>الحد الأعلى للسحب:</strong> لا يوجد حد أعلى للسحب.<br>
                 • <strong>أيام وأوقات السحب:</strong> متاحة طيلة أيام الأسبوع من الساعة <strong>08:00 صباحاً</strong> إلى غاية الساعة <strong>05:00 مساءً</strong>.
             </div>

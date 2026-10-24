@@ -1094,7 +1094,7 @@ app.post("/api/withdrawal-requests", requireUser, async (req, res) => {
   if (!isValidNetworkAddress(network, account)) {
     return appError(res, 400, `عنوان المحفظة لا يتوافق مع شبكة ${network}`);
   }
-  if (!Number.isFinite(amount) || amount < 10) return appError(res, 400, "الحد الأدنى للسحب هو 10 دولارات");
+  if (!Number.isFinite(amount) || amount < 7) return appError(res, 400, "الحد الأدنى للسحب هو 7 دولارات");
   try {
     const result = await withTransaction(async (client) => {
       const locked = await client.query(

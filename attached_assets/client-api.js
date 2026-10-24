@@ -318,8 +318,8 @@
     const account = document.getElementById("withdraw-account").value.trim();
     const amount = Number(document.getElementById("withdraw-amount").value);
     if (!account) return showApiError(new Error("يرجى إدخال عنوان المحفظة الرقمية"));
-    if (!Number.isFinite(amount) || amount < 10) {
-      return showApiError(new Error("الحد الأدنى للسحب هو 10 دولارات"));
+    if (!Number.isFinite(amount) || amount < 7) {
+      return showApiError(new Error("الحد الأدنى للسحب هو 7 دولارات"));
     }
     if (amount > balance) {
       closeWithdrawModal();
