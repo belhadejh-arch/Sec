@@ -49,7 +49,7 @@ Vercel.
 The frontend package has a validation-only build, so no bundling step is needed.
 `attached_assets/vercel.json` forwards `/api/*` to the Render backend and sets
 no-cache headers. The current Render service URL in that file is
-`https://sec-dgy6.onrender.com`.
+`https://sec-5lak.onrender.com`.
 
 ## Deployment order
 
