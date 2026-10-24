@@ -773,7 +773,7 @@
         .auth-card .field-label { display: none; }
         .auth-card .auth-note { display: none; }
         /* Hide the icon button (top-right of auth card) */
-        .auth-card > div:first-child > div:last-child { display: none; }
+        .auth-card > div:first-child > div:last-child { display: none !important; }
         .auth-card {
             width: 100%;
             max-width: 430px;
@@ -1795,6 +1795,246 @@
                   padding-inline: 0 !important;
               }
           }
+        /* Vault auth — private-room glass, anchored in the logo's brushed gold */
+        .app-container:has(#auth-screen.active) {
+            --vault-gold: #e8bb55;
+            --vault-gold-bright: #f4d782;
+            --vault-muted: #a9a59a;
+            width: 100%;
+            max-width: none;
+            min-height: 100dvh;
+            color: #f3efe5;
+            background:
+                radial-gradient(ellipse at 50% 12%, rgba(185, 137, 42, .14), transparent 36rem),
+                radial-gradient(ellipse at 12% 90%, rgba(133, 101, 43, .08), transparent 30rem),
+                #10100e;
+            box-shadow: none;
+        }
+        html:has(#auth-screen.active),
+        body:has(#auth-screen.active) {
+            width: 100%;
+            min-height: 100%;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            background: #10100e;
+        }
+        body:has(#auth-screen.active) {
+            min-height: 100dvh;
+            align-items: stretch;
+            justify-content: center;
+        }
+        .app-container:has(#auth-screen.active) > .content {
+            flex: 1 0 auto !important;
+            width: 100%;
+            min-height: 100dvh !important;
+            padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom)) !important;
+            overflow: auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        #auth-screen.active {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: none;
+            min-height: 0 !important;
+            margin: auto;
+            animation: vaultAuthReveal .5s ease both;
+        }
+        .auth-layout {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            width: min(100%, 430px);
+            max-width: 430px;
+            min-height: 0;
+            margin: 0 auto;
+            padding: 12px 0;
+        }
+        .auth-brand {
+            position: relative;
+            z-index: 2;
+            width: 112px;
+            height: 112px;
+            margin: 0 0 -42px;
+            padding: 0;
+            text-align: center;
+            line-height: 1;
+            filter: drop-shadow(0 9px 20px rgba(0, 0, 0, .56));
+        }
+        .auth-brand img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 1;
+            object-fit: contain;
+            border-radius: 50%;
+            box-shadow: none;
+        }
+        .auth-brand .brand-mark,
+        .auth-brand h2,
+        .auth-brand p,
+        .auth-brand .trust-row { display: none; }
+        .auth-card {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            width: 100%;
+            max-width: 430px;
+            margin: 0;
+            padding: 61px 34px 27px;
+            border: 1px solid rgba(232, 187, 85, .28) !important;
+            border-radius: 25px;
+            background:
+                linear-gradient(145deg, rgba(38, 36, 30, .78), rgba(22, 22, 19, .87)) !important;
+            box-shadow:
+                0 28px 75px rgba(0, 0, 0, .4),
+                inset 0 1px 0 rgba(255, 239, 194, .09);
+            -webkit-backdrop-filter: blur(22px);
+            backdrop-filter: blur(22px);
+        }
+        .auth-card::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(232, 187, 85, .11), transparent 53%),
+                linear-gradient(135deg, rgba(255,255,255,.025), transparent 42%);
+            opacity: 1;
+            mix-blend-mode: normal;
+        }
+        .auth-card > * { position: relative; z-index: 1; }
+        .auth-card > div:first-child {
+            justify-content: center !important;
+            margin-bottom: 23px !important;
+            text-align: center;
+        }
+        .auth-card > div:first-child > div:first-child > div {
+            color: var(--vault-gold) !important;
+            font-size: .64rem !important;
+            font-weight: 800;
+            letter-spacing: .24em !important;
+        }
+        .auth-card h2#auth-title {
+            margin-top: 9px !important;
+            color: #f5f0e5 !important;
+            font-size: 1.42rem;
+            font-weight: 700;
+            letter-spacing: -.025em;
+        }
+        .auth-card > div:first-child > div:last-child { display: none; }
+        .auth-card .form-group { display: flex; flex-direction: column; gap: 9px; margin-top: 0; }
+        .auth-card .field-label {
+            display: block;
+            margin: 3px 0 0;
+            color: #d0cabb;
+            font-size: .78rem;
+            font-weight: 650;
+        }
+        .auth-card input,
+        .auth-card input[type="email"],
+        .auth-card input[type="password"],
+        .auth-card input[type="text"] {
+            width: 100%;
+            min-height: 49px;
+            margin: 0 0 8px;
+            padding: 0 15px;
+            border: 1px solid rgba(235, 226, 203, .17);
+            border-radius: 12px;
+            outline: none;
+            color: #f4f0e6;
+            background: rgba(8, 8, 7, .35);
+            font-size: .92rem;
+            text-align: right;
+            transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+        }
+        .auth-card input::placeholder { color: #8e8a80; opacity: 1; }
+        .auth-card input:focus {
+            border-color: rgba(232, 187, 85, .72);
+            background: rgba(10, 10, 8, .56);
+            box-shadow: 0 0 0 3px rgba(232, 187, 85, .1);
+        }
+        .auth-card #invite-group { width: 100%; }
+        .auth-card #invite-group span { color: #a9c5a6 !important; line-height: 1.7; }
+        .auth-card #auth-btn {
+            width: 100%;
+            min-height: 50px;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 226, 153, .55);
+            border-radius: 12px;
+            color: #211909;
+            background: linear-gradient(135deg, #f4d782 0%, #dfb34e 48%, #c99a36 100%);
+            box-shadow: 0 8px 22px rgba(186, 135, 38, .18), inset 0 1px rgba(255,255,255,.4);
+            font-size: .96rem;
+            font-weight: 800;
+            letter-spacing: .01em;
+            cursor: pointer;
+            transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+        }
+        .auth-card #auth-btn:hover { transform: translateY(-1px); box-shadow: 0 11px 25px rgba(186, 135, 38, .24); }
+        .auth-card #auth-btn:active { transform: translateY(0); }
+        .auth-card #auth-btn:disabled { opacity: .6; cursor: wait; }
+        .auth-card .auth-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            margin-top: 17px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(232, 187, 85, .13);
+            color: #aaa69b;
+            font-size: .74rem;
+            line-height: 1.7;
+        }
+        .auth-card .auth-note i { color: var(--vault-gold) !important; margin-top: 3px; }
+        .auth-card #toggle-text {
+            display: inline-block;
+            padding: 7px 9px;
+            color: var(--vault-gold-bright) !important;
+            font-size: .82rem !important;
+            line-height: 1.6;
+            cursor: pointer;
+        }
+        .auth-card #toggle-text:hover { color: #fff0c2 !important; }
+        @keyframes vaultAuthReveal {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 540px) {
+            .app-container:has(#auth-screen.active) > .content {
+                padding: max(15px, env(safe-area-inset-top)) 16px max(15px, env(safe-area-inset-bottom)) !important;
+            }
+            .auth-layout { width: min(100%, 390px); padding: 4px 0; }
+            .auth-brand { width: 96px; height: 96px; margin-bottom: -36px; }
+            .auth-card { padding: 54px 23px 21px; border-radius: 21px; }
+            .auth-card > div:first-child { margin-bottom: 17px !important; }
+            .auth-card input,
+            .auth-card input[type="email"],
+            .auth-card input[type="password"],
+            .auth-card input[type="text"] { min-height: 46px; margin-bottom: 5px; }
+            .auth-card #auth-btn { min-height: 47px; margin-top: 5px; }
+            .auth-card .auth-note { margin-top: 13px; padding-top: 12px; }
+        }
+        @media (max-height: 650px) and (max-width: 540px) {
+            .app-container:has(#auth-screen.active) > .content {
+                align-items: flex-start !important;
+                justify-content: flex-start !important;
+            }
+            .auth-brand { width: 76px; height: 76px; margin-bottom: -29px; }
+            .auth-card { padding: 45px 21px 16px; }
+            .auth-card > div:first-child { margin-bottom: 12px !important; }
+            .auth-card .auth-note { display: none; }
+            .auth-card input,
+            .auth-card input[type="email"],
+            .auth-card input[type="password"],
+            .auth-card input[type="text"] { min-height: 42px; }
+        }
     </style>
 </head>
 <body>
@@ -1919,7 +2159,7 @@
         <!-- 1. شاشة تسجيل الدخول وإنشاء حساب -->
         <div id="auth-screen" class="screen active">
             <div class="auth-layout">
-              <div class="auth-brand" aria-label="Vault"><img src="Business_Suite_creation_1555674689649841_1792808792698.jpeg" alt="شعار Vault"></div>
+              <div class="auth-brand" aria-label="Vault"><img src="vault-logo-transparent.png" alt="شعار Vault"></div>
               <div class="card auth-card">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
                   <div>
@@ -1942,7 +2182,7 @@
                         <span style="font-size: 0.75rem; color: var(--accent-green); margin-top: 4px; display: block;">✓ سيتم ربط حسابك بمرسل الدعوة كفريق</span>
                     </div>
 
-                    <button class="btn btn-primary" id="auth-btn" type="submit">🚀 دخول</button>
+                    <button class="btn btn-primary" id="auth-btn" type="submit">دخول</button>
                 </form>
                 <div class="auth-note"><i class="fa-solid fa-circle-info" style="color:#60a5fa;"></i><span>لن نشارك بياناتك. يتم حفظ حسابك في قاعدة بيانات آمنة.</span></div>
                 <div style="text-align: center; margin-top: 18px;">
@@ -3083,7 +3323,7 @@
         document.getElementById('reg-name-label').style.display = isSignup ? 'block' : 'none';
         document.getElementById('invite-group').style.display = isSignup ? 'block' : 'none';
         document.getElementById('auth-title').innerText = isSignup ? 'إنشاء حساب جديد' : 'تسجيل الدخول';
-        document.getElementById('auth-btn').innerText = isSignup ? '🚀 إنشاء الحساب' : '🚀 دخول';
+        document.getElementById('auth-btn').innerText = isSignup ? 'إنشاء الحساب' : 'دخول';
         document.getElementById('toggle-text').innerText = isSignup ? 'لديك حساب بالفعل؟ دخول' : 'ليس لديك حساب؟ إنشاء حساب جديد';
         document.getElementById('toggle-text').setAttribute('onclick', 'toggleAuth()');
         translatePage(currentLanguage);
