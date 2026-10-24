@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Vault - الإدارة والمستخدم</title>
+    <link rel="icon" type="image/png" href="1000054548-removebg-preview_1792852307429.png">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://images.unsplash.com">
     <!-- مكتبة الأيقونات -->
@@ -1682,7 +1683,7 @@
         }
         .auth-card::before {
             content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-            background: url("Business_Suite_creation_1555674689649841_1792808792698.jpeg") center 52% / min(76%, 320px) no-repeat;
+            background: url("1000054548-removebg-preview_1792852307429.png") center 52% / min(76%, 320px) no-repeat;
             opacity: .12; mix-blend-mode: screen;
         }
         .auth-card > * { position: relative; z-index: 1; }
@@ -2043,6 +2044,43 @@
             .screen.active { animation: none !important; }
             *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
         }
+        .brand-lockup .brand-symbol {
+            display: block;
+            width: 50px;
+            height: 50px;
+            flex: 0 0 auto;
+            aspect-ratio: 1;
+            object-fit: contain;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            filter: drop-shadow(0 2px 8px rgba(232, 187, 85, .2));
+        }
+        .auth-brand img {
+            display: block;
+            width: clamp(132px, 15vw, 180px);
+            height: auto;
+            aspect-ratio: 1;
+            object-fit: contain;
+            border-radius: 0;
+            background: transparent;
+            filter: drop-shadow(0 7px 18px rgba(232, 187, 85, .2));
+        }
+        .auth-brand { margin-bottom: 0 !important; }
+        .auth-card { padding-top: 19px !important; }
+        @media (max-width: 760px) {
+            .brand-lockup .brand-symbol { width: 44px; height: 44px; }
+        }
+        @media (max-width: 540px) {
+            .auth-brand { width: 132px !important; height: 132px !important; margin-bottom: 0 !important; }
+            .auth-brand img { width: 132px; height: 132px; }
+            .auth-card { padding-top: 18px !important; }
+        }
+        @media (max-height: 650px) and (max-width: 540px) {
+            .auth-brand { width: 108px !important; height: 108px !important; margin-bottom: 0 !important; }
+            .auth-brand img { width: 108px; height: 108px; }
+            .auth-card { padding-top: 14px !important; }
+        }
     </style>
 </head>
 <body>
@@ -2055,7 +2093,7 @@
             </button>
         </div>
         <div class="brand-lockup" aria-label="Vault">
-            <img class="brand-symbol" src="Business_Suite_creation_1555674689649841_1792808792698.jpeg" alt="شعار Vault">
+            <img class="brand-symbol" src="1000054548-removebg-preview_1792852307429.png" alt="شعار Vault" width="500" height="500">
             <div class="brand-copy">
                 <h1 id="header-title">Vault</h1>
                 <small id="header-subtitle">مساحتك المالية الذكية</small>
@@ -2167,7 +2205,7 @@
         <!-- 1. شاشة تسجيل الدخول وإنشاء حساب -->
         <div id="auth-screen" class="screen active">
             <div class="auth-layout">
-              <div class="auth-brand" aria-label="Vault"><img src="vault-logo-transparent.png" alt="شعار Vault"></div>
+              <div class="auth-brand" aria-label="Vault"><img src="1000054548-removebg-preview_1792852307429.png" alt="شعار Vault" width="500" height="500" fetchpriority="high"></div>
               <div class="card auth-card">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
                   <div>
