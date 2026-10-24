@@ -23,3 +23,12 @@ description: قاعدة ربط واجهة Vercel مع Backend Render مع جلس
 **How to apply:** بعد أي تثبيت حزم داخل Replit، افحص lockfile قبل النشر وابحث عن
 `package-firewall.replit.local`؛ أعد توليده رسميًا أو احذفه واضبط Render على
 `npm install --registry=https://registry.npmjs.org/`.
+
+لا تسمح بكل نطاقات `*.vercel.app` في فحص Origin؛ اسمح بعنوان الإنتاج ومعاينات
+المشروع التابعة لفريقه فقط، ثم أعد نشر Backend Render بعد التعديل.
+
+**Why:** السماح الشامل قد يتيح لمواقع Vercel غير المرتبطة إرسال طلبات موثقة
+عبر Cookie؛ كما أن نشر الواجهة وحده لا يغيّر سياسة CORS لدى Backend.
+
+**How to apply:** اربط معاينات Vercel بنمط اسم المشروع والفريق المحدد في
+`server.js`، واطلب من Render نشر التغيير قبل اختبار تسجيل الدخول مجدداً.

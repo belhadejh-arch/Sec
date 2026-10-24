@@ -108,7 +108,7 @@ function requestOriginIsAllowed(req, origin) {
     const parsed = new URL(origin);
     if (
       parsed.protocol === "https:" &&
-      /^securo(?:[-a-z0-9]*)\.vercel\.app$/i.test(parsed.hostname)
+      /^sec-[a-z0-9][a-z0-9-]*-belhadejh-arch\.vercel\.app$/i.test(parsed.hostname)
     ) {
       return true;
     }
