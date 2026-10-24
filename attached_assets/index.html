@@ -27,7 +27,6 @@
             --vip-disabled: linear-gradient(135deg, #64748b 0%, #475569 100%);
             --accent-green: #10b981;
             --accent-red: #ef4444;
-            --telegram-blue: #229ED9;
             --border-color: #334155;
             --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
             --shadow-lg: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
@@ -187,7 +186,6 @@
         .btn-red { background-color: var(--accent-red); color: white; }
         .btn-gold { background: var(--vip-gold); color: white; }
         .btn-disabled { background: var(--vip-disabled); color: #94a3b8; cursor: not-allowed; }
-        .btn-telegram { background-color: var(--telegram-blue); color: white; box-shadow: 0 4px 12px rgba(34, 158, 217, 0.3); }
 
         /* سلايدر الصور */
         .slider-container {
@@ -2101,7 +2099,6 @@
             --primary-gradient: linear-gradient(135deg, #f4d782 0%, #e8bb55 52%, #bd882b 100%);
             --vip-gold: linear-gradient(135deg, #f4d782 0%, #e8bb55 52%, #bd882b 100%);
             --vip-disabled: linear-gradient(135deg, #62573e 0%, #393326 100%);
-            --telegram-blue: var(--vault-gold);
             --border-color: rgba(232, 187, 85, .22);
             --surface-0: #0d0b08;
             --surface-1: #17140f;
@@ -2629,10 +2626,9 @@
                     <i class="fa-solid fa-circle-check trial-success-icon"></i>
                     <div class="trial-success-text">الفترة التجريبية نشطة — أكمل 4 مهام لتنتهي تلقائياً 🚀</div>
                     <div style="font-size: 0.82rem; color: #a7f3d0; margin-bottom: 10px;">انتقل لصفحة "مهامي" وأكمل 4 مهام تقييم لتحصيل أرباحك.</div>
-                    <button class="btn btn-red" style="padding: 8px; font-size: 0.82rem;" id="btn-trial-cancel" onclick="cancelTrialSelf()">⛔ إيقاف الفترة التجريبية</button>
                 </div>
                 <div id="trial-cancelled-section" style="display:none;margin-top:10px;padding:10px;border:1px solid rgba(248,113,113,.35);border-radius:10px;background:rgba(127,29,29,.18);color:#fca5a5;font-size:.82rem;font-weight:700;">
-                    ⛔ تم إلغاء الفترة التجريبية نهائياً. لا يمكن إعادة تفعيلها.
+                    ⛔ تم إلغاء الفترة التجريبية من قبل الإدارة. لا يمكن إعادة تفعيلها.
                 </div>
             </div>
 
@@ -2772,8 +2768,8 @@
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="support-avatar-box">🎧👩‍💼</div>
                     <div>
-                        <div style="font-weight: bold; font-size: 0.95rem; color: white;">خدمة العملاء (موظف الاستقبال)</div>
-                        <div style="font-size: 0.78rem; color: #bae6fd;">تواصل مباشر عبر تليجرام</div>
+                        <div style="font-weight: bold; font-size: 0.95rem; color: white;">خدمة العملاء والدعم</div>
+                        <div style="font-size: 0.78rem; color: #bae6fd;">تواصل مع مدير التوظيف الخاص بك في مجموعة العمل</div>
                     </div>
                 </div>
                 <div style="font-size: 1.2rem; color: white; background: rgba(0,0,0,0.2); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">➔</div>
@@ -2805,9 +2801,6 @@
                 </div>
                 <div class="menu-item" onclick="openChangePasswordModal()">
                     <span>🔑 تغيير كلمة المرور</span> <span>👈</span>
-                </div>
-                <div id="profile-trial-cancel-item" class="menu-item" style="display:none;" onclick="cancelTrialSelf()">
-                    <span style="color:#f87171;">⛔ إيقاف الفترة التجريبية</span> <span>👈</span>
                 </div>
                 <div class="menu-item">
                     <span>🌐 لغة التطبيق (Language)</span>
@@ -2941,12 +2934,11 @@
             <div style="font-size: 3rem; margin-bottom: 8px;">🎧👩‍💼</div>
             <h3 style="color: var(--primary-blue); margin-bottom: 6px;">خدمة العملاء والإدارة</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px;">
-                للحصول على دعم سريع، شحن الحساب، أو الاستفسارات، يمكنك التواصل مباشرة مع خدمة العملاء:
+                للدعم أو الاستفسارات، تواصل مع مدير التوظيف الخاص بك في مجموعة العمل.
             </p>
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
-                <a href="https://t.me/Roana_Carter078" target="_blank" rel="noopener noreferrer" class="btn btn-telegram">
-                    💬 خدمة العملاء (موظف الاستقبال) - تليجرام
-                </a>
+            <div style="display:flex;align-items:center;gap:10px;padding:14px;margin-bottom:15px;border:1px solid rgba(240,197,93,.3);border-radius:14px;background:rgba(240,197,93,.08);color:var(--text-white);font-weight:700;line-height:1.6;">
+                <span aria-hidden="true">👥</span>
+                <span>تواصل مع مدير التوظيف الخاص بك في مجموعة العمل.</span>
             </div>
             <button class="btn" style="background: var(--bg-light-card); color: var(--text-white);" onclick="closeSupportModal()">إغلاق</button>
         </div>
@@ -3286,8 +3278,10 @@
             'لديك حساب بالفعل؟ دخول': 'Already have an account? Log in', 'كلمة المرور': 'Password',
             'كلمة المرور الجديدة:': 'New password:', 'كلمة المرور الحالية:': 'Current password:',
             'رمز الدعوة': 'Invitation code', 'دخول': 'Log in', '🚀 دخول': '🚀 Log in',
-            '🚀 إنشاء الحساب': '🚀 Create account', 'خدمة العملاء (موظف الاستقبال)': 'Customer service (reception)',
-            'تواصل مباشر عبر تليجرام': 'Direct contact via Telegram', 'خدمة العملاء والإدارة': 'Customer service and management',
+            '🚀 إنشاء الحساب': '🚀 Create account', 'خدمة العملاء والإدارة': 'Customer service and management',
+            'تواصل مع مدير التوظيف الخاص بك في مجموعة العمل': 'Contact your recruitment manager in the work group',
+            'للدعم أو الاستفسارات، تواصل مع مدير التوظيف الخاص بك في مجموعة العمل.': 'For support or questions, contact your recruitment manager in the work group.',
+            '⛔ تم إلغاء الفترة التجريبية من قبل الإدارة. لا يمكن إعادة تفعيلها.': '⛔ The trial period was cancelled by the administrator and cannot be reactivated.',
             'إغلاق': 'Close', 'حسناً': 'OK', 'نعم': 'Yes', 'لا': 'No', 'نسخ الرابط': 'Copy link',
             'نسخ الرمز': 'Copy code', 'نسخ العنوان': 'Copy address', 'تحديث البيانات': 'Refresh data',
             'عن Vault': 'About Vault', 'مهامي': 'My tasks', 'حسابي': 'My account',
@@ -3308,8 +3302,10 @@
             'ليس لديك حساب؟ إنشاء حساب جديد': 'Pas de compte ? Créer un compte',
             'لديك حساب بالفعل؟ دخول': 'Vous avez déjà un compte ? Connexion', 'كلمة المرور': 'Mot de passe',
             'رمز الدعوة': 'Code d’invitation', 'دخول': 'Connexion', '🚀 دخول': '🚀 Connexion',
-            '🚀 إنشاء الحساب': '🚀 Créer un compte', 'خدمة العملاء (موظف الاستقبال)': 'Service client (réception)',
-            'تواصل مباشر عبر تليجرام': 'Contact direct via Telegram', 'خدمة العملاء والإدارة': 'Service client et administration',
+            '🚀 إنشاء الحساب': '🚀 Créer un compte', 'خدمة العملاء والإدارة': 'Service client et administration',
+            'تواصل مع مدير التوظيف الخاص بك في مجموعة العمل': 'Contactez votre responsable du recrutement dans le groupe de travail',
+            'للدعم أو الاستفسارات، تواصل مع مدير التوظيف الخاص بك في مجموعة العمل.': 'Pour toute aide ou question, contactez votre responsable du recrutement dans le groupe de travail.',
+            '⛔ تم إلغاء الفترة التجريبية من قبل الإدارة. لا يمكن إعادة تفعيلها.': '⛔ La période d’essai a été annulée par l’administrateur et ne peut pas être réactivée.',
             'إغلاق': 'Fermer', 'حسناً': 'OK', 'نعم': 'Oui', 'لا': 'Non', 'نسخ الرابط': 'Copier le lien',
             'تحديث البيانات': 'Actualiser les données', 'عن Vault': 'À propos de Vault',
             'مهامي': 'Mes tâches', 'سحب': 'Retirer', 'إيداع': 'Déposer', 'عجلة الحظ': 'Roue de la chance'
@@ -3328,8 +3324,10 @@
             'ليس لديك حساب؟ إنشاء حساب جديد': '¿No tienes cuenta? Crear una',
             'لديك حساب بالفعل؟ دخول': '¿Ya tienes cuenta? Iniciar sesión', 'كلمة المرور': 'Contraseña',
             'رمز الدعوة': 'Código de invitación', 'دخول': 'Iniciar sesión', '🚀 دخول': '🚀 Iniciar sesión',
-            '🚀 إنشاء الحساب': '🚀 Crear cuenta', 'خدمة العملاء (موظف الاستقبال)': 'Atención al cliente (recepción)',
-            'تواصل مباشر عبر تليجرام': 'Contacto directo por Telegram', 'خدمة العملاء والإدارة': 'Atención al cliente y administración',
+            '🚀 إنشاء الحساب': '🚀 Crear cuenta', 'خدمة العملاء والإدارة': 'Atención al cliente y administración',
+            'تواصل مع مدير التوظيف الخاص بك في مجموعة العمل': 'Contacta con tu responsable de contratación en el grupo de trabajo',
+            'للدعم أو الاستفسارات، تواصل مع مدير التوظيف الخاص بك في مجموعة العمل.': 'Para recibir ayuda o hacer consultas, contacta con tu responsable de contratación en el grupo de trabajo.',
+            '⛔ تم إلغاء الفترة التجريبية من قبل الإدارة. لا يمكن إعادة تفعيلها.': '⛔ El administrador canceló el período de prueba y no se puede reactivar.',
             'إغلاق': 'Cerrar', 'حسناً': 'Aceptar', 'نعم': 'Sí', 'لا': 'No', 'نسخ الرابط': 'Copiar enlace',
             'تحديث البيانات': 'Actualizar datos', 'عن Vault': 'Acerca de Vault', 'مهامي': 'Mis tareas',
             'سحب': 'Retirar', 'إيداع': 'Depositar', 'عجلة الحظ': 'Ruleta de la suerte'
@@ -3348,8 +3346,10 @@
             'ليس لديك حساب؟ إنشاء حساب جديد': '还没有账户？创建账户',
             'لديك حساب بالفعل؟ دخول': '已有账户？登录', 'كلمة المرور': '密码',
             'رمز الدعوة': '邀请码', 'دخول': '登录', '🚀 دخول': '🚀 登录',
-            '🚀 إنشاء الحساب': '🚀 创建账户', 'خدمة العملاء (موظف الاستقبال)': '客户服务（接待）',
-            'تواصل مباشر عبر تليجرام': '通过 Telegram 直接联系', 'خدمة العملاء والإدارة': '客户服务与管理',
+            '🚀 إنشاء الحساب': '🚀 创建账户', 'خدمة العملاء والإدارة': '客户服务与管理',
+            'تواصل مع مدير التوظيف الخاص بك في مجموعة العمل': '请在工作群中联系您的招聘经理',
+            'للدعم أو الاستفسارات، تواصل مع مدير التوظيف الخاص بك في مجموعة العمل.': '如需帮助或咨询，请在工作群中联系您的招聘经理。',
+            '⛔ تم إلغاء الفترة التجريبية من قبل الإدارة. لا يمكن إعادة تفعيلها.': '⛔ 试用期已由管理员取消，无法重新启用。',
             'إغلاق': '关闭', 'حسناً': '确定', 'نعم': '是', 'لا': '否', 'نسخ الرابط': '复制链接',
             'تحديث البيانات': '刷新数据', 'عن Vault': '关于 Vault', 'مهامي': '我的任务',
             'سحب': '提现', 'إيداع': '充值', 'عجلة الحظ': '幸运转盘'
@@ -4249,21 +4249,6 @@
         } catch (error) {
             errEl.innerText = error.message || 'تعذر تغيير كلمة المرور';
             errEl.style.display = 'block';
-        }
-    }
-
-    async function cancelTrialSelf() {
-        if (!window.confirm('هل أنت متأكد من إيقاف الفترة التجريبية؟ لن تتمكن من إعادة تفعيلها لاحقاً.')) return;
-        try {
-            const result = await window.securoApi('/api/vip/trial/cancel', { method: 'POST' });
-            window.syncServerUser(result.user);
-            document.getElementById('btn-trial-activate').style.display = 'none';
-            document.getElementById('trial-success-section').style.display = 'none';
-            const profileItem = document.getElementById('profile-trial-cancel-item');
-            if (profileItem) profileItem.style.display = 'none';
-            showCopyToast('تم إيقاف الفترة التجريبية', 'تم إنهاء الفترة التجريبية. يمكنك الآن الترقية لعضوية مدفوعة من قسم VIP.');
-        } catch (error) {
-            showApiError(error);
         }
     }
 

@@ -127,15 +127,11 @@
       const trialButton = document.getElementById("btn-trial-activate");
       const trialSuccess = document.getElementById("trial-success-section");
       const trialCancelled = document.getElementById("trial-cancelled-section");
-      const profileTrialItem = document.getElementById("profile-trial-cancel-item");
       if (trialButton && trialSuccess) {
         trialButton.style.display = trialUsed ? "none" : "block";
         trialSuccess.style.display = trialActive ? "block" : "none";
       }
       if (trialCancelled) trialCancelled.style.display = trialUsed && !trialActive && !userVip ? "block" : "none";
-      if (profileTrialItem) {
-        profileTrialItem.style.display = trialActive ? "flex" : "none";
-      }
       const homeBalanceEl = document.getElementById("home-balance");
       if (homeBalanceEl) homeBalanceEl.innerText = balance.toFixed(2);
        const totalDepositsEl = document.getElementById("user-total-deposits");
@@ -182,19 +178,14 @@
      if (totalDepositCountEl) totalDepositCountEl.innerText = `${totalDepositCount} عملية`;
      if (totalWithdrawalCountEl) totalWithdrawalCountEl.innerText = `${totalWithdrawalCount} عملية`;
     if (typeof updateWheelUI === "function") updateWheelUI();
-    // Update trial cancel button visibility
     const trialButton = document.getElementById("btn-trial-activate");
     const trialSuccess = document.getElementById("trial-success-section");
     const trialCancelled = document.getElementById("trial-cancelled-section");
-    const profileTrialItem = document.getElementById("profile-trial-cancel-item");
     if (trialButton && trialSuccess) {
       trialButton.style.display = trialUsed ? "none" : "block";
       trialSuccess.style.display = trialActive ? "block" : "none";
     }
     if (trialCancelled) trialCancelled.style.display = trialUsed && !trialActive && !userVip ? "block" : "none";
-    if (profileTrialItem) {
-      profileTrialItem.style.display = trialActive ? "flex" : "none";
-    }
     if (typeof updateVipUIState === "function") updateVipUIState();
     if (typeof updateDailyRewardUI === "function") updateDailyRewardUI();
   };

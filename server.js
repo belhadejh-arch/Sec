@@ -18,6 +18,13 @@ try {
     ssl: { rejectUnauthorized: false },
     max: 10,
   });
+  // Neon may provide an empty search_path; set it before each pooled client
+  // serves queries so unqualified application tables resolve in public.
+  pool.on("connect", (client) => {
+    client.query("SET search_path TO public").catch((error) => {
+      console.error("Database schema initialization failed:", error.code || error.message);
+    });
+  });
   pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS can_withdraw BOOLEAN NOT NULL DEFAULT TRUE;`).catch(() => {});
 } catch {
   console.warn('DB not connected — mock active');
@@ -1461,33 +1468,9 @@ app.post("/api/admin/users/:id/tasks/reset", requireAdmin, async (req, res) => {
   }
 });
 
-// User self-cancel trial
-app.post("/api/vip/trial/cancel", requireUser, async (req, res) => {
-  try {
-    const result = await withTransaction(async (client) => {
-      const locked = await client.query(
-        `SELECT * FROM users
-         WHERE id = $1 AND is_admin = FALSE
-           AND (trial_active = TRUE OR (user_vip IS NOT NULL AND user_vip->>'isTrial' = 'true'))
-         FOR UPDATE`,
-        [req.session.userId],
-      );
-      if (!locked.rowCount) {
-        throw Object.assign(new Error("لا توجد فترة تجريبية نشطة"), { status: 404 });
-      }
-      const updated = await client.query(
-        `UPDATE users
-         SET trial_active = FALSE, trial_used = TRUE, user_vip = NULL,
-             trial_cancelled = FALSE, vip_expires_at = NULL, updated_at = NOW()
-         WHERE id = $1 RETURNING *`,
-        [req.session.userId],
-      );
-      return publicUser(updated.rows[0]);
-    });
-    res.json({ user: result });
-  } catch (error) {
-    appError(res, error.status || 500, error.status ? error.message : "تعذر إلغاء الفترة التجريبية");
-  }
+// Keep a clear denial for old clients; only the admin endpoint may cancel trials.
+app.post("/api/vip/trial/cancel", requireUser, (_req, res) => {
+  appError(res, 403, "إلغاء الفترة التجريبية متاح للأدمن فقط");
 });
 
 async function updateOwnPassword(userId, currentPassword, newPassword) {
