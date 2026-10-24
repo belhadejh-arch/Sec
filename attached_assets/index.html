@@ -5,7 +5,7 @@
     <meta name="securo-api-url" content="">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>SECURO VIP - الإدارة والمستخدم</title>
+    <title>Vault - الإدارة والمستخدم</title>
     <!-- مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -761,16 +761,9 @@
             line-height: 1;
         }
         .auth-brand::before {
-            content: "SECURO";
-            display: block;
-            color: #3f8cff;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: clamp(1.5rem, 4vw, 1.9rem);
-            font-weight: 900;
-            letter-spacing: .15em;
-            text-shadow: 0 0 24px rgba(59,130,246,.25);
-            margin-bottom: 2px;
+            content: none;
         }
+        .auth-brand img { width: clamp(112px, 28vw, 168px); aspect-ratio: 1; object-fit: contain; border-radius: 50%; box-shadow: 0 0 36px rgba(247, 197, 24, .2); }
         /* Hide legacy brand children inside auth screen */
         .auth-brand .brand-mark,
         .auth-brand h2,
@@ -1059,7 +1052,7 @@
             .nav-link { font-size: .58rem; }
         }
         /* ==========================================================
-         * SECURO VIP — production layout refinement
+         * Vault — production layout refinement
          * A calm, premium fintech surface: disciplined grid, compact
          * rhythm, high-contrast actions and one predictable scroll model.
          * ========================================================== */
@@ -1644,6 +1637,78 @@
                   margin-bottom: 0 !important;
               }
           }
+        :root {
+            --bg-body: #080808;
+            --bg-card: #111111;
+            --bg-light-card: #1f1b10;
+            --primary-blue: #f2bd22;
+            --primary-gradient: linear-gradient(135deg, #ffdf62 0%, #d99a00 100%);
+            --vip-gold: linear-gradient(135deg, #ffdf62 0%, #c98700 100%);
+            --accent-green: #28b463;
+            --border-color: rgba(242, 189, 34, .28);
+            --surface-0: #080808;
+            --surface-1: #111111;
+            --line-soft: rgba(242, 189, 34, .18);
+            --line-strong: rgba(242, 189, 34, .42);
+            --text-soft: #d6cfb6;
+        }
+        body, html { background: #050505; }
+        .app-container { background-color: var(--bg-body); }
+        .site-header, header { background: #0b0b0b; border-color: var(--line-soft); }
+        .brand-symbol {
+            object-fit: contain; border-radius: 50%; background: #000;
+            border: 1px solid rgba(255, 215, 79, .75);
+            box-shadow: 0 0 16px rgba(247, 197, 24, .25);
+        }
+        .brand-copy h1, .auth-brand h2 span, .home-kicker, .platform-menu-label,
+        .platform-menu-item i, .platform-menu-item .menu-item-icon,
+        .nav-link.active, .header-menu-button, .header-account-button {
+            color: #f4c542;
+        }
+        .brand-copy h1 {
+            background: linear-gradient(90deg, #fff0a3, #f2bd22);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .brand-symbol { flex: 0 0 auto; }
+        .btn-primary { background: var(--primary-gradient); color: #171000; }
+        .btn-gold { background: var(--vip-gold); color: #171000; }
+        .input:focus, input:focus, select:focus, textarea:focus { border-color: #f2bd22; }
+        .admin-hero {
+            background: linear-gradient(135deg, #191507 0%, #332400 58%, #111111 140%);
+            border-color: rgba(242, 189, 34, .35);
+            box-shadow: 0 22px 55px rgba(155, 111, 0, .15);
+        }
+        .platform-menu-panel { background: linear-gradient(180deg, #191507 0%, #0c0b08 55%, #080808 100%); border-color: var(--line-soft); }
+        .platform-menu-item:hover, .platform-menu-item.is-active { background: rgba(217, 154, 0, .14); border-color: rgba(242, 189, 34, .28); }
+        .card, .vip-card, .hotel-card, .wheel-card, .history-card, .admin-panel,
+        .balance-card, .referral-box, .daily-reward-card, .task-progress-box { border-color: var(--line-soft); }
+        .btn { border-radius: 12px; font-family: inherit; }
+        .admin-odds-grid {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;
+        }
+        .admin-odds-grid label {
+            display: flex; flex-direction: column; gap: 6px; color: var(--text-soft);
+            font-size: .8rem; font-weight: 800; min-width: 0;
+        }
+        .admin-vip-prices {
+            display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px;
+            padding: 12px; background: rgba(0, 0, 0, .28);
+            border: 1px solid var(--line-soft); border-radius: 12px;
+            color: var(--text-soft); font-size: .76rem;
+        }
+        .admin-vip-prices strong { flex-basis: 100%; color: #f4c542; }
+        .admin-vip-prices span {
+            padding: 5px 8px; border-radius: 8px;
+            background: rgba(242, 189, 34, .09); border: 1px solid var(--line-soft);
+        }
+        [style*="#60a5fa"], [style*="#7dd3fc"], [style*="#38bdf8"], [style*="#3b82f6"] { color: #f4c542 !important; }
+        [style*="rgba(59,130,246"], [style*="rgba(37,99,235"], [style*="rgba(96,165,250"] {
+            border-color: rgba(242,189,34,.28) !important;
+            background-color: rgba(242,189,34,.08) !important;
+        }
+        @media (max-width: 760px) {
+            .admin-odds-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        }
 
           /*
            * HARD APP SHELL RESET
@@ -1720,10 +1785,10 @@
                 <i class="fa-solid fa-bars"></i><span>منصة</span>
             </button>
         </div>
-        <div class="brand-lockup" aria-label="SECURO">
-            <div class="brand-symbol"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="brand-lockup" aria-label="Vault">
+            <img class="brand-symbol" src="Business_Suite_creation_1555674689649841_1792808792698.jpeg" alt="شعار Vault">
             <div class="brand-copy">
-                <h1 id="header-title">SECURO</h1>
+                <h1 id="header-title">Vault</h1>
                 <small id="header-subtitle">مساحتك المالية الذكية</small>
             </div>
         </div>
@@ -1739,7 +1804,7 @@
         <aside class="platform-menu-panel" aria-label="قائمة منصة">
             <div class="platform-menu-head">
                 <div>
-                    <h2><i class="fa-solid fa-layer-group" style="color:#7dd3fc;"></i> منصة SECURO</h2>
+                    <h2><i class="fa-solid fa-layer-group" style="color:#7dd3fc;"></i> منصة Vault</h2>
                     <p id="platform-menu-description">كل أقسام المنصة في مكان واحد</p>
                 </div>
                 <button class="platform-menu-close" type="button" aria-label="إغلاق القائمة" onclick="closePlatformMenu()"><i class="fa-solid fa-xmark"></i></button>
@@ -1752,7 +1817,7 @@
                         <span class="menu-item-icon">⌂</span><span>الرئيسية</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
                     </button>
                     <button class="platform-menu-item" type="button" onclick="navigateFromPlatform('about')">
-                        <span class="menu-item-icon">◈</span><span>عن SECURO والمعلومات</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
+                        <span class="menu-item-icon">◈</span><span>عن Vault والمعلومات</span><i class="fa-solid fa-chevron-left menu-item-arrow"></i>
                     </button>
                 </div>
                 <div class="platform-menu-group">
@@ -1833,11 +1898,11 @@
         <!-- 1. شاشة تسجيل الدخول وإنشاء حساب -->
         <div id="auth-screen" class="screen active">
             <div class="auth-layout">
-              <div class="auth-brand" aria-label="SECURO"></div>
+              <div class="auth-brand" aria-label="Vault"><img src="Business_Suite_creation_1555674689649841_1792808792698.jpeg" alt="شعار Vault"></div>
               <div class="card auth-card">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">
                   <div>
-                    <div style="font-size:.74rem;color:#60a5fa;font-weight:800;letter-spacing:.08em;">WELCOME BACK</div>
+                    <div style="font-size:.74rem;color:#60a5fa;font-weight:800;letter-spacing:.08em;">VAULT</div>
                     <h2 id="auth-title" style="color: var(--text-white); margin-top: 6px;">تسجيل الدخول</h2>
                   </div>
                   <div style="width:42px;height:42px;border-radius:14px;background:rgba(59,130,246,.14);display:grid;place-items:center;color:#60a5fa;"><i class="fa-solid fa-arrow-right-to-bracket"></i></div>
@@ -1908,12 +1973,43 @@
                     <div>
                         <h3 style="border:none;padding:0;margin:0 0 5px;"><i class="fa-solid fa-list-check" style="color:#fbbf24;"></i> التحكم في المهام</h3>
                         <div style="font-size:.78rem;color:var(--text-muted);line-height:1.6;">
-                            يتحكم هذا الزر في مهام VIP1–VIP4 فقط. الفترة التجريبية مستقلة تماماً وتستمر بمهمتين يومياً، 4 مهام إجمالاً.
+                            يتحكم هذا الزر في مهام VIP1–VIP6 فقط. الفترة التجريبية مستقلة تماماً وتستمر بمهمتين يومياً، 4 مهام إجمالاً.
                         </div>
                     </div>
                     <button id="admin-tasks-toggle" class="btn btn-green" type="button" aria-pressed="true" onclick="adminToggleTasks()" style="min-width:90px;font-weight:900;">ON</button>
                 </div>
-                <div id="admin-tasks-toggle-status" style="font-size:.78rem;margin-top:8px;color:#86efac;">المهام المدفوعة متاحة الآن لمستخدمي VIP1–VIP4.</div>
+                <div id="admin-tasks-toggle-status" style="font-size:.78rem;margin-top:8px;color:#86efac;">المهام المدفوعة متاحة الآن لمستخدمي VIP1–VIP6.</div>
+            </div>
+
+            <div id="admin-platform-settings" class="card admin-panel" style="margin-top:15px;">
+                <h3><i class="fa-solid fa-sliders" style="color:#f4c542;"></i> إعدادات المحافظ واحتمالات العجلة</h3>
+                <p style="font-size:.78rem;color:var(--text-muted);line-height:1.6;margin-bottom:10px;">
+                    تُحفظ التغييرات في قاعدة البيانات وتُطبّق على الطلبات الجديدة واللفات اللاحقة. مجموع احتمالات الجوائز لا يتجاوز 100%، والباقي موزع بالتساوي على قطاعي «حظ سعيد».
+                </p>
+                <div class="form-group">
+                    <label for="admin-wallet-trc20">عنوان محفظة الإيداع TRC20</label>
+                    <input id="admin-wallet-trc20" type="text" autocomplete="off" spellcheck="false" placeholder="عنوان يبدأ بـ T">
+                    <label for="admin-wallet-bep20">عنوان محفظة الإيداع BEP20</label>
+                    <input id="admin-wallet-bep20" type="text" autocomplete="off" spellcheck="false" placeholder="عنوان 0x... (اتركه فارغاً لتعطيل الإيداع عبر BEP20)">
+                </div>
+                <h4 style="margin:16px 0 8px;color:#f4c542;">احتمال كل جائزة من إجمالي اللفات (%)</h4>
+                <div class="admin-odds-grid">
+                    <label>$0.50<input id="admin-odds-0-5" type="number" min="0" max="100" step="0.01"></label>
+                    <label>$1<input id="admin-odds-1" type="number" min="0" max="100" step="0.01"></label>
+                    <label>$2<input id="admin-odds-2" type="number" min="0" max="100" step="0.01"></label>
+                    <label>$3<input id="admin-odds-3" type="number" min="0" max="100" step="0.01"></label>
+                    <label>$50<input id="admin-odds-50" type="number" min="0" max="100" step="0.01"></label>
+                    <label>$100<input id="admin-odds-100" type="number" min="0" max="100" step="0.01"></label>
+                </div>
+                <div id="admin-no-prize-odds" style="font-size:.82rem;font-weight:800;margin-top:8px;color:#f4c542;">احتمال «حظ سعيد»: 40%</div>
+                <div class="admin-vip-prices" aria-label="أسعار ومكافآت باقات VIP">
+                    <strong>أسعار ومكافآت VIP الرسمية:</strong>
+                    <span>VIP1 $14 / $0.83 يومياً</span><span>VIP2 $25 / $1.75 يومياً</span>
+                    <span>VIP3 $57 / $4.42 يومياً</span><span>VIP4 $122 / $9.83 يومياً</span>
+                    <span>VIP5 $200 / $16.33 يومياً</span><span>VIP6 $301 / $24.75 يومياً</span>
+                </div>
+                <button class="btn btn-primary" type="button" onclick="adminSavePlatformSettings()" style="margin-top:12px;">حفظ الإعدادات</button>
+                <div id="admin-settings-status" role="status" style="font-size:.8rem;margin-top:8px;"></div>
             </div>
 
             <div id="admin-users-panel" class="card admin-panel admin-section-anchor">
@@ -1957,7 +2053,7 @@
         <div id="home-screen" class="screen">
             <div class="home-overview">
                 <div class="home-welcome">
-                    <div class="home-kicker">مساحتك في SECURO</div>
+                            <div class="home-kicker">مساحتك في Vault</div>
                     <h2>أهلاً بك في منصتك</h2>
                     <p>تابع رصيدك، نفّذ خطواتك اليومية، واستكشف جميع الأقسام من قائمة <strong>منصة</strong> المنظمة.</p>
                 </div>
@@ -1989,7 +2085,7 @@
             <div class="subpage-header">
                 <div>
                     <div class="home-kicker">معلومات المنصة</div>
-                    <h2 style="color: var(--text-white); font-size: 1.2rem;">عن SECURO</h2>
+                    <h2 style="color: var(--text-white); font-size: 1.2rem;">عن Vault</h2>
                 </div>
                 <button class="back-btn-arrow" type="button" onclick="switchTab('home')" aria-label="العودة للرئيسية">➔</button>
             </div>
@@ -2002,7 +2098,7 @@
                     <div class="slide-caption">🏛️ مكاتب العمل الإدارية والتقنية (تأسست عام 2014)</div>
                 </div>
                 <div class="slider-slide" style="background-image: linear-gradient(to top, #0f172a, transparent), url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80');">
-                    <div class="slide-caption">⚡ SECURO - ريادة عالمية موثوقة في الاستثمار الذكي</div>
+                    <div class="slide-caption">⚡ Vault - ريادة عالمية موثوقة في الاستثمار الذكي</div>
                 </div>
             </div>
 <div class="stats-bar">
@@ -2022,9 +2118,9 @@
                 </div>
             </div>
 <div class="card">
-                <h3>🇺🇸 عن شركة SECURO (نيويورك)</h3>
+                <h3>🇺🇸 عن شركة Vault (نيويورك)</h3>
                 <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6;">
-                    تأسست شركة **SECURO** رسميًا في عام **2014** وتتخذ من مدينة **نيويورك في الولايات المتحدة الأمريكية** مقراً رئيسياً لها. تُعد المنصة رائدة عالمياً في مجالات التداول والحلول الاستثمارية الرقمية المتقدمة.
+                    تأسست شركة **Vault** رسميًا في عام **2014** وتتخذ من مدينة **نيويورك في الولايات المتحدة الأمريكية** مقراً رئيسياً لها. تُعد المنصة رائدة عالمياً في مجالات التداول والحلول الاستثمارية الرقمية المتقدمة.
                 </p>
             </div>
 </div>
@@ -2073,43 +2169,43 @@
             <div class="vip-card" id="vip-card-vip1" style="border-color: #f59e0b;">
                 <span class="vip-badge">VIP 1</span>
                 <h3 style="color: #fbbf24;">المستوى الأول</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 3 مهام يومياً | دخل المهام: $1.20 | سعر العضوية: $14.00</p>
-                <button class="btn btn-gold" id="btn-buy-vip1" onclick="buyVipProduct('VIP 1', 14, 3, 1.20)">شراء العضوية ($14)</button>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 3 مهام يومياً | مجموع مكافآت المهام: $0.83 يومياً | سعر العضوية: $14.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip1" onclick="buyVipProduct('VIP 1', 14, 3, 0.83)">شراء العضوية ($14)</button>
             </div>
 
             <div class="vip-card" id="vip-card-vip2" style="border-color: #f59e0b;">
                 <span class="vip-badge">VIP 2</span>
                 <h3 style="color: #fbbf24;">المستوى الثاني</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 6 مهام يومياً | دخل المهام: $2.50 | سعر العضوية: $24.00</p>
-                <button class="btn btn-gold" id="btn-buy-vip2" onclick="buyVipProduct('VIP 2', 24, 6, 2.50)">شراء العضوية ($24)</button>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 6 مهام يومياً | مجموع مكافآت المهام: $1.75 يومياً | سعر العضوية: $25.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip2" onclick="buyVipProduct('VIP 2', 25, 6, 1.75)">شراء العضوية ($25)</button>
             </div>
 
             <div class="vip-card" id="vip-card-vip3" style="border-color: #f59e0b;">
                 <span class="vip-badge">VIP 3</span>
                 <h3 style="color: #fbbf24;">المستوى الثالث</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 8 مهام يومياً | دخل المهام: $7.00 | سعر العضوية: $54.00</p>
-                <button class="btn btn-gold" id="btn-buy-vip3" onclick="buyVipProduct('VIP 3', 54, 8, 7.00)">شراء العضوية ($54)</button>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 8 مهام يومياً | مجموع مكافآت المهام: $4.42 يومياً | سعر العضوية: $57.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip3" onclick="buyVipProduct('VIP 3', 57, 8, 4.42)">شراء العضوية ($57)</button>
             </div>
 
             <div class="vip-card" id="vip-card-vip4" style="border-color: #f59e0b;">
                 <span class="vip-badge">VIP 4</span>
                 <h3 style="color: #fbbf24;">المستوى الرابع</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 10 مهام يومياً | دخل المهام: $18.00 | سعر العضوية: $120.00</p>
-                <button class="btn btn-gold" id="btn-buy-vip4" onclick="buyVipProduct('VIP 4', 120, 10, 18.00)">شراء العضوية ($120)</button>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 10 مهام يومياً | مجموع مكافآت المهام: $9.83 يومياً | سعر العضوية: $122.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip4" onclick="buyVipProduct('VIP 4', 122, 10, 9.83)">شراء العضوية ($122)</button>
             </div>
 
-            <div class="vip-card disabled">
-                <span class="vip-badge locked-badge">🔒 قريباً</span>
-                <h3 style="color: #94a3b8;">VIP 5 - المستوى المتقدم</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | السعر: $200.00 | سيكون متاحاً للتفعيل قريباً جداً!</p>
-                <button class="btn btn-disabled" disabled>🔒 غير متاح حالياً (قريباً)</button>
+            <div class="vip-card" id="vip-card-vip5" style="border-color: #f59e0b;">
+                <span class="vip-badge">VIP 5</span>
+                <h3 style="color: #fbbf24;">المستوى الخامس</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 12 مهمة يومياً | مجموع مكافآت المهام: $16.33 يومياً | سعر العضوية: $200.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip5" onclick="buyVipProduct('VIP 5', 200, 12, 16.33)">شراء العضوية ($200)</button>
             </div>
 
-            <div class="vip-card disabled">
-                <span class="vip-badge locked-badge">🔒 قريباً</span>
-                <h3 style="color: #94a3b8;">VIP 6 - المستوى الذهبي كبار الشخصيات</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | السعر: $300.00 | سيكون متاحاً للتفعيل قريباً جداً!</p>
-                <button class="btn btn-disabled" disabled>🔒 غير متاح حالياً (قريباً)</button>
+            <div class="vip-card" id="vip-card-vip6" style="border-color: #f59e0b;">
+                <span class="vip-badge">VIP 6</span>
+                <h3 style="color: #fbbf24;">المستوى السادس</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 5px 0 10px 0;">المدة: 365 يوماً | 15 مهمة يومياً | مجموع مكافآت المهام: $24.75 يومياً | سعر العضوية: $301.00</p>
+                <button class="btn btn-gold" id="btn-buy-vip6" onclick="buyVipProduct('VIP 6', 301, 15, 24.75)">شراء العضوية ($301)</button>
             </div>
         </div>
 
@@ -2353,7 +2449,7 @@
             <div class="success-icon-box">👋</div>
             <h2 style="color: var(--accent-green); margin-bottom: 8px;">مرحباً بك مجدداً!</h2>
             <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
-                تم تسجيل دخولك إلى حسابك بنجاح.<br>نتمنى لك رحلة استثمارية موفقة مع SECURO!
+                تم تسجيل دخولك إلى حسابك بنجاح.<br>نتمنى لك رحلة استثمارية موفقة مع Vault!
             </p>
             <button class="btn btn-primary" onclick="closeLoginSuccessModal()">دخول المنصة 🚀</button>
         </div>
@@ -2412,12 +2508,17 @@
             <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 10px auto;">
                 💳
             </div>
-            <h3 style="color: var(--accent-green); margin-bottom: 12px; text-align: center;">شحن رصيد الحساب (USDT TRC20)</h3>
+            <h3 style="color: var(--accent-green); margin-bottom: 12px; text-align: center;">شحن رصيد الحساب (USDT)</h3>
             
             <div class="form-group">
+                <label for="deposit-network" style="font-size: 0.85rem; font-weight: bold; color: var(--text-white);">شبكة الإيداع:</label>
+                <select id="deposit-network" onchange="updateDepositWallet()">
+                    <option value="TRC20">USDT TRC20</option>
+                    <option value="BEP20">USDT BEP20</option>
+                </select>
                 <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white);">عنوان محفظة الإيداع الرسمية:</label>
                 <div class="copy-input-container">
-                    <input type="text" id="company-wallet-address" value="TKmr5pbXSEWSQ5EfFTtF5wjZRt4Y4KRKxE" readonly style="font-size: 0.78rem; text-align: center;">
+                    <input type="text" id="company-wallet-address" value="" readonly style="font-size: 0.78rem; text-align: center;">
                     <button type="button" class="copy-btn" onclick="copyCompanyWallet()">نسخ العنوان</button>
                 </div>
 
@@ -2428,7 +2529,7 @@
                 <input type="text" id="deposit-txid" placeholder="أدخل رقم أو كود المعاملة بعد التحويل">
                 
                 <div class="deposit-notice-box">
-                    ⚠️ الحد الأدنى للإيداع هو 10 دولار ($10). يرجى التأكد من إرسال المبلغ عبر شبكة TRC20 حصراً.
+                    <span id="deposit-network-notice">⚠️ الحد الأدنى للإيداع هو 10 دولار ($10). تأكد من إرسال USDT عبر شبكة TRC20.</span>
                 </div>
 
                 <button type="button" id="deposit-submit-btn" class="btn btn-green" onclick="submitDeposit()" style="margin-top: 5px;">تأكيد إرسال طلب الإيداع</button>
@@ -2489,9 +2590,9 @@
             <h3 style="margin-bottom: 15px; text-align: center;">💸 اختيار طريقة السحب</h3>
             <div class="form-group">
                 <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-white);">اختر المحفظة الرقمية:</label>
-                <select id="withdraw-bank">
-                    <option value="USDT">🪙 محفظة رقمية (USDT TRC20)</option>
-                    <option value="USDC">🪙 محفظة رقمية (USDC)</option>
+                <select id="withdraw-network">
+                    <option value="TRC20">🪙 USDT عبر TRC20</option>
+                    <option value="BEP20">🪙 USDT عبر BEP20</option>
                 </select>
 
                 <input type="text" id="withdraw-account" placeholder="أدخل عنوان المحفظة الرقمية (Wallet Address)">
@@ -2569,6 +2670,7 @@
     let currentLanguage = localStorage.getItem('securo-language') || 'ar';
 
     let activeTaskTimers = {};
+    let walletAddresses = { TRC20: "", BEP20: "" };
     let midnightTimerInterval = null;
 
     const wheelSectors = [
@@ -2594,7 +2696,10 @@
         { name: "فندق إمباسادور - سنغافورة", location: "سنغافورة", img: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=600&q=80" },
         { name: "منتجع سيكس سينسز - المالديف", location: "جزر المالديف", img: "https://images.unsplash.com/photo-1439130490301-25e322d88054?auto=format&fit=crop&w=600&q=80" },
         { name: "فندق الملك داود - القدس", location: "فلسطين", img: "https://images.unsplash.com/photo-1549918864-48ac978761a4?auto=format&fit=crop&w=600&q=80" },
-        { name: "فندق كمبينسكي - جنيف", location: "سويسرا", img: "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=600&q=80" }
+        { name: "فندق كمبينسكي - جنيف", location: "سويسرا", img: "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق أمان - كيوتو", location: "اليابان", img: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق ذا بينينسولا - هونغ كونغ", location: "هونغ كونغ", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80" },
+        { name: "فندق رافلز - سنغافورة", location: "سنغافورة", img: "https://images.unsplash.com/photo-1578683010236-d716a1f6a4f6?auto=format&fit=crop&w=600&q=80" }
     ];
 
     function relocateHomeSecondaryContent() {
@@ -2693,8 +2798,8 @@
     const languageTranslations = {
         en: {
             'منصة': 'Platform', 'حسابي': 'My account', 'مساحتك المالية الذكية': 'Your smart financial space',
-            'منصة SECURO': 'SECURO platform', 'كل أقسام المنصة في مكان واحد': 'All platform sections in one place',
-            'الوصول السريع': 'Quick access', 'الرئيسية': 'Home', 'عن SECURO والمعلومات': 'About SECURO',
+            'منصة Vault': 'Vault platform', 'كل أقسام المنصة في مكان واحد': 'All platform sections in one place',
+            'الوصول السريع': 'Quick access', 'الرئيسية': 'Home', 'عن Vault والمعلومات': 'About Vault',
             'نشاط المنصة': 'Platform activity', 'مستويات ومنتجات VIP': 'VIP levels and products',
             'مهامي اليومية': 'My daily tasks', 'فريقي والإحالات': 'My team and referrals',
             'الحساب والسجلات': 'Account and records', 'حسابي والرصيد': 'My account and balance',
@@ -2710,14 +2815,14 @@
             'تواصل مباشر عبر تليجرام': 'Direct contact via Telegram', 'خدمة العملاء والإدارة': 'Customer service and management',
             'إغلاق': 'Close', 'حسناً': 'OK', 'نعم': 'Yes', 'لا': 'No', 'نسخ الرابط': 'Copy link',
             'نسخ الرمز': 'Copy code', 'نسخ العنوان': 'Copy address', 'تحديث البيانات': 'Refresh data',
-            'عن SECURO': 'About SECURO', 'مهامي': 'My tasks', 'حسابي': 'My account',
+            'عن Vault': 'About Vault', 'مهامي': 'My tasks', 'حسابي': 'My account',
             'سحب': 'Withdraw', 'إيداع': 'Deposit', 'عجلة الحظ': 'Lucky wheel',
             'فريق': 'Team', 'تأكيد': 'Confirm'
         },
         fr: {
             'منصة': 'Plateforme', 'حسابي': 'Mon compte', 'مساحتك المالية الذكية': 'Votre espace financier intelligent',
-            'منصة SECURO': 'Plateforme SECURO', 'كل أقسام المنصة في مكان واحد': 'Toutes les sections au même endroit',
-            'الوصول السريع': 'Accès rapide', 'الرئيسية': 'Accueil', 'عن SECURO والمعلومات': 'À propos de SECURO',
+            'منصة Vault': 'Plateforme Vault', 'كل أقسام المنصة في مكان واحد': 'Toutes les sections au même endroit',
+            'الوصول السريع': 'Accès rapide', 'الرئيسية': 'Accueil', 'عن Vault والمعلومات': 'À propos de Vault',
             'نشاط المنصة': 'Activité de la plateforme', 'مستويات ومنتجات VIP': 'Niveaux et produits VIP',
             'مهامي اليومية': 'Mes tâches quotidiennes', 'فريقي والإحالات': 'Mon équipe et mes parrainages',
             'الحساب والسجلات': 'Compte et historiques', 'حسابي والرصيد': 'Mon compte et mon solde',
@@ -2731,13 +2836,13 @@
             '🚀 إنشاء الحساب': '🚀 Créer un compte', 'خدمة العملاء (موظف الاستقبال)': 'Service client (réception)',
             'تواصل مباشر عبر تليجرام': 'Contact direct via Telegram', 'خدمة العملاء والإدارة': 'Service client et administration',
             'إغلاق': 'Fermer', 'حسناً': 'OK', 'نعم': 'Oui', 'لا': 'Non', 'نسخ الرابط': 'Copier le lien',
-            'تحديث البيانات': 'Actualiser les données', 'عن SECURO': 'À propos de SECURO',
+            'تحديث البيانات': 'Actualiser les données', 'عن Vault': 'À propos de Vault',
             'مهامي': 'Mes tâches', 'سحب': 'Retirer', 'إيداع': 'Déposer', 'عجلة الحظ': 'Roue de la chance'
         },
         es: {
             'منصة': 'Plataforma', 'حسابي': 'Mi cuenta', 'مساحتك المالية الذكية': 'Tu espacio financiero inteligente',
-            'منصة SECURO': 'Plataforma SECURO', 'كل أقسام المنصة في مكان واحد': 'Todas las secciones en un solo lugar',
-            'الوصول السريع': 'Acceso rápido', 'الرئيسية': 'Inicio', 'عن SECURO والمعلومات': 'Acerca de SECURO',
+            'منصة Vault': 'Plataforma Vault', 'كل أقسام المنصة في مكان واحد': 'Todas las secciones en un solo lugar',
+            'الوصول السريع': 'Acceso rápido', 'الرئيسية': 'Inicio', 'عن Vault والمعلومات': 'Acerca de Vault',
             'نشاط المنصة': 'Actividad de la plataforma', 'مستويات ومنتجات VIP': 'Niveles y productos VIP',
             'مهامي اليومية': 'Mis tareas diarias', 'فريقي والإحالات': 'Mi equipo y referidos',
             'الحساب والسجلات': 'Cuenta e historial', 'حسابي والرصيد': 'Mi cuenta y saldo',
@@ -2751,13 +2856,13 @@
             '🚀 إنشاء الحساب': '🚀 Crear cuenta', 'خدمة العملاء (موظف الاستقبال)': 'Atención al cliente (recepción)',
             'تواصل مباشر عبر تليجرام': 'Contacto directo por Telegram', 'خدمة العملاء والإدارة': 'Atención al cliente y administración',
             'إغلاق': 'Cerrar', 'حسناً': 'Aceptar', 'نعم': 'Sí', 'لا': 'No', 'نسخ الرابط': 'Copiar enlace',
-            'تحديث البيانات': 'Actualizar datos', 'عن SECURO': 'Acerca de SECURO', 'مهامي': 'Mis tareas',
+            'تحديث البيانات': 'Actualizar datos', 'عن Vault': 'Acerca de Vault', 'مهامي': 'Mis tareas',
             'سحب': 'Retirar', 'إيداع': 'Depositar', 'عجلة الحظ': 'Ruleta de la suerte'
         },
         zh: {
             'منصة': '平台', 'حسابي': '我的账户', 'مساحتك المالية الذكية': '您的智能金融空间',
-            'منصة SECURO': 'SECURO 平台', 'كل أقسام المنصة في مكان واحد': '所有平台功能一处查看',
-            'الوصول السريع': '快速访问', 'الرئيسية': '首页', 'عن SECURO والمعلومات': '关于 SECURO',
+            'منصة Vault': 'Vault 平台', 'كل أقسام المنصة في مكان واحد': '所有平台功能一处查看',
+            'الوصول السريع': '快速访问', 'الرئيسية': '首页', 'عن Vault والمعلومات': '关于 Vault',
             'نشاط المنصة': '平台活动', 'مستويات ومنتجات VIP': 'VIP 等级和产品',
             'مهامي اليومية': '我的每日任务', 'فريقي والإحالات': '我的团队和推荐',
             'الحساب والسجلات': '账户和记录', 'حسابي والرصيد': '我的账户和余额',
@@ -2771,7 +2876,7 @@
             '🚀 إنشاء الحساب': '🚀 创建账户', 'خدمة العملاء (موظف الاستقبال)': '客户服务（接待）',
             'تواصل مباشر عبر تليجرام': '通过 Telegram 直接联系', 'خدمة العملاء والإدارة': '客户服务与管理',
             'إغلاق': '关闭', 'حسناً': '确定', 'نعم': '是', 'لا': '否', 'نسخ الرابط': '复制链接',
-            'تحديث البيانات': '刷新数据', 'عن SECURO': '关于 SECURO', 'مهامي': '我的任务',
+            'تحديث البيانات': '刷新数据', 'عن Vault': '关于 Vault', 'مهامي': '我的任务',
             'سحب': '提现', 'إيداع': '充值', 'عجلة الحظ': '幸运转盘'
         }
     };
@@ -3001,7 +3106,7 @@
         if (isAdmin) {
             document.querySelector('.app-container').classList.remove('nav-visible');
             document.getElementById('admin-screen').classList.add('active');
-            document.getElementById('header-title').innerText = "SECURO ADMIN";
+            document.getElementById('header-title').innerText = "Vault ADMIN";
             renderAdminDashboard();
         } else {
             document.getElementById('bottom-nav').style.display = 'flex';
@@ -3082,12 +3187,12 @@
     function setupUserInviteData() {
         const code = currentUser.inviteCode || 529993;
         document.getElementById('my-invite-code').value = code;
-        document.getElementById('my-invite-link').value = `https://securo-vip.com/register?invite=${code}`;
+        document.getElementById('my-invite-link').value = `${window.location.origin}${window.location.pathname}?invite=${encodeURIComponent(code)}`;
     }
 
     function updateVipUIState() {
-        let priceMap = { 1: 14, 2: 24, 3: 54, 4: 120 };
-        for (let i = 1; i <= 4; i++) {
+        const priceMap = { 1: 14, 2: 25, 3: 57, 4: 122, 5: 200, 6: 301 };
+        for (let i = 1; i <= 6; i++) {
             const btn = document.getElementById(`btn-buy-vip${i}`);
             if (!btn) continue;
             
@@ -3122,7 +3227,7 @@
         document.getElementById('admin-screen').classList.remove('active');
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('auth-screen').classList.add('active');
-        document.getElementById('header-title').innerText = "SECURO";
+        document.getElementById('header-title').innerText = "Vault";
         document.getElementById('auth-email').value = '';
         document.getElementById('auth-pass').value = '';
         document.getElementById('reg-name').value = '';
@@ -3225,7 +3330,8 @@
     }
 
     function copyCompanyWallet() {
-        return copyTextFromInput('company-wallet-address', 'تم نسخ عنوان المحفظة! 📋', 'تم نسخ عنوان محفظة الشركة (USDT TRC20) بنجاح إلى الحافظة.');
+        const network = document.getElementById('deposit-network')?.value || 'TRC20';
+        return copyTextFromInput('company-wallet-address', 'تم نسخ عنوان المحفظة! 📋', `تم نسخ عنوان محفظة الشركة (USDT ${network}) بنجاح إلى الحافظة.`);
     }
 
     function openSubPage(pageId) {
@@ -3245,7 +3351,31 @@
 
     function openSupportModal() { document.getElementById('support-modal').style.display = 'flex'; }
     function closeSupportModal() { document.getElementById('support-modal').style.display = 'none'; }
-    function openDepositModal() { document.getElementById('deposit-modal').style.display = 'flex'; }
+    async function openDepositModal() {
+        document.getElementById('deposit-modal').style.display = 'flex';
+        try {
+            const result = await window.securoApi("/api/public/wallets");
+            walletAddresses = { ...walletAddresses, ...(result.wallets || {}) };
+            updateDepositWallet();
+        } catch (error) {
+            showApiError(error);
+        }
+    }
+    function updateDepositWallet() {
+        const networkSelect = document.getElementById('deposit-network');
+        const network = networkSelect?.value || 'TRC20';
+        const address = walletAddresses[network] || '';
+        const walletInput = document.getElementById('company-wallet-address');
+        const notice = document.getElementById('deposit-network-notice');
+        const submitButton = document.getElementById('deposit-submit-btn');
+        if (walletInput) walletInput.value = address;
+        if (notice) {
+            notice.innerText = address
+                ? `⚠️ الحد الأدنى للإيداع هو 10 دولار ($10). تأكد من إرسال USDT عبر شبكة ${network} حصراً.`
+                : `⚠️ لم يضف الأدمن عنواناً صالحاً لشبكة ${network} بعد؛ الإيداع عبرها غير متاح حالياً.`;
+        }
+        if (submitButton) submitButton.disabled = !address;
+    }
     function closeDepositModal() { document.getElementById('deposit-modal').style.display = 'none'; }
     function closeDepositSuccessModal() { document.getElementById('deposit-success-modal').style.display = 'none'; }
     function openWithdrawModal() { document.getElementById('withdraw-modal').style.display = 'flex'; }
@@ -3360,7 +3490,7 @@
                     <div style="font-size:3rem;margin-bottom:10px;">⏸️</div>
                     <h3 style="color:#fbbf24;margin-bottom:8px;">المهام متوقفة مؤقتاً</h3>
                     <p style="color:var(--text-muted);font-size:.88rem;line-height:1.6;">
-                        تم إيقاف مهام VIP1–VIP4 مؤقتاً من قِبل الإدارة. ستعود المهام عند تشغيلها مرة أخرى.
+                        تم إيقاف مهام VIP1–VIP6 مؤقتاً من قِبل الإدارة. ستعود المهام عند تشغيلها مرة أخرى.
                     </p>
                 </div>
             `;
@@ -3422,8 +3552,8 @@
                 ? Math.floor((Date.now() - new Date(status.startedAt).getTime()) / 1000)
                 : 0;
             const currentSec = isRunning
-                ? Math.max(0, activeTaskTimers[taskIndex]?.timeLeft ?? (60 - elapsed))
-                : 60;
+                ? Math.max(0, activeTaskTimers[taskIndex]?.timeLeft ?? (10 - elapsed))
+                : 10;
             const buttonText = isCompleted
                 ? "✅ مكتملة اليوم — المكافأة مستلمة"
                 : isRunning
@@ -3488,12 +3618,12 @@
         }, 1000);
     }
 
-    function startTaskTimer(taskIdx, comment, startedAtValue) {
+    function startTaskTimer(taskIdx, comment, startedAtValue, minimumDurationSeconds = 10) {
         if (activeTaskTimers[taskIdx]?.running) return;
         const startedAt = new Date(startedAtValue).getTime();
         activeTaskTimers[taskIdx] = {
             running: true,
-            timeLeft: Math.max(0, 60 - Math.floor((Date.now() - startedAt) / 1000))
+            timeLeft: Math.max(0, Number(minimumDurationSeconds) - Math.floor((Date.now() - startedAt) / 1000))
         };
 
         const timer = setInterval(() => {
@@ -3585,7 +3715,7 @@
                 completed: false
             },
         ];
-        startTaskTimer(taskIdx, comment, started.startedAt);
+        startTaskTimer(taskIdx, comment, started.startedAt, started.minimumDurationSeconds);
     }
 
     window.syncTaskAvailability = function (enabled) {

@@ -205,7 +205,7 @@
       if (typeof setPlatformMenuMode === "function") setPlatformMenuMode(true);
       appContainer?.classList.remove("nav-visible");
       document.getElementById("admin-screen").classList.add("active");
-      document.getElementById("header-title").innerText = "SECURO ADMIN";
+      document.getElementById("header-title").innerText = "Vault ADMIN";
       renderAdminDashboard();
       startAdminDashboardRefresh();
     } else {
@@ -213,7 +213,7 @@
       stopAdminDashboardRefresh();
       document.getElementById("bottom-nav").style.display = "flex";
       appContainer?.classList.add("nav-visible");
-      document.getElementById("header-title").innerText = "SECURO";
+      document.getElementById("header-title").innerText = "Vault";
       switchTab("home");
     }
   }
@@ -272,6 +272,7 @@
     if (depositSubmissionInFlight) return;
     const amount = Number(document.getElementById("deposit-amount").value);
     const txid = document.getElementById("deposit-txid").value.trim();
+    const network = document.getElementById("deposit-network").value;
     if (!Number.isFinite(amount) || amount < 10) {
       return showApiError(new Error("الحد الأدنى للإيداع هو 10 دولارات"));
     }
@@ -286,7 +287,7 @@
     try {
       await api("/api/deposit-requests", {
         method: "POST",
-        body: JSON.stringify({ amount, txid }),
+        body: JSON.stringify({ amount, txid, network }),
       });
       closeDepositModal();
       document.getElementById("deposit-amount").value = "";
@@ -309,7 +310,7 @@
 
   window.submitWithdraw = async function () {
     if (withdrawalSubmissionInFlight) return;
-    const bank = document.getElementById("withdraw-bank").value;
+    const network = document.getElementById("withdraw-network").value;
     const account = document.getElementById("withdraw-account").value.trim();
     const amount = Number(document.getElementById("withdraw-amount").value);
     if (!account) return showApiError(new Error("يرجى إدخال عنوان المحفظة الرقمية"));
@@ -333,7 +334,7 @@
     try {
       await api("/api/withdrawal-requests", {
         method: "POST",
-        body: JSON.stringify({ bank, account, amount }),
+        body: JSON.stringify({ network, account, amount }),
       });
       closeWithdrawModal();
       document.getElementById("withdraw-amount").value = "";
@@ -468,7 +469,7 @@
     const amount = Number(item.amount).toFixed(2);
     const detail = isDeposit
       ? `TxID: ${escapeHtml(item.txid)} | ${escapeHtml(item.network)}`
-      : `${escapeHtml(item.bank)} | ${escapeHtml(item.account)}`;
+      : `${escapeHtml(item.bank)} ${escapeHtml(item.network || "")} | ${escapeHtml(item.account)}`;
     const buttons = item.status === "pending"
       ? `<div style="display:flex;gap:6px;margin-top:8px">
           <button class="btn btn-green" style="padding:8px;font-size:.78rem" onclick="adminReview('${kind}',${item.id},'accepted')">✅ قبول</button>
@@ -615,8 +616,8 @@
       }
       if (tasksToggleStatus) {
         tasksToggleStatus.innerText = adminTasksEnabled
-          ? "المهام المدفوعة متاحة الآن لمستخدمي VIP1–VIP4."
-          : "المهام المدفوعة متوقفة الآن لمستخدمي VIP1–VIP4.";
+          ? "المهام المدفوعة متاحة الآن لمستخدمي VIP1–VIP6."
+          : "المهام المدفوعة متوقفة الآن لمستخدمي VIP1–VIP6.";
         tasksToggleStatus.style.color = adminTasksEnabled ? "#86efac" : "#fca5a5";
       }
       _allAdminUsers = data.users;
@@ -640,6 +641,7 @@
         || '<div class="history-date">لا توجد طلبات إيداع.</div>';
       document.getElementById("admin-withdrawal-requests").innerHTML = data.withdrawals.map((item) => adminRequestCard(item, "withdrawals")).join("")
         || '<div class="history-date">لا توجد طلبات سحب.</div>';
+      renderAdminPlatformSettings(data.settings);
     } catch (error) {
       showApiError(error);
     } finally {
@@ -648,7 +650,7 @@
   };
   window.adminToggleTasks = async function () {
     const nextEnabled = !adminTasksEnabled;
-    const action = nextEnabled ? "تشغيل مهام VIP1–VIP4" : "إيقاف مهام VIP1–VIP4";
+    const action = nextEnabled ? "تشغيل مهام VIP1–VIP6" : "إيقاف مهام VIP1–VIP6";
     if (!window.confirm(`هل تريد ${action}؟ الفترة التجريبية لن تتأثر بهذا الزر.`)) return;
     try {
       await api("/api/admin/tasks/status", {
@@ -657,6 +659,60 @@
       });
       await window.renderAdminDashboard();
     } catch (error) {
+      showApiError(error);
+    }
+  };
+  function renderAdminPlatformSettings(settings) {
+    if (!settings) return;
+    const fields = {
+      "admin-wallet-trc20": settings.wallets?.TRC20 || "",
+      "admin-wallet-bep20": settings.wallets?.BEP20 || "",
+      "admin-odds-0-5": settings.wheelOdds?.["0.5"] ?? 20,
+      "admin-odds-1": settings.wheelOdds?.["1"] ?? 20,
+      "admin-odds-2": settings.wheelOdds?.["2"] ?? 0,
+      "admin-odds-3": settings.wheelOdds?.["3"] ?? 20,
+      "admin-odds-50": settings.wheelOdds?.["50"] ?? 0,
+      "admin-odds-100": settings.wheelOdds?.["100"] ?? 0,
+    };
+    for (const [id, value] of Object.entries(fields)) {
+      const input = document.getElementById(id);
+      if (input && document.activeElement !== input) input.value = value;
+    }
+    const prizeSum = Object.values(settings.wheelOdds || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+    const noPrize = document.getElementById("admin-no-prize-odds");
+    if (noPrize) noPrize.innerText = `احتمال «حظ سعيد»: ${(100 - prizeSum).toFixed(2).replace(/\.00$/, "")}%`;
+  }
+
+  window.adminSavePlatformSettings = async function () {
+    const getValue = (id) => document.getElementById(id)?.value ?? "";
+    const wallets = {
+      TRC20: getValue("admin-wallet-trc20").trim(),
+      BEP20: getValue("admin-wallet-bep20").trim(),
+    };
+    const wheelOdds = {
+      "0.5": Number(getValue("admin-odds-0-5")),
+      "1": Number(getValue("admin-odds-1")),
+      "2": Number(getValue("admin-odds-2")),
+      "3": Number(getValue("admin-odds-3")),
+      "50": Number(getValue("admin-odds-50")),
+      "100": Number(getValue("admin-odds-100")),
+    };
+    const status = document.getElementById("admin-settings-status");
+    try {
+      const result = await api("/api/admin/settings", {
+        method: "POST",
+        body: JSON.stringify({ wallets, wheelOdds }),
+      });
+      renderAdminPlatformSettings(result.settings);
+      if (status) {
+        status.innerText = "تم حفظ إعدادات المحافظ واحتمالات العجلة.";
+        status.style.color = "#86efac";
+      }
+    } catch (error) {
+      if (status) {
+        status.innerText = error.message || "تعذر حفظ الإعدادات.";
+        status.style.color = "#fca5a5";
+      }
       showApiError(error);
     }
   };
@@ -695,9 +751,9 @@
     }
   };
   window.adminChangeVip = async function (userId) {
-    const name = window.prompt("اختر العضوية: VIP 1 أو VIP 2 أو VIP 3 أو VIP 4", "VIP 1");
+    const name = window.prompt("اختر العضوية: VIP 1 إلى VIP 6", "VIP 1");
     if (name === null) return;
-    if (!["VIP 1", "VIP 2", "VIP 3", "VIP 4"].includes(name.trim())) {
+    if (!["VIP 1", "VIP 2", "VIP 3", "VIP 4", "VIP 5", "VIP 6"].includes(name.trim())) {
       return showApiError(new Error("اسم عضوية VIP غير صالح"));
     }
     try {
@@ -795,7 +851,7 @@
     document.querySelector(".app-container").classList.remove("nav-visible");
     document.querySelectorAll(".screen").forEach((screen) => screen.classList.remove("active"));
     document.getElementById("auth-screen").classList.add("active");
-    document.getElementById("header-title").innerText = "SECURO";
+    document.getElementById("header-title").innerText = "Vault";
     document.getElementById("auth-email").value = "";
     document.getElementById("auth-pass").value = "";
     document.getElementById("reg-name").value = "";
@@ -819,7 +875,7 @@
     if (authScreen) authScreen.classList.add("active");
     if (bottomNav) bottomNav.style.display = "none";
     document.querySelector(".app-container").classList.remove("nav-visible");
-    document.getElementById("header-title").innerText = "SECURO";
+    document.getElementById("header-title").innerText = "Vault";
     return true;
   }
 

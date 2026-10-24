@@ -5,7 +5,7 @@ const pgSession = require("connect-pg-simple")(session);
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const helmet = require("helmet");
-const { randomInt } = require("crypto");
+const { createHash, randomInt } = require("crypto");
 
 const DATABASE_URL = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 const SESSION_SECRET = process.env.SESSION_SECRET || "fallback_secret_for_mock";
@@ -28,6 +28,11 @@ try {
   };
 }
 
+const defaultWalletAddresses = {
+  TRC20: "TKmr5pbXSEWSQ5EfFTtF5wjZRt4Y4KRKxE",
+  BEP20: "",
+};
+const defaultWheelOdds = { "0.5": 20, "1": 20, "2": 0, "3": 20, "50": 0, "100": 0 };
 const platformSettingsReady = pool.query(`
   CREATE TABLE IF NOT EXISTS platform_settings (
     setting_key VARCHAR(64) PRIMARY KEY,
@@ -40,6 +45,45 @@ const platformSettingsReady = pool.query(`
 `).catch((error) => {
   console.error("Platform settings initialization failed:", error.code || error.message);
 });
+let platformConfigCache = {
+  wallets: { ...defaultWalletAddresses },
+  wheelOdds: { ...defaultWheelOdds },
+};
+const platformConfigReady = (async () => {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS platform_config (
+      config_key VARCHAR(64) PRIMARY KEY,
+      config_value JSONB NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+  await pool.query(
+    `INSERT INTO platform_config (config_key, config_value)
+     VALUES ('wallets', $1::jsonb), ('wheel_odds', $2::jsonb)
+     ON CONFLICT (config_key) DO NOTHING`,
+    [JSON.stringify(defaultWalletAddresses), JSON.stringify(defaultWheelOdds)],
+  );
+  await refreshPlatformConfig();
+})().catch((error) => {
+  console.error("Platform configuration initialization failed:", error.code || error.message);
+});
+
+async function refreshPlatformConfig(clientOrPool = pool) {
+  const result = await clientOrPool.query(
+    "SELECT config_key, config_value FROM platform_config WHERE config_key IN ('wallets', 'wheel_odds')",
+  );
+  const values = Object.fromEntries(result.rows.map((row) => [row.config_key, row.config_value]));
+  platformConfigCache = {
+    wallets: { ...defaultWalletAddresses, ...(values.wallets || {}) },
+    wheelOdds: { ...defaultWheelOdds, ...(values.wheel_odds || {}) },
+  };
+  return platformConfigCache;
+}
+
+async function getPlatformConfig(clientOrPool = pool) {
+  await platformConfigReady;
+  return refreshPlatformConfig(clientOrPool);
+}
 
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
@@ -129,10 +173,12 @@ const trialMaxTasks = 4;
 const trialDailyMaxTasks = 2;
 const trialMaxDays = 2;
 const vipProducts = {
-  "VIP 1": { price: 14, totalTasks: 3, totalReward: 1.2 },
-  "VIP 2": { price: 24, totalTasks: 6, totalReward: 2.5 },
-  "VIP 3": { price: 54, totalTasks: 8, totalReward: 7 },
-  "VIP 4": { price: 120, totalTasks: 10, totalReward: 18 },
+  "VIP 1": { price: 14, totalTasks: 3, totalReward: 0.83 },
+  "VIP 2": { price: 25, totalTasks: 6, totalReward: 1.75 },
+  "VIP 3": { price: 57, totalTasks: 8, totalReward: 4.42 },
+  "VIP 4": { price: 122, totalTasks: 10, totalReward: 9.83 },
+  "VIP 5": { price: 200, totalTasks: 12, totalReward: 16.33 },
+  "VIP 6": { price: 301, totalTasks: 15, totalReward: 24.75 },
 };
 const wheelSectors = [
   { label: "حظ سعيد", amount: 0 },
@@ -144,8 +190,60 @@ const wheelSectors = [
   { label: "$50.00", amount: 50 },
   { label: "$100.00", amount: 100 },
 ];
-const allowedWheelSectors = [0, 1, 2, 4, 5];
-const taskMinimumDurationMs = 60 * 1000;
+const wheelPrizeSectors = [
+  { sectorIndex: 1, amount: 0.5, key: "0.5" },
+  { sectorIndex: 2, amount: 1, key: "1" },
+  { sectorIndex: 3, amount: 2, key: "2" },
+  { sectorIndex: 5, amount: 3, key: "3" },
+  { sectorIndex: 6, amount: 50, key: "50" },
+  { sectorIndex: 7, amount: 100, key: "100" },
+];
+const taskMinimumDurationSeconds = 10;
+const taskMinimumDurationMs = taskMinimumDurationSeconds * 1000;
+
+function validTronAddress(address) {
+  const value = String(address || "").trim();
+  if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(value)) return false;
+  let decoded = 0n;
+  for (const character of value) {
+    const digit = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".indexOf(character);
+    if (digit < 0) return false;
+    decoded = decoded * 58n + BigInt(digit);
+  }
+  let hex = decoded.toString(16);
+  if (hex.length % 2) hex = `0${hex}`;
+  let bytes = hex ? Buffer.from(hex, "hex") : Buffer.alloc(0);
+  let leadingZeros = 0;
+  while (value[leadingZeros] === "1") leadingZeros += 1;
+  if (leadingZeros) bytes = Buffer.concat([Buffer.alloc(leadingZeros), bytes]);
+  if (bytes.length !== 25 || bytes[0] !== 0x41) return false;
+  const payload = bytes.subarray(0, 21);
+  const checksum = createHash("sha256").update(createHash("sha256").update(payload).digest()).digest().subarray(0, 4);
+  return checksum.equals(bytes.subarray(21));
+}
+
+function isValidNetworkAddress(network, address) {
+  const value = String(address || "").trim();
+  if (network === "TRC20") return validTronAddress(value);
+  if (network === "BEP20") return /^0x[a-fA-F0-9]{40}$/.test(value);
+  return false;
+}
+
+function getWheelSectorIndex(odds) {
+  const prizeTotalBasisPoints = wheelPrizeSectors.reduce(
+    (total, prize) => total + Math.round(Number(odds[prize.key]) * 100),
+    0,
+  );
+  const roll = randomInt(10000);
+  let boundary = 0;
+  for (const prize of wheelPrizeSectors) {
+    boundary += Math.round(Number(odds[prize.key]) * 100);
+    if (roll < boundary) return prize.sectorIndex;
+  }
+  const noPrizeBasisPoints = 10000 - prizeTotalBasisPoints;
+  const firstBlankSectorBasisPoints = Math.ceil(noPrizeBasisPoints / 2);
+  return roll - prizeTotalBasisPoints < firstBlankSectorBasisPoints ? 0 : 4;
+}
 
 function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
@@ -473,6 +571,15 @@ app.get("/api/health", async (_req, res) => {
   }
 });
 
+app.get("/api/public/wallets", async (_req, res) => {
+  try {
+    const config = await getPlatformConfig();
+    res.json({ wallets: config.wallets });
+  } catch {
+    appError(res, 503, "تعذر تحميل عناوين المحافظ");
+  }
+});
+
 app.post("/api/auth/register", async (req, res) => {
   const name = String(req.body.name || "").trim();
   const email = normalizeEmail(req.body.email);
@@ -724,13 +831,14 @@ app.post("/api/vip/purchase", requireUser, async (req, res) => {
 app.post("/api/wheel/spin", requireUser, async (req, res) => {
   try {
     const result = await withTransaction(async (client) => {
+      const config = await getPlatformConfig(client);
       const locked = await client.query("SELECT * FROM users WHERE id = $1 FOR UPDATE", [req.session.userId]);
       if (!locked.rowCount) throw Object.assign(new Error("الحساب غير موجود"), { status: 404 });
       const user = locked.rows[0];
       if (Number(user.available_spins) < 1) {
         throw Object.assign(new Error("لا توجد محاولات حظ متاحة"), { status: 400 });
       }
-      const sectorIndex = allowedWheelSectors[randomInt(allowedWheelSectors.length)];
+      const sectorIndex = getWheelSectorIndex(config.wheelOdds);
       const amount = wheelSectors[sectorIndex].amount;
       const updated = await client.query(
         `UPDATE users SET available_spins = available_spins - 1,
@@ -815,7 +923,7 @@ app.post("/api/tasks/:taskIndex/start", requireUser, async (req, res) => {
          completed: false,
        };
     });
-    res.json({ ...result, minimumDurationSeconds: 60 });
+    res.json({ ...result, minimumDurationSeconds: taskMinimumDurationSeconds });
   } catch (error) {
     appError(res, error.status || 500, error.status ? error.message : "تعذر بدء المهمة");
   }
@@ -875,8 +983,8 @@ app.post("/api/tasks/:taskIndex/complete", requireUser, async (req, res) => {
       if (attempt.rows[0].comment !== comment) {
         throw Object.assign(new Error("تعليق المهمة لا يطابق التعليق المسجل عند البدء"), { status: 400 });
       }
-      if (Number(attempt.rows[0].elapsed_seconds) * 1000 < taskMinimumDurationMs) {
-        throw Object.assign(new Error("يجب الانتظار دقيقة كاملة قبل إكمال المهمة"), { status: 400 });
+       if (Number(attempt.rows[0].elapsed_seconds) * 1000 < taskMinimumDurationMs) {
+         throw Object.assign(new Error("يجب الانتظار 10 ثوانٍ قبل إكمال المهمة"), { status: 400 });
       }
       const totalRewardCents = Math.round(Number(vip.totalReward) * 100);
       const taskCount = Number(vip.totalTasks);
@@ -952,13 +1060,20 @@ app.post("/api/tasks/:taskIndex/complete", requireUser, async (req, res) => {
 app.post("/api/deposit-requests", requireUser, async (req, res) => {
   const amount = Number(req.body.amount);
   const txid = String(req.body.txid || "").trim();
+  const network = String(req.body.network || "").trim();
+  if (!["TRC20", "BEP20"].includes(network)) return appError(res, 400, "شبكة الإيداع غير صالحة");
   if (!Number.isFinite(amount) || amount < 10) return appError(res, 400, "الحد الأدنى للإيداع هو 10 دولارات");
   if (!txid || txid.length > 255) return appError(res, 400, "يرجى إدخال معرف المعاملة");
   try {
+    const config = await getPlatformConfig();
+    const walletAddress = config.wallets[network];
+    if (!walletAddress || !isValidNetworkAddress(network, walletAddress)) {
+      return appError(res, 409, `الإيداع عبر ${network} غير متاح حالياً لعدم إعداد عنوان محفظة صالح`);
+    }
     const result = await pool.query(
-      `INSERT INTO deposit_requests (user_id, amount, txid)
-       VALUES ($1, $2, $3) RETURNING id`,
-      [req.session.userId, amount.toFixed(2), txid],
+      `INSERT INTO deposit_requests (user_id, amount, txid, network, wallet_address)
+       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [req.session.userId, amount.toFixed(2), txid, `USDT ${network}`, walletAddress],
     );
     res.status(201).json({ id: result.rows[0].id });
   } catch (error) {
@@ -968,10 +1083,13 @@ app.post("/api/deposit-requests", requireUser, async (req, res) => {
 });
 
 app.post("/api/withdrawal-requests", requireUser, async (req, res) => {
-  const bank = String(req.body.bank || "").trim();
+  const network = String(req.body.network || "").trim();
   const account = String(req.body.account || "").trim();
   const amount = Number(req.body.amount);
-  if (!bank || !account) return appError(res, 400, "يرجى إدخال بيانات المحفظة");
+  if (!["TRC20", "BEP20"].includes(network)) return appError(res, 400, "شبكة السحب غير صالحة");
+  if (!isValidNetworkAddress(network, account)) {
+    return appError(res, 400, `عنوان المحفظة لا يتوافق مع شبكة ${network}`);
+  }
   if (!Number.isFinite(amount) || amount < 10) return appError(res, 400, "الحد الأدنى للسحب هو 10 دولارات");
   try {
     const result = await withTransaction(async (client) => {
@@ -992,9 +1110,9 @@ app.post("/api/withdrawal-requests", requireUser, async (req, res) => {
         throw Object.assign(new Error("رصيدك غير كافٍ"), { status: 400 });
       }
       const request = await client.query(
-        `INSERT INTO withdrawal_requests (user_id, bank, account, amount)
-         VALUES ($1, $2, $3, $4) RETURNING id`,
-        [req.session.userId, bank, account, amount.toFixed(2)],
+        `INSERT INTO withdrawal_requests (user_id, bank, account, amount, network)
+         VALUES ($1, 'USDT', $2, $3, $4) RETURNING id`,
+        [req.session.userId, account, amount.toFixed(2), network],
       );
       await client.query(
         `UPDATE users SET reserved_balance = reserved_balance + $1, updated_at = NOW()
@@ -1011,7 +1129,7 @@ app.post("/api/withdrawal-requests", requireUser, async (req, res) => {
 
 app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
   try {
-    const [users, deposits, withdrawals, stats, tasksEnabled] = await Promise.all([
+      const [users, deposits, withdrawals, stats, tasksEnabled, settings] = await Promise.all([
       pool.query(
         `SELECT u.id, u.email, u.name, u.referral_code, u.is_admin, u.is_blocked, u.can_withdraw,
                 u.balance, u.reserved_balance, u.user_vip, u.created_at,
@@ -1052,13 +1170,13 @@ app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
          ORDER BY u.created_at DESC`,
       ),
       pool.query(
-        `SELECT d.id, d.amount, d.txid, d.network, d.status, d.created_at,
+        `SELECT d.id, d.amount, d.txid, d.network, d.wallet_address, d.status, d.created_at,
                 u.name, u.email
          FROM deposit_requests d JOIN users u ON u.id = d.user_id
           ORDER BY d.created_at DESC`,
       ),
       pool.query(
-        `SELECT w.id, w.amount, w.bank, w.account, w.status, w.created_at,
+        `SELECT w.id, w.amount, w.bank, w.account, w.network, w.status, w.created_at,
                 u.name, u.email
          FROM withdrawal_requests w JOIN users u ON u.id = w.user_id
           ORDER BY w.created_at DESC`,
@@ -1072,6 +1190,7 @@ app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
            (SELECT COUNT(*) FROM withdrawal_requests WHERE status = 'accepted') AS withdrawal_count`,
       ),
       getTasksEnabled(),
+      getPlatformConfig(),
     ]);
     res.json({
       users: users.rows.map((row) => ({
@@ -1089,9 +1208,51 @@ app.get("/api/admin/overview", requireAdmin, async (_req, res) => {
         withdrawalCount: Number(stats.rows[0].withdrawal_count || 0),
       },
       tasksEnabled,
+      settings: {
+        wallets: settings.wallets,
+        wheelOdds: settings.wheelOdds,
+        vipProducts,
+      },
     });
   } catch {
     appError(res, 500, "تعذر تحميل لوحة الإدارة");
+  }
+});
+
+app.post("/api/admin/settings", requireAdmin, async (req, res) => {
+  const wallets = req.body.wallets || {};
+  const wheelOdds = req.body.wheelOdds || {};
+  const expectedPrizeKeys = wheelPrizeSectors.map((prize) => prize.key);
+  const oddsValues = expectedPrizeKeys.map((key) => Number(wheelOdds[key]));
+  if (
+    !isValidNetworkAddress("TRC20", wallets.TRC20) ||
+    (String(wallets.BEP20 || "").trim() && !isValidNetworkAddress("BEP20", wallets.BEP20)) ||
+    oddsValues.some((value) => !Number.isFinite(value) || value < 0 || value > 100 || Math.abs(value * 100 - Math.round(value * 100)) > 1e-7) ||
+    oddsValues.reduce((sum, value) => sum + value, 0) > 100
+  ) {
+    return appError(res, 400, "تحقق من عناوين المحافظ والنسب؛ يجب ألا يتجاوز مجموع احتمالات الجوائز 100%");
+  }
+  try {
+    await platformConfigReady;
+    await withTransaction(async (client) => {
+      await client.query(
+        `INSERT INTO platform_config (config_key, config_value)
+         VALUES ('wallets', $1::jsonb), ('wheel_odds', $2::jsonb)
+         ON CONFLICT (config_key)
+         DO UPDATE SET config_value = EXCLUDED.config_value, updated_at = NOW()`,
+        [
+          JSON.stringify({
+            TRC20: String(wallets.TRC20).trim(),
+            BEP20: String(wallets.BEP20 || "").trim(),
+          }),
+          JSON.stringify(Object.fromEntries(expectedPrizeKeys.map((key, index) => [key, oddsValues[index]]))),
+        ],
+      );
+    });
+    const settings = await getPlatformConfig();
+    res.json({ settings });
+  } catch {
+    appError(res, 500, "تعذر حفظ إعدادات المنصة");
   }
 });
 
@@ -1523,6 +1684,20 @@ app.post("/api/admin/deposits/:id/review", requireAdmin, async (req, res) => {
       if (request.status !== "pending") {
         throw Object.assign(new Error("تمت مراجعة هذا الطلب سابقاً"), { status: 409 });
       }
+      if (
+        status === "accepted" &&
+        request.wallet_address &&
+        !isValidNetworkAddress(String(request.network || "").replace(/^USDT\s+/, ""), request.wallet_address)
+      ) {
+        throw Object.assign(new Error("عنوان المحفظة المسجل لا يتوافق مع شبكة طلب الإيداع"), { status: 409 });
+      }
+      if (
+        status === "accepted" &&
+        request.network &&
+        !["USDT TRC20", "USDT BEP20"].includes(request.network)
+      ) {
+        throw Object.assign(new Error("شبكة الإيداع المسجلة غير صالحة"), { status: 409 });
+      }
       await client.query(
         `UPDATE deposit_requests SET status = $1, reviewed_by = $2, reviewed_at = NOW()
          WHERE id = $3`,
@@ -1597,6 +1772,9 @@ app.post("/api/admin/withdrawals/:id/review", requireAdmin, async (req, res) => 
         throw Object.assign(new Error("تمت مراجعة هذا الطلب سابقاً"), { status: 409 });
       }
       if (status === "accepted") {
+        if (request.network && !isValidNetworkAddress(request.network, request.account)) {
+          throw Object.assign(new Error("عنوان السحب لا يتوافق مع الشبكة المختارة"), { status: 409 });
+        }
         const updatedUser = await client.query(
           `UPDATE users
            SET balance = balance - $1, reserved_balance = reserved_balance - $1, updated_at = NOW()
@@ -1644,7 +1822,7 @@ app.get("/{*splat}", (_req, res) => res.sendFile(path.join(publicDir, "index.htm
 
 if (require.main === module) {
   const server = app.listen(PORT, "0.0.0.0", () => {
-    console.log(`SECURO server listening on port ${PORT}`);
+    console.log(`Vault server listening on port ${PORT}`);
   });
 
   process.on("SIGTERM", () => {

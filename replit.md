@@ -1,8 +1,8 @@
-# SECURO
+# Vault
 
 ## Project overview
 
-SECURO is an Arabic Node.js/Express application with a PostgreSQL database. The
+Vault is an Arabic Node.js/Express application with a PostgreSQL database. The
 backend exposes the `/api` routes and the static frontend is in `attached_assets/`.
 
 ## Deployment layout
@@ -91,11 +91,18 @@ Those values are changed only by authenticated backend transactions:
 - `POST /api/rewards/daily`, `/api/vip/trial`, `/api/vip/purchase`, and
   `/api/wheel/spin` perform their checks and balance changes on the server.
 - `/api/tasks/:taskIndex/start` and `/complete` use `task_attempts`; the server
-  validates membership, order, one attempt per day, comment, and the 60-second
+  validates membership, order, one attempt per day, comment, and the 10-second
   minimum duration.
 - Each successful paid VIP activation increments `users.available_spins` and
   records exactly one `vip_activation` grant in `wheel_spin_grants` within the
   same PostgreSQL transaction. `/api/wheel/spin` locks the user row and
   atomically consumes one persisted opportunity before crediting any prize.
+
+## Vault platform settings
+
+Run `npm run db:init` against the intended database after schema changes. This
+adds editable TRC20/BEP20 wallet settings and persisted wheel prize odds, keeps
+the existing TRC20 address, and applies the published VIP daily totals to paid
+membership snapshots without changing account balances or task counts.
 
 After schema changes, run `npm run db:init` against the intended Neon database.

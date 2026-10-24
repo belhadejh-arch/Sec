@@ -103,12 +103,16 @@ CREATE TABLE IF NOT EXISTS deposit_requests (
   amount NUMERIC(14, 2) NOT NULL CHECK (amount >= 10),
   txid VARCHAR(255) NOT NULL UNIQUE,
   network VARCHAR(32) NOT NULL DEFAULT 'USDT TRC20',
+  wallet_address VARCHAR(255),
   status VARCHAR(16) NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending', 'accepted', 'rejected')),
   reviewed_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
   reviewed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE deposit_requests
+  ADD COLUMN IF NOT EXISTS wallet_address VARCHAR(255);
 
 CREATE INDEX IF NOT EXISTS deposit_requests_status_idx
   ON deposit_requests(status, created_at DESC);
@@ -118,6 +122,7 @@ CREATE TABLE IF NOT EXISTS withdrawal_requests (
   user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   bank VARCHAR(32) NOT NULL,
   account VARCHAR(255) NOT NULL,
+  network VARCHAR(16),
   amount NUMERIC(14, 2) NOT NULL CHECK (amount >= 10),
   status VARCHAR(16) NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending', 'accepted', 'rejected')),
@@ -125,6 +130,9 @@ CREATE TABLE IF NOT EXISTS withdrawal_requests (
   reviewed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE withdrawal_requests
+  ADD COLUMN IF NOT EXISTS network VARCHAR(16);
 
 CREATE INDEX IF NOT EXISTS withdrawal_requests_status_idx
   ON withdrawal_requests(status, created_at DESC);
@@ -210,6 +218,50 @@ CREATE TABLE IF NOT EXISTS platform_settings (
   enabled BOOLEAN NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS platform_config (
+  config_key VARCHAR(64) PRIMARY KEY,
+  config_value JSONB NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO platform_config (config_key, config_value)
+VALUES
+  ('wallets', '{"TRC20":"TKmr5pbXSEWSQ5EfFTtF5wjZRt4Y4KRKxE","BEP20":""}'::jsonb),
+  ('wheel_odds', '{"0.5":20,"1":20,"2":0,"3":20,"50":0,"100":0}'::jsonb)
+ON CONFLICT (config_key) DO NOTHING;
+
+-- Apply the published daily task totals to active paid memberships without
+-- changing each user's existing task count, expiration, or balance.
+UPDATE users
+SET user_vip = jsonb_set(
+  jsonb_set(
+    user_vip,
+    '{price}',
+    to_jsonb(CASE user_vip->>'name'
+      WHEN 'VIP 1' THEN 14
+      WHEN 'VIP 2' THEN 25
+      WHEN 'VIP 3' THEN 57
+      WHEN 'VIP 4' THEN 122
+      WHEN 'VIP 5' THEN 200
+      WHEN 'VIP 6' THEN 301
+    END),
+    TRUE
+  ),
+  '{totalReward}',
+  to_jsonb(CASE user_vip->>'name'
+    WHEN 'VIP 1' THEN 0.83
+    WHEN 'VIP 2' THEN 1.75
+    WHEN 'VIP 3' THEN 4.42
+    WHEN 'VIP 4' THEN 9.83
+    WHEN 'VIP 5' THEN 16.33
+    WHEN 'VIP 6' THEN 24.75
+  END),
+  TRUE
+)
+WHERE user_vip IS NOT NULL
+  AND COALESCE(user_vip->>'isTrial', 'false') <> 'true'
+  AND user_vip->>'name' IN ('VIP 1', 'VIP 2', 'VIP 3', 'VIP 4', 'VIP 5', 'VIP 6');
 
 INSERT INTO platform_settings (setting_key, enabled)
 VALUES ('tasks_enabled', TRUE)
