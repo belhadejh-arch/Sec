@@ -1672,6 +1672,27 @@
         .brand-symbol { flex: 0 0 auto; }
         .btn-primary { background: var(--primary-gradient); color: #171000; }
         .btn-gold { background: var(--vip-gold); color: #171000; }
+        .auth-card {
+            position: relative; isolation: isolate; overflow: hidden;
+            background: linear-gradient(155deg, rgba(20, 18, 12, .98), rgba(8, 8, 8, .98)) !important;
+            border: 1px solid rgba(242, 189, 34, .32) !important;
+            box-shadow: 0 18px 48px rgba(0, 0, 0, .4), 0 0 28px rgba(242, 189, 34, .06);
+        }
+        .auth-card::before {
+            content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+            background: url("Business_Suite_creation_1555674689649841_1792808792698.jpeg") center 52% / min(76%, 320px) no-repeat;
+            opacity: .12; mix-blend-mode: screen;
+        }
+        .auth-card > * { position: relative; z-index: 1; }
+        .auth-card input {
+            color: #f7f3e7; background: rgba(0, 0, 0, .54);
+            border-color: rgba(242, 189, 34, .2);
+        }
+        .auth-card input:focus {
+            border-color: #f2bd22;
+            box-shadow: 0 0 0 3px rgba(242, 189, 34, .12);
+        }
+        .auth-card #toggle-text { color: #f4c542 !important; }
         .input:focus, input:focus, select:focus, textarea:focus { border-color: #f2bd22; }
         .admin-hero {
             background: linear-gradient(135deg, #191507 0%, #332400 58%, #111111 140%);
