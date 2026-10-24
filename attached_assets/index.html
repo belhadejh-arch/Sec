@@ -2241,6 +2241,170 @@
             background: linear-gradient(180deg, var(--vault-gold-bright), var(--vault-gold-deep));
             border-radius: 999px;
         }
+
+        /* VIP purchase feedback — branded in-app dialog, never a browser alert */
+        #vip-confirm-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+            background: rgba(6, 5, 3, .78);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+        #vip-confirm-modal .vip-modal-card {
+            position: relative;
+            width: min(100%, 430px);
+            max-height: calc(100dvh - 32px);
+            overflow-y: auto;
+            margin: auto;
+            padding: clamp(24px, 6vw, 32px);
+            border: 1px solid rgba(232, 187, 85, .38) !important;
+            border-radius: 24px;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(232, 187, 85, .14), transparent 58%),
+                linear-gradient(155deg, #211b10 0%, #15120c 58%, #100e0a 100%) !important;
+            box-shadow: 0 28px 90px rgba(0, 0, 0, .62), 0 0 38px rgba(232, 187, 85, .11);
+            text-align: center;
+            animation: vipDialogEnter .24s cubic-bezier(.2, .75, .25, 1) both;
+        }
+        #vip-confirm-modal .vip-modal-dismiss {
+            position: absolute;
+            top: 12px;
+            inset-inline-end: 12px;
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border: 1px solid rgba(232, 187, 85, .18);
+            border-radius: 50%;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, .035);
+            cursor: pointer;
+            transition: color .18s ease, background .18s ease, border-color .18s ease;
+        }
+        #vip-confirm-modal .vip-modal-dismiss:hover {
+            color: var(--vault-gold-bright);
+            background: rgba(232, 187, 85, .1);
+            border-color: rgba(232, 187, 85, .4);
+        }
+        #vip-confirm-modal .vip-modal-icon {
+            display: grid;
+            place-items: center;
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 18px;
+            border: 1px solid rgba(232, 187, 85, .38);
+            border-radius: 50%;
+            color: var(--vault-gold-bright);
+            background: radial-gradient(circle, rgba(232, 187, 85, .18), rgba(232, 187, 85, .045));
+            box-shadow: inset 0 0 20px rgba(232, 187, 85, .08), 0 8px 26px rgba(0, 0, 0, .22);
+        }
+        #vip-confirm-modal .vip-modal-icon svg { display: none; width: 34px; height: 34px; }
+        #vip-confirm-modal .vip-modal-icon[data-state="confirm"] .vip-icon-confirm,
+        #vip-confirm-modal .vip-modal-icon[data-state="loading"] .vip-icon-loading,
+        #vip-confirm-modal .vip-modal-icon[data-state="success"] .vip-icon-success,
+        #vip-confirm-modal .vip-modal-icon[data-state="error"] .vip-icon-error { display: block; }
+        #vip-confirm-modal .vip-modal-icon[data-state="success"] {
+            color: #80d9aa;
+            border-color: rgba(91, 193, 137, .45);
+            background: radial-gradient(circle, rgba(49, 161, 105, .2), rgba(49, 161, 105, .05));
+        }
+        #vip-confirm-modal .vip-modal-icon[data-state="error"] {
+            color: #f0a49a;
+            border-color: rgba(220, 101, 86, .42);
+            background: radial-gradient(circle, rgba(220, 101, 86, .16), rgba(220, 101, 86, .04));
+        }
+        #vip-confirm-modal .vip-icon-loading { animation: vipIconSpin .9s linear infinite; }
+        #vip-confirm-modal .vip-modal-title {
+            margin: 0 0 8px;
+            color: #fff8e6;
+            font-size: clamp(1.2rem, 4.5vw, 1.45rem);
+            font-weight: 700;
+            line-height: 1.45;
+        }
+        #vip-confirm-modal .vip-modal-msg {
+            margin: 0 auto 18px;
+            max-width: 34ch;
+            color: #c8bea8;
+            font-size: .95rem;
+            line-height: 1.8;
+            white-space: normal;
+        }
+        #vip-confirm-modal .vip-modal-msg.is-error { color: #f0a49a; }
+        #vip-confirm-modal .vip-modal-plan {
+            display: grid;
+            gap: 3px;
+            margin: 0 0 22px;
+            padding: 13px 16px;
+            border: 1px solid rgba(232, 187, 85, .2);
+            border-radius: 16px;
+            background: rgba(232, 187, 85, .055);
+        }
+        #vip-confirm-modal .vip-modal-plan-label {
+            color: #aa9d82;
+            font-size: .77rem;
+        }
+        #vip-confirm-modal .vip-modal-plan-name {
+            color: var(--vault-gold-bright);
+            font-size: 1.08rem;
+            font-weight: 700;
+        }
+        #vip-confirm-modal .vip-modal-plan-details {
+            color: #ddd1b6;
+            font-size: .85rem;
+        }
+        #vip-confirm-modal .vip-modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        #vip-confirm-modal .vip-modal-button {
+            display: inline-flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 11px 16px;
+            border: 1px solid transparent;
+            border-radius: 14px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .16s ease, filter .16s ease, border-color .16s ease;
+        }
+        #vip-confirm-modal .vip-modal-button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.06); }
+        #vip-confirm-modal .vip-modal-button:active:not(:disabled) { transform: translateY(0); }
+        #vip-confirm-modal .vip-modal-button:focus-visible,
+        #vip-confirm-modal .vip-modal-dismiss:focus-visible {
+            outline: 3px solid rgba(244, 215, 130, .6);
+            outline-offset: 3px;
+        }
+        #vip-confirm-modal .vip-modal-button:disabled { opacity: .72; cursor: wait; }
+        #vip-confirm-modal .vip-modal-button-primary {
+            color: #191306 !important;
+            background: linear-gradient(135deg, #f4d782 0%, #e8bb55 54%, #bd882b 100%) !important;
+            box-shadow: 0 8px 20px rgba(176, 126, 34, .22);
+        }
+        #vip-confirm-modal .vip-modal-button-secondary {
+            color: #d2c8b3 !important;
+            background: rgba(255, 255, 255, .035) !important;
+            border-color: rgba(232, 187, 85, .18) !important;
+        }
+        #vip-confirm-modal .vip-modal-success-action { width: 100%; }
+        @keyframes vipDialogEnter {
+            from { opacity: 0; transform: translateY(12px) scale(.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes vipIconSpin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            #vip-confirm-modal .vip-modal-card { animation: none; }
+            #vip-confirm-modal .vip-modal-icon[data-state="loading"] .vip-icon-loading { animation-duration: 2s; }
+        }
     </style>
 </head>
 <body>
@@ -3034,16 +3198,41 @@
         </div>
     </div>
 
-    <div id="vip-confirm-modal" class="modal">
-        <div class="modal-content">
-            <div id="vip-modal-icon" style="font-size: 3rem; margin-bottom: 8px;">🛍️</div>
-            <h3 id="vip-modal-title" style="color: var(--text-white); margin-bottom: 10px;">تأكيد شراء العضوية</h3>
-            <p id="vip-modal-msg" style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;"></p>
-            <div id="vip-modal-actions" style="display: flex; gap: 10px;">
-                <button type="button" class="btn btn-green" id="vip-confirm-yes-btn" style="flex:1;" onclick="window.confirmBuyVip(event)">نعم</button>
-                <button type="button" class="btn btn-red" style="flex:1;" onclick="closeVipModal()">لا</button>
+    <div id="vip-confirm-modal" class="modal" aria-hidden="true">
+        <div class="modal-content vip-modal-card" role="dialog" aria-modal="true" aria-labelledby="vip-modal-title" aria-describedby="vip-modal-msg">
+            <button type="button" class="vip-modal-dismiss" aria-label="إغلاق النافذة" onclick="closeVipModal()">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                    <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div id="vip-modal-icon" class="vip-modal-icon" data-state="confirm" aria-hidden="true">
+                <svg class="vip-icon-confirm" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 8.5 8.3 11 12 5l3.7 6L19 8.5l-1.8 9H6.8L5 8.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                    <path d="M7 20h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+                <svg class="vip-icon-loading" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity=".25" stroke-width="2"/>
+                    <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <svg class="vip-icon-success" viewBox="0 0 24 24" fill="none">
+                    <path d="m5 12.5 4.4 4.2L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <svg class="vip-icon-error" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 8v5m0 3h.01M10.3 4.9 2.9 18a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 4.9a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
             </div>
-            <button type="button" id="vip-modal-close-btn" class="btn btn-primary" style="display:none;" onclick="closeVipModal()">حسناً</button>
+            <h3 id="vip-modal-title" class="vip-modal-title" aria-live="polite">تأكيد شراء العضوية</h3>
+            <p id="vip-modal-msg" class="vip-modal-msg" aria-live="polite"></p>
+            <div id="vip-modal-plan" class="vip-modal-plan">
+                <span class="vip-modal-plan-label">العضوية المختارة</span>
+                <span id="vip-modal-plan-name" class="vip-modal-plan-name">VIP</span>
+                <span id="vip-modal-plan-details" class="vip-modal-plan-details"></span>
+            </div>
+            <div id="vip-modal-actions" class="vip-modal-actions">
+                <button type="button" class="vip-modal-button vip-modal-button-primary" id="vip-confirm-yes-btn" onclick="window.confirmBuyVip(event)">تأكيد الشراء</button>
+                <button type="button" class="vip-modal-button vip-modal-button-secondary" id="vip-confirm-cancel-btn" onclick="closeVipModal()">إلغاء</button>
+            </div>
+            <button type="button" id="vip-modal-close-btn" class="vip-modal-button vip-modal-button-primary vip-modal-success-action" style="display:none;" onclick="continueAfterVipPurchase()">الانتقال إلى المهام</button>
         </div>
     </div>
 
@@ -3858,41 +4047,91 @@
     function closeWithdrawSuccessModal() { document.getElementById('withdraw-success-modal').style.display = 'none'; }
     function closeInsufficientModal() { document.getElementById('insufficient-modal').style.display = 'none'; }
 
+    function setVipModalStatus(state, title, message) {
+        const modal = document.getElementById('vip-confirm-modal');
+        const icon = document.getElementById('vip-modal-icon');
+        const titleElement = document.getElementById('vip-modal-title');
+        const messageElement = document.getElementById('vip-modal-msg');
+        if (icon) icon.dataset.state = state;
+        if (titleElement) titleElement.textContent = title;
+        if (messageElement) {
+            messageElement.textContent = message;
+            messageElement.classList.toggle('is-error', state === 'error');
+        }
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+        }
+    }
+
+    function showVipPurchaseError(message) {
+        setVipModalStatus('error', 'تعذر تفعيل العضوية', message || 'حدث خطأ أثناء تفعيل العضوية. حاول مرة أخرى.');
+        const actions = document.getElementById('vip-modal-actions');
+        const confirmBtn = document.getElementById('vip-confirm-yes-btn');
+        const cancelBtn = document.getElementById('vip-confirm-cancel-btn');
+        const closeBtn = document.getElementById('vip-modal-close-btn');
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'إعادة المحاولة';
+            confirmBtn.setAttribute('aria-busy', 'false');
+        }
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+            cancelBtn.textContent = 'إغلاق';
+            cancelBtn.style.display = 'inline-flex';
+        }
+        if (actions) actions.style.display = 'flex';
+        if (closeBtn) closeBtn.style.display = 'none';
+    }
+
     function buyVipProduct(name, price, totalTasks, totalReward) {
         pendingVip = { name, price, totalTasks, totalReward, isTrial: false };
         const modal = document.getElementById('vip-confirm-modal');
         const actions = document.getElementById('vip-modal-actions');
         const closeBtn = document.getElementById('vip-modal-close-btn');
         const confirmBtn = document.getElementById('vip-confirm-yes-btn');
+        const cancelBtn = document.getElementById('vip-confirm-cancel-btn');
 
         if (confirmBtn) {
             confirmBtn.disabled = false;
-            confirmBtn.innerText = "نعم";
+            confirmBtn.textContent = "تأكيد الشراء";
             confirmBtn.setAttribute("aria-busy", "false");
         }
+        if (cancelBtn) {
+            cancelBtn.disabled = false;
+            cancelBtn.textContent = "إلغاء";
+            cancelBtn.style.display = "inline-flex";
+        }
+        closeBtn.onclick = continueAfterVipPurchase;
         // The server is the source of truth for the available balance. Do not
         // block the purchase here using a possibly stale client-side balance:
         // VIP purchases are allowed at any time and the API performs the
         // final atomic balance check after the user confirms with "نعم".
-        document.getElementById('vip-modal-icon').innerText = "❓";
-        document.getElementById('vip-modal-title').innerText = "تأكيد شراء العضوية";
-        document.getElementById('vip-modal-msg').innerText = `هل أنت متأكد من شراء عضوية ${name} بسعر $${price} (مدة الصلاحية: 365 يوماً)؟\nسيتم التحقق من الرصيد المتاح وتنفيذ الشراء فوراً.`;
+        setVipModalStatus('confirm', "تأكيد شراء العضوية", "ستُفعّل العضوية لمدة 365 يوماً بعد التحقق من الرصيد المتاح.");
+        document.getElementById('vip-modal-plan-name').textContent = name;
+        document.getElementById('vip-modal-plan-details').textContent = `$${price} · 365 يوماً`;
         actions.style.display = "flex";
         closeBtn.style.display = "none";
-        modal.style.display = "flex";
+        modal.setAttribute("aria-hidden", "false");
+        confirmBtn?.focus();
     }
 
     async function confirmBuyVip(event) {
         event?.preventDefault();
         if (!pendingVip) {
-            showApiError(new Error("يرجى اختيار عضوية VIP أولاً"));
+            setVipModalStatus('error', 'لم يتم اختيار عضوية', 'أغلق هذه النافذة واختر إحدى عضويات VIP للمتابعة.');
+            document.getElementById('vip-modal-actions').style.display = 'none';
+            const closeBtn = document.getElementById('vip-modal-close-btn');
+            closeBtn.textContent = 'إغلاق';
+            closeBtn.style.display = 'inline-flex';
+            closeBtn.onclick = closeVipModal;
             return;
         }
         const confirmBtn = document.getElementById('vip-confirm-yes-btn');
         if (confirmBtn?.disabled) return;
         const vipToBuy = { ...pendingVip };
         if (!window.securoApi) {
-            showApiError(new Error("الخادم غير جاهز بعد، يرجى المحاولة مرة أخرى"));
+            showVipPurchaseError("الخادم غير جاهز بعد. تحقق من الاتصال وحاول مرة أخرى.");
             return;
         }
         if (confirmBtn) {
@@ -3900,6 +4139,8 @@
             confirmBtn.innerText = "جارٍ التأكيد...";
             confirmBtn.setAttribute("aria-busy", "true");
         }
+        document.getElementById('vip-confirm-cancel-btn').style.display = 'none';
+        setVipModalStatus('loading', 'جارٍ تفعيل العضوية', 'يتم تأكيد العملية وتحديث حسابك بأمان.');
         try {
             const result = await window.securoApi("/api/vip/purchase", {
                 method: "POST",
@@ -3913,27 +4154,31 @@
             taskStatuses = result.taskStatuses || [];
             activeTaskTimers = {};
             pendingVip = null;
-            closeVipModal();
-            alert(`🎉 تم تفعيل الاشتراك ${result.user.userVip.name} بنجاح. بدأت الآن مهام ${result.user.userVip.name} الخاصة بك.`);
-            switchTab('tasks');
+            const activeVipName = result.user.userVip?.name || vipToBuy.name;
+            document.getElementById('vip-modal-plan-name').textContent = activeVipName;
+            setVipModalStatus('success', 'تم تفعيل العضوية بنجاح', 'أصبحت عضويتك نشطة. يمكنك الآن متابعة مهام VIP من صفحة المهام.');
+            document.getElementById('vip-modal-actions').style.display = 'none';
+            const successButton = document.getElementById('vip-modal-close-btn');
+            successButton.textContent = 'الانتقال إلى المهام';
+            successButton.onclick = continueAfterVipPurchase;
+            successButton.style.display = 'inline-flex';
         } catch (error) {
-            if (confirmBtn) {
-                confirmBtn.disabled = false;
-                confirmBtn.innerText = "نعم";
-                confirmBtn.setAttribute("aria-busy", "false");
-            }
-            const message = document.getElementById('vip-modal-msg');
-            if (message) {
-                message.innerText = error.message || "تعذر تأكيد شراء العضوية";
-                message.style.color = "#fca5a5";
-            }
-            showApiError(error);
+            showVipPurchaseError(error.message || "تعذر تأكيد شراء العضوية. حاول مرة أخرى.");
         }
     }
 
     window.confirmBuyVip = confirmBuyVip;
 
-    function closeVipModal() { document.getElementById('vip-confirm-modal').style.display = "none"; }
+    function closeVipModal() {
+        const modal = document.getElementById('vip-confirm-modal');
+        modal.style.display = "none";
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function continueAfterVipPurchase() {
+        closeVipModal();
+        switchTab('tasks');
+    }
 
     function renderTasksScreen() {
         const statusEl = document.getElementById('task-vip-status');

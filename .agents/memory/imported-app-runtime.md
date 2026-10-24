@@ -7,4 +7,4 @@ The Replit webview workflow expects the Express server to listen on the injected
 
 **Why:** A server hardcoded to another port makes the workflow appear broken even when the application is healthy. A `Secure` cookie is silently omitted over HTTP, so login can return success while the next authenticated request is anonymous. A failed dependency install prevents all routes from starting.
 
-**How to apply:** Check the workflow's `waitForPort` against the server's listen call before debugging application routes; install dependencies with the project's lockfile and an explicit public npm registry only when the managed package installer cannot resolve the package.
+**How to apply:** Check the workflow's `waitForPort` against the server's listen call before debugging application routes; install dependencies with the project's lockfile and an explicit public npm registry only when the managed package installer cannot resolve the package. Before committing any newly generated lockfile, check its `resolved` URLs and do not ship private Replit registry links to external hosts; regenerate against the public registry or omit an optional nested lockfile.
