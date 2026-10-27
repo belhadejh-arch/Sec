@@ -200,7 +200,7 @@
       if (typeof setPlatformMenuMode === "function") setPlatformMenuMode(true);
       appContainer?.classList.remove("nav-visible");
       document.getElementById("admin-screen").classList.add("active");
-      document.getElementById("header-title").innerText = "Vault ADMIN";
+      document.getElementById("header-title").innerText = "Tarnoy ADMIN";
       renderAdminDashboard();
       startAdminDashboardRefresh();
     } else {
@@ -208,7 +208,7 @@
       stopAdminDashboardRefresh();
       document.getElementById("bottom-nav").style.display = "flex";
       appContainer?.classList.add("nav-visible");
-      document.getElementById("header-title").innerText = "Vault";
+      document.getElementById("header-title").innerText = "Tarnoy";
       switchTab("home");
     }
   }
@@ -927,7 +927,7 @@
     document.querySelector(".app-container").classList.remove("nav-visible");
     document.querySelectorAll(".screen").forEach((screen) => screen.classList.remove("active"));
     document.getElementById("auth-screen").classList.add("active");
-    document.getElementById("header-title").innerText = "Vault";
+    document.getElementById("header-title").innerText = "Tarnoy";
     document.getElementById("auth-email").value = "";
     document.getElementById("auth-pass").value = "";
     document.getElementById("reg-name").value = "";
@@ -951,7 +951,7 @@
     if (authScreen) authScreen.classList.add("active");
     if (bottomNav) bottomNav.style.display = "none";
     document.querySelector(".app-container").classList.remove("nav-visible");
-    document.getElementById("header-title").innerText = "Vault";
+    document.getElementById("header-title").innerText = "Tarnoy";
     return true;
   }
 

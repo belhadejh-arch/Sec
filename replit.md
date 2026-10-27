@@ -1,8 +1,8 @@
-# Vault
+# Tarnoy
 
 ## Project overview
 
-Vault is an Arabic Node.js/Express application with a PostgreSQL database. The
+Tarnoy is an Arabic Node.js/Express application with a PostgreSQL database. The
 backend exposes the `/api` routes and the static frontend is in `attached_assets/`.
 
 ## Deployment layout
@@ -17,14 +17,14 @@ contains the service configuration:
 - Build command: `npm install --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/ && npm run build`
 - Start command: `npm start`
 - Health check: `/api/health`
-- Runtime: Node.js 20 (`.node-version` / `NODE_VERSION`)
+- Runtime: Node.js 24 (`.node-version` / `NODE_VERSION`)
 
 Required environment variables:
 
 - `NODE_ENV=production`
 - `NEON_DATABASE_URL` — PostgreSQL/Neon connection string
 - `SESSION_SECRET` — long random session secret
-- `FRONTEND_URL` — `https://sec-rosy.vercel.app`
+- `FRONTEND_URL` — `https://tarnoy.xyz,https://www.tarnoy.xyz`
 - `COOKIE_SAME_SITE=none`
 
 Run database initialization once before first use:
@@ -55,7 +55,7 @@ no-cache headers. The current Render service URL in that file is
 
 1. Create the PostgreSQL database and initialize it with `npm run db:init`.
 2. Deploy the repository root to Render and copy the backend URL.
-3. Set the Render `FRONTEND_URL` to the final Vercel URL.
+3. Set the Render `FRONTEND_URL` to `https://tarnoy.xyz,https://www.tarnoy.xyz`.
 4. Replace the backend destination in `attached_assets/vercel.json`.
 5. Deploy `attached_assets` to Vercel.
 6. Confirm `GET https://<render-service>/api/health` returns JSON.
@@ -98,7 +98,7 @@ Those values are changed only by authenticated backend transactions:
   same PostgreSQL transaction. `/api/wheel/spin` locks the user row and
   atomically consumes one persisted opportunity before crediting any prize.
 
-## Vault platform settings
+## Tarnoy platform settings
 
 Run `npm run db:init` against the intended database after schema changes. This
 adds editable TRC20/BEP20 wallet settings and persisted wheel prize odds, keeps

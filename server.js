@@ -100,10 +100,8 @@ const allowedOrigins = [
   frontendUrl,
   "https://securo-m9ei-seven.vercel.app",
   "https://sec-rosy.vercel.app",
-  "https://valutpro.online",
-  "https://www.valutpro.online",
-  "https://valoriza.space",
-  "https://www.valoriza.space",
+  "https://tarnoy.xyz",
+  "https://www.tarnoy.xyz",
 ]
   .flatMap((value) => value.split(","))
   .map((origin) => origin.trim().replace(/\/+$/, ""))
@@ -1813,7 +1811,7 @@ app.get("/{*splat}", (_req, res) => res.sendFile(path.join(publicDir, "index.htm
 
 if (require.main === module) {
   const server = app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Vault server listening on port ${PORT}`);
+    console.log(`Tarnoy server listening on port ${PORT}`);
   });
 
   process.on("SIGTERM", () => {

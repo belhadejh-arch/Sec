@@ -3,7 +3,7 @@
 - [Responsive CSS layering](responsive-css-layering.md) — قواعد responsive المتكررة قد تلغي الإصلاح؛ يجب وضع override النهائي في آخر CSS.
 - [Imported app runtime](imported-app-runtime.md) — تطبيقات Express المستوردة يجب أن تحترم PORT المعطى، وقد يتطلب npm تثبيتاً صريحاً مع registry العام.
 - [Task transaction locking](task-transaction-locking.md) — لا تستخدم pool داخل معاملة تملك قفل المستخدم؛ استخدم نفس client لتجنب انتظار متبادل أثناء إكمال المهام.
-- [هوية Vault الرسمية](vault-brand-logo.md) — وحّد الذهب والأسود وخط Changa في جميع الشاشات، مع إظهار الشعار الشفاف كاملاً.
+- [هوية Tarnoy الرسمية](tarnoy-brand-logo.md) — اعتمد شعار Tarnoy الذهبي الشفاف وخط Changa والنطاق الرسمي tarnoy.xyz.
 - [تتبّع أصول Vercel](static-asset-tracking.md) — صور `attached_assets` قد تعمل محلياً رغم استبعادها من Git؛ تحقق من تتبع كل أصل منشور.
 - [نسخ Neon قبل الحذف](neon-destructive-backups.md) — افحص توافق إصدار `pg_dump` مع Neon وخذ لقطة متسقة خاصة قبل أي حذف إنتاجي.
 - [مسار مخطط Neon](neon-search-path.md) — Neon قد يفتح اتصالاً بـ`search_path` فارغ؛ اضبط `public` لكل اتصال من مجمّع الاتصالات.

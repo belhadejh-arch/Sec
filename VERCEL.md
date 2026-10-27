@@ -1,4 +1,4 @@
-# نشر SECURO على Render وVercel
+# نشر Tarnoy على Render وVercel
 
 تم تجهيز المشروع ليُنشر كخدمتين منفصلتين:
 
@@ -45,14 +45,14 @@ Health Check Path: /api/health
 NODE_ENV=production
 NEON_DATABASE_URL=رابط PostgreSQL الحقيقي
 SESSION_SECRET=قيمة عشوائية طويلة
-FRONTEND_URL=https://sec-rosy.vercel.app
+FRONTEND_URL=https://tarnoy.xyz,https://www.tarnoy.xyz
 COOKIE_SAME_SITE=none
 ```
 
 `SESSION_SECRET` يجب ألا يُحفظ في Git. استخدم قيمة مختلفة للإنتاج.
 يجب إعادة نشر الـBackend على Render بعد تغييرات CORS؛ نشر الواجهة على Vercel
-وحده لا يحدّث قائمة المصادر المسموح بها. تُقبل معاينات Vercel التابعة لمشروع
-Sec ضمن فريق `belhadejh-arch` فقط، ولا يُسمح عموماً بكل نطاقات `vercel.app`.
+وحده لا يحدّث قائمة المصادر المسموح بها. تُقبل معاينات Vercel التابعة للمشروع
+ضمن فريق `belhadejh-arch` فقط، ولا يُسمح عموماً بكل نطاقات `vercel.app`.
 
 ### أوامر Backend المطلوبة
 
@@ -133,7 +133,7 @@ https://sec-5lak.onrender.com
 4. انسخ رابط Render.
 5. استخدم رابط Render الصحيح `https://sec-5lak.onrender.com` في `attached_assets/vercel.json`.
 6. انشر `attached_assets` على Vercel.
-7. اضبط `FRONTEND_URL` في Render على `https://sec-rosy.vercel.app`.
+7. اضبط `FRONTEND_URL` في Render على `https://tarnoy.xyz,https://www.tarnoy.xyz`.
 8. أعد تشغيل Render واختبر تسجيل الدخول.
 
 ## أوامر التحقق

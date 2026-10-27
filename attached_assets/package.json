@@ -1,9 +1,9 @@
 {
-  "name": "securo-frontend",
+  "name": "tarnoy-frontend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "node --check client-api.js && node -e \"const fs=require('fs'); const files=['index.html','client-api.js','1000054548-removebg-preview_1792852307429.png']; for (const file of files) { if (!fs.existsSync(file)) throw new Error(file + ' is missing'); } if (!fs.readFileSync('index.html','utf8').includes('1000054548-removebg-preview_1792852307429.png')) throw new Error('Official Vault logo is not referenced by index.html');\""
+    "build": "node --check client-api.js && node -e \"const fs=require('fs'); const files=['index.html','client-api.js','tarnoy-logo.png']; for (const file of files) { if (!fs.existsSync(file)) throw new Error(file + ' is missing'); } if (!fs.readFileSync('index.html','utf8').includes('tarnoy-logo.png')) throw new Error('Official Tarnoy logo is not referenced by index.html');\""
   },
   "engines": {
     "node": "24.x",
