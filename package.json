@@ -8,7 +8,7 @@
     "start": "node server.js",
     "db:init": "node db-init.js",
     "admin:create": "node create-admin.js",
-    "build": "node --check server.js && node --check api/index.js && node --check attached_assets/client-api.js",
+    "build": "node --check app.js && node --check server.js && node --check api/index.js && node --check attached_assets/client-api.js",
     "test": "npm run build"
   },
   "keywords": [],
@@ -16,8 +16,7 @@
   "license": "ISC",
   "type": "commonjs",
   "engines": {
-    "node": "24.x",
-    "npm": "10.x"
+    "node": ">=22 <25"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
