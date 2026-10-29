@@ -6,7 +6,6 @@
     "build": "node --check client-api.js && node -e \"const fs=require('fs'); const files=['index.html','client-api.js','tarnoy-logo.png']; for (const file of files) { if (!fs.existsSync(file)) throw new Error(file + ' is missing'); } if (!fs.readFileSync('index.html','utf8').includes('tarnoy-logo.png')) throw new Error('Official Tarnoy logo is not referenced by index.html');\""
   },
   "engines": {
-    "node": "24.x",
-    "npm": "10.x"
+    "node": "24.x"
   }
 }

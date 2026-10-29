@@ -83,8 +83,8 @@ Install Command: npm ci
 ```
 
 يجب أن تكون نسخة Node.js للواجهة `24.x` لأن Vercel لم يعد يقبل
-`20.x` للمشاريع الجديدة. الملف `attached_assets/package.json` يحدد ذلك
-تلقائياً، كما يثبت `attached_assets/.node-version` الإصدار `24.14.1`.
+`20.x` للمشاريع الجديدة. الملف `attached_assets/package.json` يحدد ذلك.
+يتضمن مجلد الواجهة `package-lock.json` حتى يعمل أمر `npm ci` المحدد في Vercel.
 
 ### أمر التشغيل في Vercel
 
