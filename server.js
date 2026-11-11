@@ -8,7 +8,16 @@ const helmet = require("helmet");
 const { createHash, randomInt } = require("crypto");
 
 const DATABASE_URL = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
-const SESSION_SECRET = process.env.SESSION_SECRET || "fallback_secret_for_mock";
+const isProduction = process.env.NODE_ENV === "production";
+const SESSION_SECRET =
+  process.env.SESSION_SECRET || (isProduction ? "" : "fallback_secret_for_mock");
+
+if (isProduction && !DATABASE_URL) {
+  throw new Error("NEON_DATABASE_URL or DATABASE_URL must be configured in production");
+}
+if (isProduction && !SESSION_SECRET) {
+  throw new Error("SESSION_SECRET must be configured in production");
+}
 
 let pool;
 try {
@@ -16,7 +25,7 @@ try {
   pool = new Pool({
     connectionString: DATABASE_URL,
     ssl: { rejectUnauthorized: false },
-    max: 10,
+    max: process.env.NETLIFY === "true" ? 1 : 10,
   });
   // Neon may provide an empty search_path; set it before each pooled client
   // serves queries so unqualified application tables resolve in public.
@@ -26,7 +35,12 @@ try {
     });
   });
   pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS can_withdraw BOOLEAN NOT NULL DEFAULT TRUE;`).catch(() => {});
-} catch {
+} catch (error) {
+  if (isProduction) {
+    throw new Error("The PostgreSQL connection pool could not be initialized", {
+      cause: error,
+    });
+  }
   console.warn('DB not connected — mock active');
   pool = {
     query: async () => ({ rows: [], rowCount: 0 }),
@@ -106,7 +120,6 @@ const allowedOrigins = [
   .flatMap((value) => value.split(","))
   .map((origin) => origin.trim().replace(/\/+$/, ""))
   .filter(Boolean);
-const isProduction = process.env.NODE_ENV === "production";
 const cookieSameSite = process.env.COOKIE_SAME_SITE || (isProduction ? "none" : "lax");
 
 app.disable("x-powered-by");
@@ -1803,11 +1816,15 @@ app.post("/api/admin/withdrawals/:id/review", requireAdmin, async (req, res) => 
   }
 });
 
-app.get("/index_1786306377933.html", (_req, res) =>
-  res.sendFile(path.join(publicDir, "index.html")),
-);
-app.use(express.static(publicDir));
-app.get("/{*splat}", (_req, res) => res.sendFile(path.join(publicDir, "index.html")));
+if (process.env.NETLIFY === "true") {
+  app.use((req, res) => appError(res, 404, "المسار غير موجود"));
+} else {
+  app.get("/index_1786306377933.html", (_req, res) =>
+    res.sendFile(path.join(publicDir, "index.html")),
+  );
+  app.use(express.static(publicDir));
+  app.get("/{*splat}", (_req, res) => res.sendFile(path.join(publicDir, "index.html")));
+}
 
 if (require.main === module) {
   const server = app.listen(PORT, "0.0.0.0", () => {

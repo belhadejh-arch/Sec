@@ -1,33 +1,38 @@
-# إعداد نشر Tarnoy على Netlify
+# إعداد نشر Tarnoy بالكامل على Netlify
 
-يستضيف Netlify ملفات الواجهة فقط. يبقى Backend وPostgreSQL والجلسات على Render
-كما هي؛ وتُمرَّر طلبات `/api` من Netlify إلى خدمة Render.
+يستضيف Netlify الواجهة وExpress API عبر Netlify Functions. تبقى قاعدة PostgreSQL
+على Neon، وهي خدمة خارج Netlify؛ بياناتها السرية تُضاف إلى إعدادات Netlify
+لتصل إليها الـFunctions.
 
 ## القيم في إعدادات Netlify
 
 | الخانة | القيمة |
 | --- | --- |
-| Base directory | `attached_assets` |
+| Base directory | اتركها فارغة (جذر المستودع) |
 | Build command | `npm ci --no-audit --no-fund && npm run build` |
-| Publish directory | `.` |
-| Functions directory | اترك القيمة الافتراضية `netlify/functions`؛ لا يستخدم المشروع Netlify Functions |
+| Publish directory | `attached_assets` |
+| Functions directory | `netlify/functions` |
 
 الإعدادات موجودة أيضاً في `netlify.toml`. ملف `attached_assets/_redirects` يمرر
-`/api/*` إلى Backend على Render، ثم يوجّه مسارات الواجهة إلى `index.html`.
+`/api/*` إلى Express Function ثم يوجّه مسارات الواجهة إلى `index.html`.
 
-## بعد إنشاء موقع Netlify
+## متغيرات البيئة على Netlify
 
-1. انسخ عنوان الموقع الذي أعطاه Netlify، مثل `https://اسم-الموقع.netlify.app`.
-2. في إعدادات خدمة Render، اضبط `FRONTEND_URL` على عنوان Netlify، وأضف النطاق
-   المخصص إن استُخدم، مفصولاً بفاصلة. مثال:
+أضف القيم التالية في إعدادات الموقع، من دون وضعها في GitHub:
 
-   ```text
-   https://اسم-الموقع.netlify.app,https://tarnoy.xyz,https://www.tarnoy.xyz
-   ```
+- `NEON_DATABASE_URL` — رابط PostgreSQL الحالي على Neon.
+- `SESSION_SECRET` — قيمة عشوائية طويلة وخاصة بالإنتاج.
+- `NODE_ENV=production`
+- `FRONTEND_URL` — عنوان Netlify، وأضف النطاق المخصص بعد ربطه، مفصولين بفاصلة.
+- `COOKIE_SAME_SITE=none`
 
-3. أعد نشر خدمة Render كي تقبل طلبات الواجهة من نطاق Netlify.
-4. اختبر تسجيل الدخول والتسجيل من موقع Netlify. قاعدة البيانات و`SESSION_SECRET`
-   يبقيان في Render؛ لا تنقلهما إلى إعدادات Netlify.
+بعد إنشاء الموقع استخدم عنوانه الفعلي في `FRONTEND_URL`، مثلاً:
 
-إذا تغير عنوان خدمة Render، عدّل وجهة `/api/*` في `attached_assets/_redirects`
-وأعد نشر الواجهة.
+```text
+https://اسم-الموقع.netlify.app,https://tarnoy.xyz,https://www.tarnoy.xyz
+```
+
+لا حاجة إلى `FRONTEND_URL` خاص بـRender بعد نقل API إلى Netlify. لا توقف خدمة
+Render القديمة حتى تتأكد من عمل التسجيل والدخول وبيانات المستخدمين على Netlify؛
+بعد ذلك يمكن إيقافها. لا تغيّر قاعدة Neon أو تنقلها؛ الـFunction يتصل بقاعدة
+البيانات نفسها.

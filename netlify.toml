@@ -1,7 +1,10 @@
 [build]
-  base = "attached_assets"
   command = "npm ci --no-audit --no-fund && npm run build"
-  publish = "."
+  publish = "attached_assets"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "24"
+
+[functions]
+  node_bundler = "esbuild"

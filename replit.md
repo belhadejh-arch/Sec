@@ -7,58 +7,27 @@ backend exposes the `/api` routes and the static frontend is in `attached_assets
 
 ## Deployment layout
 
-The project is intentionally split into two services:
+The currently requested hosting target is Netlify for both the static frontend
+and Express API. PostgreSQL remains on Neon; Netlify runs the API as a Function.
 
-### Backend — Render Web Service
+### Full-stack Netlify deployment
 
-Create the Render service from the repository root. The checked-in `render.yaml`
-contains the service configuration:
+- Repository root is the Base directory.
+- Build command: `npm ci --no-audit --no-fund && npm run build`
+- Publish directory: `attached_assets`
+- Functions directory: `netlify/functions`
+- `netlify/functions/api.js` wraps the existing Express app for Netlify Functions.
+- `/api/*` is rewritten to that function by `attached_assets/_redirects`.
+- Netlify environment variables must include `NEON_DATABASE_URL`,
+  `SESSION_SECRET`, `NODE_ENV=production`, `FRONTEND_URL` (Netlify/custom origins),
+  and `COOKIE_SAME_SITE=none`.
+- PostgreSQL remains on Neon; it is not migrated into Netlify.
 
-- Build command: `npm install --omit=dev --no-audit --no-fund --registry=https://registry.npmjs.org/ && npm run build`
-- Start command: `npm start`
-- Health check: `/api/health`
-- Runtime: Node.js 24 (`.node-version` / `NODE_VERSION`)
+### Existing Render + Vercel alternative
 
-Required environment variables:
-
-- `NODE_ENV=production`
-- `NEON_DATABASE_URL` — PostgreSQL/Neon connection string
-- `SESSION_SECRET` — long random session secret
-- `FRONTEND_URL` — `https://tarnoy.xyz,https://www.tarnoy.xyz`
-- `COOKIE_SAME_SITE=none`
-
-Run database initialization once before first use:
-
-```bash
-    npm install --omit=dev --registry=https://registry.npmjs.org/
-npm run db:init
-```
-
-### Frontend — Vercel
-
-Create the Vercel project with `attached_assets` as its **Root Directory**.
-The frontend is plain HTML/CSS/JavaScript; there is no Node server to run on
-Vercel.
-
-- Framework preset: Other
-- Build command: `npm run build`
-- Output directory: `.`
-- Install command: `npm install` (automatic)
-- Start command: not applicable — Vercel serves the static files directly
-
-The frontend package has a validation-only build, so no bundling step is needed.
-`attached_assets/vercel.json` forwards `/api/*` to the Render backend and sets
-no-cache headers. The current Render service URL in that file is
-`https://sec-5lak.onrender.com`.
-
-## Deployment order
-
-1. Create the PostgreSQL database and initialize it with `npm run db:init`.
-2. Deploy the repository root to Render and copy the backend URL.
-3. Set the Render `FRONTEND_URL` to `https://tarnoy.xyz,https://www.tarnoy.xyz`.
-4. Replace the backend destination in `attached_assets/vercel.json`.
-5. Deploy `attached_assets` to Vercel.
-6. Confirm `GET https://<render-service>/api/health` returns JSON.
+The project can still run as a Render backend plus Vercel static frontend using
+`render.yaml` and `attached_assets/vercel.json`. This is an alternative; do not
+point the Netlify API rewrite back to Render for the all-in-Netlify setup.
 
 ## Local commands
 
