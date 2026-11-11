@@ -1,0 +1,7 @@
+[build]
+  base = "attached_assets"
+  command = "npm ci --no-audit --no-fund && npm run build"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "24"
