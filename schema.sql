@@ -123,13 +123,38 @@ CREATE TABLE IF NOT EXISTS withdrawal_requests (
   bank VARCHAR(32) NOT NULL,
   account VARCHAR(255) NOT NULL,
   network VARCHAR(16),
-  amount NUMERIC(14, 2) NOT NULL CHECK (amount >= 10),
+  amount NUMERIC(14, 2) NOT NULL CHECK (amount >= 7),
   status VARCHAR(16) NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending', 'accepted', 'rejected')),
   reviewed_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
   reviewed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Update existing installations too: their generated check constraint may
+-- still enforce the former $10 minimum.
+DO $$
+DECLARE
+  constraint_name TEXT;
+BEGIN
+  PERFORM pg_advisory_xact_lock(hashtext('tarnoy-withdrawal-minimum-v1'));
+
+  FOR constraint_name IN
+    SELECT con.conname
+    FROM pg_constraint AS con
+    WHERE con.conrelid = 'public.withdrawal_requests'::regclass
+      AND con.contype = 'c'
+      AND pg_get_constraintdef(con.oid) ILIKE '%amount%'
+  LOOP
+    EXECUTE format(
+      'ALTER TABLE public.withdrawal_requests DROP CONSTRAINT %I',
+      constraint_name
+    );
+  END LOOP;
+
+  ALTER TABLE public.withdrawal_requests
+    ADD CONSTRAINT withdrawal_requests_amount_min_check CHECK (amount >= 7);
+END $$;
 
 ALTER TABLE withdrawal_requests
   ADD COLUMN IF NOT EXISTS network VARCHAR(16);

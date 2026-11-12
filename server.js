@@ -54,6 +54,8 @@ const withdrawalMinimumReady = pool.query(`
   DECLARE
     constraint_name TEXT;
   BEGIN
+    PERFORM pg_advisory_xact_lock(hashtext('tarnoy-withdrawal-minimum-v1'));
+
     FOR constraint_name IN
       SELECT con.conname
       FROM pg_constraint AS con
