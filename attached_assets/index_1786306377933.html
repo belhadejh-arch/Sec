@@ -927,7 +927,7 @@
 
             <div class="withdraw-info-box">
                 <div style="font-weight: bold; color: var(--text-white); margin-bottom: 4px;">📌 شروط وملاحظات السحب:</div>
-                • <strong>الحد الأدنى للسحب:</strong> هو 10 دولارات ($10) بالضبط.<br>
+                • <strong>الحد الأدنى للسحب:</strong> 7 دولارات ($7).<br>
                 • <strong>الحد الأعلى للسحب:</strong> لا يوجد حد أعلى للسحب.<br>
                 • <strong>أيام وأوقات السحب:</strong> متاحة طيلة أيام الأسبوع من الساعة <strong>08:00 صباحاً</strong> إلى غاية الساعة <strong>05:00 مساءً</strong>.
             </div>
@@ -1582,7 +1582,7 @@
         const amount = parseFloat(document.getElementById('deposit-amount').value);
         const txid = document.getElementById('deposit-txid').value.trim();
 
-        if (isNaN(amount) || amount < 10) {
+        if (isNaN(amount) || amount < 7) {
             openLoginErrorModal('⚠️ الحد الأدنى للإيداع هو 10 دولارات ($10) !');
             return;
         }
@@ -1981,8 +1981,8 @@
             return;
         }
 
-        if (isNaN(amount) || amount < 10) {
-            alert('⚠️ الحد الأدنى للسحب هو 10 دولارات ($10) !');
+        if (isNaN(amount) || amount < 7) {
+            alert('⚠️ الحد الأدنى للسحب هو 7 دولارات ($7) !');
             return;
         }
 

@@ -49,6 +49,35 @@ try {
   };
 }
 
+const withdrawalMinimumReady = pool.query(`
+  DO $$
+  DECLARE
+    constraint_name TEXT;
+  BEGIN
+    FOR constraint_name IN
+      SELECT con.conname
+      FROM pg_constraint AS con
+      WHERE con.conrelid = 'public.withdrawal_requests'::regclass
+        AND con.contype = 'c'
+        AND pg_get_constraintdef(con.oid) ILIKE '%amount%'
+    LOOP
+      EXECUTE format(
+        'ALTER TABLE public.withdrawal_requests DROP CONSTRAINT %I',
+        constraint_name
+      );
+    END LOOP;
+
+    ALTER TABLE public.withdrawal_requests
+      ADD CONSTRAINT withdrawal_requests_amount_min_check CHECK (amount >= 7);
+  END $$;
+`).then(
+  () => null,
+  (error) => {
+    console.error("Withdrawal minimum initialization failed:", error.code || error.message);
+    return error;
+  },
+);
+
 const defaultWalletAddresses = {
   TRC20: "TKmr5pbXSEWSQ5EfFTtF5wjZRt4Y4KRKxE",
   BEP20: "",
@@ -1109,6 +1138,10 @@ app.post("/api/deposit-requests", requireUser, async (req, res) => {
 });
 
 app.post("/api/withdrawal-requests", requireUser, async (req, res) => {
+  const withdrawalMinimumError = await withdrawalMinimumReady;
+  if (withdrawalMinimumError) {
+    return appError(res, 503, "تعذر تهيئة حد السحب؛ يرجى المحاولة لاحقاً");
+  }
   const network = String(req.body.network || "").trim();
   const account = String(req.body.account || "").trim();
   const amount = Number(req.body.amount);
