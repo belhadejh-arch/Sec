@@ -1,8 +1,13 @@
 const http = require('http');
 
+const { ADMIN_EMAIL, ADMIN_PASSWORD } = process.env;
+if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+  throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD are required");
+}
+
 const data = JSON.stringify({
-  email: 'admin@securo.com',
-  password: 'adminpassword123'
+  email: ADMIN_EMAIL,
+  password: ADMIN_PASSWORD
 });
 
 const options = {

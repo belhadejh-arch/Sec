@@ -5,6 +5,7 @@
 
 [build.environment]
   NODE_VERSION = "24"
+  SECRETS_SCAN_OMIT_KEYS = "NODE_ENV"
 
 [functions]
   node_bundler = "esbuild"
